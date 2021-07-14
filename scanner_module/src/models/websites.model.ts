@@ -1,7 +1,8 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { Website } from '@interfaces/websites.interface';
+import { WebsiteStateModel } from '@models/website_status.model';
 
-export type WebsiteCreationAttributes = Optional<Website, 'id' | 'name' | 'url' | 'is_active'>;
+export type WebsiteCreationAttributes = Optional<Website, 'id'>;
 
 export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> implements Website {
   public id: number;
@@ -37,6 +38,17 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
       sequelize,
     },
   );
+
+  WebsiteModel.hasMany(WebsiteStateModel, {
+    sourceKey: 'id',
+    foreignKey: 'website_id',
+    as: 'website_state',
+  });
+
+  WebsiteStateModel.belongsTo(WebsiteModel, {
+    foreignKey: 'website_id',
+    as: 'website',
+  });
 
   return WebsiteModel;
 }

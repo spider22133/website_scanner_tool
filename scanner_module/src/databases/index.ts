@@ -1,12 +1,13 @@
 import config from 'config';
-import Sequelize from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { dbConfig } from '@interfaces/db.interface';
 import UserModel from '@models/users.model';
 import WebsiteModel from '@models/websites.model';
+import WebsiteStateModel from '@models/website_status.model';
 import { logger } from '@utils/logger';
 
 const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');
-const sequelize = new Sequelize.Sequelize(database, user, password, {
+const sequelize = new Sequelize(database, user, password, {
   host: host,
   dialect: 'mysql',
   timezone: '+09:00',
@@ -30,8 +31,9 @@ const sequelize = new Sequelize.Sequelize(database, user, password, {
 sequelize.authenticate();
 
 const DB = {
-  Users: UserModel(sequelize),
+  WebsiteStates: WebsiteStateModel(sequelize),
   Websites: WebsiteModel(sequelize),
+  Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
 };
