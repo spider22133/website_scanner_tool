@@ -38,5 +38,4 @@ const DB = {
   Sequelize, // library
 };
 
-
 export default DB;
