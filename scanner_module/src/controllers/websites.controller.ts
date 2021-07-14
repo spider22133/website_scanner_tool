@@ -14,6 +14,11 @@ class WebsitesController {
       next(error);
     }
   };
+
+  public updateWebsite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+    } catch (error) {}
+  };
 }
 
 export default WebsitesController;

@@ -2,7 +2,7 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { Website } from '@interfaces/websites.interface';
 import { WebsiteStateModel } from '@models/website_status.model';
 
-export type WebsiteCreationAttributes = Optional<Website, 'id'>;
+export type WebsiteCreationAttributes = Optional<Website, 'id' | 'is_active' | 'name' | 'url'>;
 
 export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> implements Website {
   public id: number;
@@ -11,6 +11,7 @@ export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> impl
   public is_active: boolean;
 
   public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 export default function (sequelize: Sequelize): typeof WebsiteModel {
