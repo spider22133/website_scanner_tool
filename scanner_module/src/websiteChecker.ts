@@ -1,22 +1,28 @@
 import websiteService from '@services/websites.service';
+import websiteStatesService from '@services/website_states.service';
 import { Website } from '@interfaces/websites.interface';
 import fetch from 'node-fetch';
 import { CreateWebsiteDto } from '@dtos/website.dto';
 
 class WebsiteChecker {
   public websiteService = new websiteService();
+  public websiteStatesService = new websiteStatesService();
 
   public async checkWebsites() {
     try {
       const findAllWebsitesData: Website[] = await this.websiteService.findAllWebsites();
 
-      for (const data of findAllWebsitesData) {
-        const status = await this.checkWebsiteStatus(data.url);
-        const dataToUpdate: CreateWebsiteDto = { name: data.name, url: data.url, is_active: true };
+      for (const website of findAllWebsitesData) {
+        const start = new Date().getTime();
+        const status = await this.checkWebsiteStatus(website.url);
+        const end = new Date().getTime() - start;
+        const websiteToUpdate: CreateWebsiteDto = { name: website.name, url: website.url, is_active: true };
 
-        if (status === 200) {
-          await this.websiteService.updateWebsite(data.id, dataToUpdate);
+        if (status !== 200) {
         }
+
+        await this.websiteService.updateWebsite(website.id, websiteToUpdate);
+        await this.websiteStatesService.createWebsiteState(website.id, end, status);
       }
     } catch (error) {
       console.log(error);

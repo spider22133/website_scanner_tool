@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize';
 import { dbConfig } from '@interfaces/db.interface';
 import UserModel from '@models/users.model';
 import WebsiteModel from '@models/websites.model';
-import WebsiteStateModel from '@models/website_status.model';
+import WebsiteStateModel from '@/models/website_states.model';
 import { logger } from '@utils/logger';
 
 const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');

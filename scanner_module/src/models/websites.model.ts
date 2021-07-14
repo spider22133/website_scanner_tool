@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { Website } from '@interfaces/websites.interface';
-import { WebsiteStateModel } from '@models/website_status.model';
+import { WebsiteStateModel } from '@/models/website_states.model';
 
 export type WebsiteCreationAttributes = Optional<Website, 'id' | 'is_active' | 'name' | 'url'>;
 
