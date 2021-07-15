@@ -17,7 +17,7 @@ class UserService {
     if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
 
     const findUser: User = await this.users.findByPk(userId);
-    if (!findUser) throw new HttpException(409, "You're not user");
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;
   }

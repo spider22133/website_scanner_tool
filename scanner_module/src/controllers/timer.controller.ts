@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { Timer } from '@interfaces/timer.interface';
 import WebsiteChecker from 'websiteChecker';
 
-class TimerController implements Timer {
+class TimerController {
   private _interval = 3600000;
   public timer: NodeJS.Timer;
   public worker: WebsiteChecker;

@@ -1,6 +1,9 @@
+swagger: '2.0'
 tags:
 - name: users
   description: users API
+- name: websites
+  description: websites API
 
 paths:
 # [GET] users
@@ -120,7 +123,23 @@ definitions:
       password:
         type: string
         description: user Password
-
+  websites:
+    type: object
+    required:
+        - url
+        - name
+    properties:
+      id:
+        type: integer
+        description: website Id
+      name:
+        type: string
+        description: website Name
+      url:
+        type: string
+        description: website Url
+      is_active: 
+        type: boolean
 schemes:
  - https
  - http
