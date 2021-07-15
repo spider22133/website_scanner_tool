@@ -13,15 +13,6 @@ class WebsiteStatesController {
       next(error);
     }
   };
-
-  // public createWebsiteState = async (website_id: number, answer_time: number, answer_code: number) => {
-  //   try {
-  //     const createWebsiteStateData: WebsiteState = await this.websiteStatesService.createWebsiteState(website_id, answer_time, answer_code);
-  //     console.log(createWebsiteStateData.id);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 }
 
 export default WebsiteStatesController;

@@ -8,7 +8,7 @@ class WebsiteChecker {
   public websiteService = new websiteService();
   public websiteStatesService = new websiteStatesService();
 
-  public async checkWebsites() {
+  public async checkWebsites(): Promise<void> {
     try {
       const findAllWebsitesData: Website[] = await this.websiteService.findAllWebsites();
 
@@ -18,18 +18,17 @@ class WebsiteChecker {
         const end = new Date().getTime() - start;
         const websiteToUpdate: CreateWebsiteDto = { name: website.name, url: website.url, is_active: true };
 
-        if (status !== 200) {
+        if (status === 200) {
+          await this.websiteService.updateWebsite(website.id, websiteToUpdate);
+          await this.websiteStatesService.createWebsiteState(website.id, end, status);
         }
-
-        await this.websiteService.updateWebsite(website.id, websiteToUpdate);
-        await this.websiteStatesService.createWebsiteState(website.id, end, status);
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  public checkWebsiteStatus(url: string): Promise<number> {
+  private checkWebsiteStatus(url: string): Promise<number> {
     return fetch(url).then(res => res.status);
   }
 }
