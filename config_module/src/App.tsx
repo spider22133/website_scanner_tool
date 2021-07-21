@@ -12,7 +12,7 @@ function App() {
       <Header />
       <div className="container-fluid">
         <Switch>
-          <Route exact path="" component={WebsitesList} />
+          <Route exact path={["/","/websites"]} component={WebsitesList} />
           {/* <Route exact path="" component=""/>
           <Route exact path="" component=""/> */}
         </Switch>
