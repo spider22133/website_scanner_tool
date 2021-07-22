@@ -14,7 +14,7 @@ function App() {
         <Switch>
           <Route exact path={['/', '/websites']} component={WebsitesList} />
           {/* <Route exact path="" component=""/>
-          <Route exact path="" component=""/> */}
+          <Route path="" component=""/> */}
         </Switch>
       </div>
     </>
