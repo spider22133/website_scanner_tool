@@ -1,5 +1,7 @@
 import WebsitesListItem from './webseites-list-item.component';
-import CurrentWebsite from './/current-website.component';
+import CurrentWebsite from './current-website.component';
+import StatesDataService from '../services/states.service';
+import StatesTable from './states-table.component';
 import WebsiteDataService from '../services/website.service';
 import { useEffect, useState } from 'react';
 import IWebsite from '../interfaces/website.interface';
@@ -19,9 +21,16 @@ export default function WebsitesList() {
     });
   };
 
-  const setActiveTutorial = (website: IWebsite, index: number) => {
+  const getStatesByWebsiteId = (id: number) => {
+    StatesDataService.getByWebsiteId(id).then(response => {
+      console.log(response.data.data);
+    });
+  };
+
+  const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
     setCurrentWebsite(website);
+    getStatesByWebsiteId(website.id);
   };
 
   return (
@@ -32,7 +41,7 @@ export default function WebsitesList() {
           <ul className="list-group">
             {websites &&
               websites.map((website: IWebsite, index) => (
-                <WebsitesListItem setActiveTutorial={setActiveTutorial} key={index} index={index} currentIndex={currentIndex} website={website} />
+                <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
               ))}
           </ul>
         </div>
@@ -40,9 +49,18 @@ export default function WebsitesList() {
           <CurrentWebsite website={currentWebsite} />
         </div>
       </div>
-      <div className="row mt">
-        <div className="col-12"></div>
-        <h2>Checks list</h2>
+      <div className="row mt-5">
+        <div className="col-12">
+          <h2>Checks list</h2>
+          {currentWebsite ? (
+            <StatesTable websiteId={currentWebsite.id} />
+          ) : (
+            <div>
+              <br />
+              <p>Please choose a Website...</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

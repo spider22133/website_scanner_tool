@@ -13,6 +13,7 @@ class WebsiteStatesRoute implements Route {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, this.websiteStatesController.getWebsiteStates);
+    this.router.get(`${this.path}/website/:id(\\d+)`, this.websiteStatesController.getWebsiteStatesByWebsiteId);
   }
 }
 

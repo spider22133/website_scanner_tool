@@ -4,15 +4,15 @@ type ItemProps = {
   index: number;
   website: IWebsite;
   currentIndex: number;
-  setActiveTutorial: SetActiveTutorial;
+  setActiveWebsite: SetActiveTutorial;
 };
 
 type SetActiveTutorial = (website: IWebsite, index: number) => void;
 
-export default function WebsitesListItem({ website, index, currentIndex, setActiveTutorial }: ItemProps) {
+export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: ItemProps) {
   return (
     <>
-      <li className={`list-group-item ${index === currentIndex ? 'active' : ''}`} onClick={() => setActiveTutorial(website, index)}>
+      <li className={`list-group-item ${index === currentIndex ? 'active' : ''}`} onClick={() => setActiveWebsite(website, index)}>
         {website.name}
       </li>
     </>
