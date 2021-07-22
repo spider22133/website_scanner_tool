@@ -1,11 +1,11 @@
-import http from "../http-connection";
+import http from '../http-connection';
 
 const getAll = () => {
-    return http.get("/websites");
+  return http.get('/websites');
 };
 
 const WebsiteDataService = {
-    getAll
-}
+  getAll,
+};
 
 export default WebsiteDataService;
