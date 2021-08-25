@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { Switch, Route } from 'react-router-dom';
 import Header from './components/layout/header.component';
-import WebsitesList from './components/websites-list';
+import WebsitesList from './components/websites-page';
 
 import 'bootstrap/dist/css/bootstrap.css';
 

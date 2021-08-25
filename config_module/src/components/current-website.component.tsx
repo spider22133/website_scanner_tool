@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import IWebsite from '../interfaces/website.interface';
-type CurrentWebsiteProps = {
+type Props = {
   website: IWebsite | null;
 };
 
-export default function currentWebsite({ website }: CurrentWebsiteProps) {
+export default function currentWebsite({ website }: Props) {
   return (
     <>
       {website ? (

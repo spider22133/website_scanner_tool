@@ -1,10 +1,33 @@
-import StatesDataService from '../services/states.service';
-import { useEffect, useState } from 'react';
+import IState from '../interfaces/website-state.interface';
 
-type StatesTableProps = {
-  websiteId: number;
+type Props = {
+  states: IState[];
 };
 
-export default function StatesTable({ websiteId }: StatesTableProps) {
-  return <></>;
+export default function StatesTable({ states }: Props) {
+  return (
+    <>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Website id</th>
+            <th>Answer code</th>
+            <th>Answer time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {states &&
+            states.map((state: IState, index) => (
+              <tr key={index}>
+                <td>{state.id}</td>
+                <td>{state.website_id}</td>
+                <td>{state.answer_code}</td>
+                <td>{state.answer_time}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </>
+  );
 }

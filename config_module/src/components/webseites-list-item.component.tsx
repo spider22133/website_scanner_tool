@@ -1,6 +1,6 @@
 import IWebsite from '../interfaces/website.interface';
 
-type ItemProps = {
+type Props = {
   index: number;
   website: IWebsite;
   currentIndex: number;
@@ -9,7 +9,7 @@ type ItemProps = {
 
 type SetActiveTutorial = (website: IWebsite, index: number) => void;
 
-export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: ItemProps) {
+export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: Props) {
   return (
     <>
       <li className={`list-group-item ${index === currentIndex ? 'active' : ''}`} onClick={() => setActiveWebsite(website, index)}>

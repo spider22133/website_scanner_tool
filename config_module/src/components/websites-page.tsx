@@ -3,17 +3,23 @@ import CurrentWebsite from './current-website.component';
 import StatesDataService from '../services/states.service';
 import StatesTable from './states-table.component';
 import WebsiteDataService from '../services/website.service';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import IWebsite from '../interfaces/website.interface';
+import IState from '../interfaces/website-state.interface';
+import PaginationContainer from '../components/elements/pagination-container.component';
 
 export default function WebsitesList() {
-  const [websites, setWebsites] = useState([]);
+  const [websites, setWebsites] = useState<IWebsite[]>([]);
+  const [states, setWebsiteStates] = useState<IState[]>([]);
+  const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [currentWebsite, setCurrentWebsite] = useState<IWebsite | null>(null);
 
   useEffect(() => {
     getWebsites();
   }, []);
+
+  //  useLayoutEffect(() => getStatesByWebsiteId(websites[0].id));
 
   const getWebsites = () => {
     WebsiteDataService.getAll().then(response => {
@@ -23,8 +29,13 @@ export default function WebsitesList() {
 
   const getStatesByWebsiteId = (id: number) => {
     StatesDataService.getByWebsiteId(id).then(response => {
-      console.log(response.data.data);
+      setWebsiteStates(response.data.data);
     });
+  };
+
+  const onPageChange = (page: number, itemsPerPage: number) => {
+    const startItem = (page - 1) * itemsPerPage;
+    const endItem = page * itemsPerPage;
   };
 
   const setActiveWebsite = (website: IWebsite, index: number) => {
@@ -52,14 +63,8 @@ export default function WebsitesList() {
       <div className="row mt-5">
         <div className="col-12">
           <h2>Checks list</h2>
-          {currentWebsite ? (
-            <StatesTable websiteId={currentWebsite.id} />
-          ) : (
-            <div>
-              <br />
-              <p>Please choose a Website...</p>
-            </div>
-          )}
+          <StatesTable states={states} />
+          <div className="pagination">{states.length > 0 ? <PaginationContainer totalItems={states.length} pageChange={onPageChange} /> : ''}</div>
         </div>
       </div>
     </div>
