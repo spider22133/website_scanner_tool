@@ -1,12 +1,12 @@
 import WebsitesListItem from './webseites-list-item.component';
-import CurrentWebsite from './current-website.component';
+import WebsiteInfo from './website-info.component';
 import StatesDataService from '../services/states.service';
 import StatesTable from './states-table.component';
 import WebsiteDataService from '../services/website.service';
 import { useEffect, useState } from 'react';
 import IWebsite from '../interfaces/website.interface';
 import IState from '../interfaces/website-state.interface';
-import PaginationContainer from '../components/elements/pagination-container.component';
+import PaginationContainer from './elements/pagination-container.component';
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -59,7 +59,8 @@ export default function WebsitesList() {
       <div className="row">
         {' '}
         <div className="col-4">
-          <ul className="list-group">
+          <WebsiteInfo website={currentWebsite ? currentWebsite : websites[0]} />
+          <ul className="list-group mt-4">
             {websites &&
               websites.map((website: IWebsite, index) => (
                 <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
@@ -67,11 +68,6 @@ export default function WebsitesList() {
           </ul>
         </div>
         <div className="col-8">
-          <CurrentWebsite website={currentWebsite ? currentWebsite : websites[0]} />
-        </div>
-      </div>
-      <div className="row mt-5">
-        <div className="col-12">
           <h2>Checks list</h2>
           <StatesTable states={displayedStates} />
           <div className="pagination">

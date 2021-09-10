@@ -4,7 +4,7 @@ type Props = {
   website: IWebsite | null;
 };
 
-export default function currentWebsite({ website }: Props) {
+export default function WebsiteInfo({ website }: Props) {
   return (
     <>
       {website ? (
