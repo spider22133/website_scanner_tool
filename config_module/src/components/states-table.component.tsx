@@ -23,7 +23,7 @@ export default function StatesTable({ states }: Props) {
                 <td>{state.id}</td>
                 <td>{state.website_id}</td>
                 <td>{state.answer_code}</td>
-                <td>{state.answer_time}</td>
+                <td>{state.answer_time} ms</td>
               </tr>
             ))}
         </tbody>

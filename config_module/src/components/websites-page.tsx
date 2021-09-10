@@ -3,7 +3,7 @@ import CurrentWebsite from './current-website.component';
 import StatesDataService from '../services/states.service';
 import StatesTable from './states-table.component';
 import WebsiteDataService from '../services/website.service';
-import { useEffect, useState, useLayoutEffect } from 'react';
+import { useEffect, useState } from 'react';
 import IWebsite from '../interfaces/website.interface';
 import IState from '../interfaces/website-state.interface';
 import PaginationContainer from '../components/elements/pagination-container.component';
@@ -12,14 +12,22 @@ export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
   const [states, setWebsiteStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [currentWebsite, setCurrentWebsite] = useState<IWebsite | null>(null);
+  const itemsPerPage = 15;
 
   useEffect(() => {
     getWebsites();
+  }, [websites.length]);
+
+  useEffect(() => {
+    getStatesByWebsiteId(1);
   }, []);
 
-  //  useLayoutEffect(() => getStatesByWebsiteId(websites[0].id));
+  useEffect(() => {
+    onPageChange();
+  }, [states]);
 
   const getWebsites = () => {
     WebsiteDataService.getAll().then(response => {
@@ -33,15 +41,17 @@ export default function WebsitesList() {
     });
   };
 
-  const onPageChange = (page: number, itemsPerPage: number) => {
+  const onPageChange = (page = 1) => {
     const startItem = (page - 1) * itemsPerPage;
     const endItem = page * itemsPerPage;
+    setDisplayedStates(states.slice(startItem, endItem));
   };
 
   const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
     setCurrentWebsite(website);
     getStatesByWebsiteId(website.id);
+    setCurrentPage(1);
   };
 
   return (
@@ -57,14 +67,26 @@ export default function WebsitesList() {
           </ul>
         </div>
         <div className="col-8">
-          <CurrentWebsite website={currentWebsite} />
+          <CurrentWebsite website={currentWebsite ? currentWebsite : websites[0]} />
         </div>
       </div>
       <div className="row mt-5">
         <div className="col-12">
           <h2>Checks list</h2>
-          <StatesTable states={states} />
-          <div className="pagination">{states.length > 0 ? <PaginationContainer totalItems={states.length} pageChange={onPageChange} /> : ''}</div>
+          <StatesTable states={displayedStates} />
+          <div className="pagination">
+            {states.length > 0 ? (
+              <PaginationContainer
+                totalItems={states.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                pageChange={onPageChange}
+                setCurrentPage={setCurrentPage}
+              />
+            ) : (
+              ''
+            )}
+          </div>
         </div>
       </div>
     </div>
