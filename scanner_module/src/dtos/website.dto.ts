@@ -1,6 +1,6 @@
 import { IsString, IsBoolean } from 'class-validator';
 
-export class CreateWebsiteDto {
+export default class CreateWebsiteDto {
   @IsString()
   public name: string;
 

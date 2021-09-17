@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Website } from '@interfaces/websites.interface';
 import websiteService from '@services/websites.service';
+import CreateWebsiteDto from '@dtos/website.dto';
 
 class WebsitesController {
   public websiteService = new websiteService();
@@ -15,9 +16,33 @@ class WebsitesController {
     }
   };
 
+  public getWebsiteById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = Number(req.params.id);
+      const findOne: Website = await this.websiteService.findWebsiteById(websiteId);
+
+      res.status(200).json({ data: findOne, message: 'findOne' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public updateWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public createWebsite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteData: CreateWebsiteDto = req.body;
+      const createWebsiteData: Website = await this.websiteService.createWebsite(websiteData);
+
+      res.status(201).json({ data: createWebsiteData, message: 'created' });
+    } catch (error) {
+      next(error);
+    }
   };
 }
 

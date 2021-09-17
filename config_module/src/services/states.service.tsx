@@ -4,13 +4,13 @@ const getAll = () => {
   return http.get('/website-states');
 };
 
-const getByWebsiteId = (id: number) => {
+const getStatesByWebsiteId = (id: number | undefined) => {
   return http.get(`/website-states/website/${id}`);
 };
 
 const StatesDataService = {
   getAll,
-  getByWebsiteId,
+  getStatesByWebsiteId,
 };
 
 export default StatesDataService;

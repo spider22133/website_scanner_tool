@@ -35,8 +35,8 @@ export default function WebsitesList() {
     });
   };
 
-  const getStatesByWebsiteId = (id: number) => {
-    StatesDataService.getByWebsiteId(id).then(response => {
+  const getStatesByWebsiteId = (id: number | undefined) => {
+    StatesDataService.getStatesByWebsiteId(id).then(response => {
       setWebsiteStates(response.data.data);
     });
   };
