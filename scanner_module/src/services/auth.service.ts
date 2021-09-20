@@ -48,9 +48,9 @@ class AuthService {
   }
 
   public createToken(user: User): TokenData {
-    const dataStoredInToken: DataStoredInToken = { id: user.id };
+    const dataStoredInToken: DataStoredInToken = { id: user.id, email: user.email };
     const secretKey: string = config.get('secretKey');
-    const expiresIn: number = 60 * 60;
+    const expiresIn: number = 60 * 60 * 24; // expires in 24 hours
 
     return { expiresIn, token: jwt.sign(dataStoredInToken, secretKey, { expiresIn }) };
   }
