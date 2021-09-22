@@ -1,12 +1,12 @@
 import WebsitesListItem from './webseites-list-item.component';
 import WebsiteInfo from './website-info.component';
-import StatesDataService from '../services/states.service';
+import StatesDataService from '../../services/states.service';
 import StatesTable from './states-table.component';
-import WebsiteDataService from '../services/website.service';
+import WebsiteDataService from '../../services/website.service';
 import { useEffect, useState } from 'react';
-import IWebsite from '../interfaces/website.interface';
-import IState from '../interfaces/website-state.interface';
-import PaginationContainer from './elements/pagination-container.component';
+import IWebsite from '../../interfaces/website.interface';
+import IState from '../../interfaces/website-state.interface';
+import PaginationContainer from './../elements/pagination-container.component';
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -55,33 +55,35 @@ export default function WebsitesList() {
   };
 
   return (
-    <div className="my-4">
-      <div className="row">
-        {' '}
-        <div className="col-4">
-          <WebsiteInfo website={currentWebsite ? currentWebsite : websites[0]} />
-          <ul className="list-group mt-4">
-            {websites &&
-              websites.map((website: IWebsite, index) => (
-                <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
-              ))}
-          </ul>
-        </div>
-        <div className="col-8">
-          <h2>Checks list</h2>
-          <StatesTable states={displayedStates} />
-          <div className="pagination">
-            {states.length > 0 ? (
-              <PaginationContainer
-                totalItems={states.length}
-                itemsPerPage={itemsPerPage}
-                currentPage={currentPage}
-                pageChange={onPageChange}
-                setCurrentPage={setCurrentPage}
-              />
-            ) : (
-              ''
-            )}
+    <div className="container">
+      <div className="my-4">
+        <div className="row">
+          {' '}
+          <div className="col-4">
+            <WebsiteInfo website={currentWebsite ? currentWebsite : websites[0]} />
+            <ul className="list-group mt-4">
+              {websites &&
+                websites.map((website: IWebsite, index) => (
+                  <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
+                ))}
+            </ul>
+          </div>
+          <div className="col-8">
+            <h2>Checks list</h2>
+            <StatesTable states={displayedStates} />
+            <div className="pagination">
+              {states.length > 0 ? (
+                <PaginationContainer
+                  totalItems={states.length}
+                  itemsPerPage={itemsPerPage}
+                  currentPage={currentPage}
+                  pageChange={onPageChange}
+                  setCurrentPage={setCurrentPage}
+                />
+              ) : (
+                ''
+              )}
+            </div>
           </div>
         </div>
       </div>

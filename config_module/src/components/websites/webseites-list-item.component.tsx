@@ -1,4 +1,4 @@
-import IWebsite from '../interfaces/website.interface';
+import IWebsite from '../../interfaces/website.interface';
 
 type Props = {
   index: number;

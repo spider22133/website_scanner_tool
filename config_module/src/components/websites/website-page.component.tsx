@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import IWebsite from '../interfaces/website.interface';
-import WebsiteDataService from '../services/website.service';
+import IWebsite from '../../interfaces/website.interface';
+import WebsiteDataService from '../../services/website.service';
 
 export default function WebsitePage() {
   const { id } = useParams<{ id: string }>();

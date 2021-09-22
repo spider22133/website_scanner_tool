@@ -13,7 +13,6 @@ import DB from '@databases';
 import Routes from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
-import authMiddleware from './middlewares/auth.middleware';
 
 class App {
   public app: express.Application;
@@ -67,7 +66,7 @@ class App {
   }
 
   private initializeRoutes(routes: Routes[]) {
-    this.app.use(authMiddleware);
+    //this.app.use(authMiddleware);
     routes.forEach(route => {
       this.app.use('/', route.router);
     });

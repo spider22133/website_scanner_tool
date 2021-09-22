@@ -1,4 +1,4 @@
-import IState from '../interfaces/website-state.interface';
+import IState from '../../interfaces/website-state.interface';
 
 type Props = {
   states: IState[];

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import IWebsite from '../interfaces/website.interface';
+import IWebsite from '../../interfaces/website.interface';
 type Props = {
   website: IWebsite | null;
 };
