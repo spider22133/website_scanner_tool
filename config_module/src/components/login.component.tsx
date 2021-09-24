@@ -1,21 +1,18 @@
 import { useInput } from '../helpers/form-input.helper';
 import React, { useState } from 'react';
 import AuthService from '../services/auth.service';
-import { History } from 'history';
+import { useHistory } from 'react-router-dom';
 import { setUserSession } from '../helpers/session.helper';
-import IUser from './../interfaces/user.interface';
 import { useAuth } from '../contexts/auth.context';
 
-type Props = {
-  history: History;
-};
-
-export default function LogIn({ history }: Props) {
+export default function LogIn() {
   const [email, setEmail] = useInput('');
   const [password, setPassword] = useInput('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const { setCurrentUser } = useAuth();
+  const history = useHistory();
 
   const handleLogin = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();

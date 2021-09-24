@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import IUser from './../interfaces/user.interface';
-import { getUser } from './../helpers/session.helper';
+import { getUser, removeUserSession } from './../helpers/session.helper';
+import { useHistory } from 'react-router-dom';
 
 type ContextType = {
   user: IUser | null;
@@ -16,11 +17,12 @@ const AuthContext = createContext<ContextType>({
   unsetCurrentUser: () => ({}),
 });
 
-export const useAuth = () => useContext(AuthContext);
+const useAuth = () => useContext(AuthContext);
 
-export const AuthContextProvider: React.FC = ({ children }) => {
+const AuthContextProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const history = useHistory();
 
   useEffect(() => {
     const token = getUser();
@@ -37,6 +39,8 @@ export const AuthContextProvider: React.FC = ({ children }) => {
 
   const unsetCurrentUser = () => {
     setUser(null);
+    removeUserSession();
+    history.push('/login');
   };
 
   const contextValue = {
@@ -48,3 +52,5 @@ export const AuthContextProvider: React.FC = ({ children }) => {
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
+
+export { useAuth, AuthContextProvider };
