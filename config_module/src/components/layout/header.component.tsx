@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/auth.context';
+import { userIsLogged } from '../../helpers/session.helper';
 
 export default function Header() {
+  const { user } = useAuth();
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
@@ -20,14 +23,26 @@ export default function Header() {
               </Link>
             </li>
           </ul>
-          <div>
-            <Link className="btn btn-outline-success" to="/login">
-              Login
-            </Link>
-            <Link className="btn btn-outline" to="/signup">
-              Signup
-            </Link>
-          </div>
+
+          {userIsLogged() ? (
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <div className="nav-link">Hello, {user ? user.email : ''}</div>
+              </li>
+              <li className="nav-item">
+                <button className="btn btn-outline-danger">Logout</button>
+              </li>
+            </ul>
+          ) : (
+            <div>
+              <Link className="btn btn-outline-success" to="/login">
+                Login
+              </Link>
+              <Link className="btn btn-outline" to="/signup">
+                Signup
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </nav>

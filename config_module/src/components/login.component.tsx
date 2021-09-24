@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import AuthService from '../services/auth.service';
 import { History } from 'history';
 import { setUserSession } from '../helpers/session.helper';
+import IUser from './../interfaces/user.interface';
+import { useAuth } from '../contexts/auth.context';
 
 type Props = {
   history: History;
@@ -11,7 +13,9 @@ type Props = {
 export default function LogIn({ history }: Props) {
   const [email, setEmail] = useInput('');
   const [password, setPassword] = useInput('');
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { setCurrentUser } = useAuth();
 
   const handleLogin = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -19,8 +23,10 @@ export default function LogIn({ history }: Props) {
 
     AuthService.login({ email, password })
       .then(response => {
-        console.log(response.data);
         setLoading(false);
+        setCurrentUser(response.data.user);
+        setUserSession(response.data.token, response.data.user);
+
         history.push('/websites');
       })
       .catch(error => {
