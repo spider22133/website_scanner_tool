@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/auth.context';
 export default function LogIn() {
   const [email, setEmail] = useInput('');
   const [password, setPassword] = useInput('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { setCurrentUser } = useAuth();
@@ -26,9 +26,9 @@ export default function LogIn() {
 
         history.push('/websites');
       })
-      .catch(error => {
+      .catch(err => {
         setLoading(false);
-        console.log(error);
+        setError(err.message);
       });
   };
 
@@ -59,7 +59,17 @@ export default function LogIn() {
                 <p className="text-center m-0">
                   No account yet, <a href="#">Please Signup</a>
                 </p>
+                <p className="text-center m-0 pt-3">
+                  {error && (
+                    <>
+                      <small style={{ color: 'red' }}>{error}</small>
+                      <br />
+                    </>
+                  )}
+                </p>
               </form>
+
+              <br />
             </div>
           </div>
         </div>
