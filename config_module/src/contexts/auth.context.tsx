@@ -43,14 +43,7 @@ const AuthContextProvider: React.FC = ({ children }) => {
     history.push('/login');
   };
 
-  const contextValue = {
-    user,
-    loadingUser,
-    setCurrentUser,
-    unsetCurrentUser,
-  };
-
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loadingUser, setCurrentUser, unsetCurrentUser }}>{children}</AuthContext.Provider>;
 };
 
 export { useAuth, AuthContextProvider };
