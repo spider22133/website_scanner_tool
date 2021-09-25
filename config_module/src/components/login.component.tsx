@@ -4,6 +4,7 @@ import AuthService from '../services/auth.service';
 import { useHistory } from 'react-router-dom';
 import { setUserSession } from '../helpers/session.helper';
 import { useAuth } from '../contexts/auth.context';
+import { AxiosError } from 'axios';
 
 export default function LogIn() {
   const [email, setEmail] = useInput('');
@@ -26,9 +27,9 @@ export default function LogIn() {
 
         history.push('/websites');
       })
-      .catch(err => {
+      .catch((error: AxiosError) => {
         setLoading(false);
-        setError(err.message);
+        setError(error.response?.data.message);
       });
   };
 
