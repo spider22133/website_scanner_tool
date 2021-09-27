@@ -1,9 +1,9 @@
-import { useInput } from '../helpers/form-input.helper';
+import { useInput } from '../../helpers/form-input.helper';
 import React, { useState } from 'react';
-import AuthService from '../services/auth.service';
+import AuthService from '../../services/auth.service';
 import { useHistory } from 'react-router-dom';
-import { setUserSession } from '../helpers/session.helper';
-import { useAuth } from '../contexts/auth.context';
+import { setUserSession } from '../../helpers/session.helper';
+import { useAuth } from '../../contexts/auth.context';
 import { AxiosError } from 'axios';
 
 export default function LogIn() {
@@ -58,7 +58,7 @@ export default function LogIn() {
                   {loading ? 'Loading...' : 'Login'}
                 </button>
                 <p className="text-center m-0">
-                  No account yet, <a href="#">Please Signup</a>
+                  No account yet, <a href="/signup">Please Signup</a>
                 </p>
                 <p className="text-center m-0 pt-3">
                   {error && (
