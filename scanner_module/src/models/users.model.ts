@@ -5,6 +5,8 @@ export type UserCreationAttributes = Optional<User, 'id' | 'email' | 'password'>
 
 export class UserModel extends Model<User, UserCreationAttributes> implements User {
   public id: number;
+  public firstName: string;
+  public lastName: string;
   public email: string;
   public password: string;
 
@@ -19,6 +21,14 @@ export default function (sequelize: Sequelize): typeof UserModel {
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
+      },
+      firstName: {
+        allowNull: false,
+        type: DataTypes.STRING(255),
+      },
+      lastName: {
+        allowNull: false,
+        type: DataTypes.STRING(255),
       },
       email: {
         allowNull: false,

@@ -7,8 +7,8 @@ import { useAuth } from '../../contexts/auth.context';
 import { AxiosError } from 'axios';
 
 export default function SignUp() {
-  const [firstname, setFirstname] = useInput('');
-  const [lastname, setLastname] = useInput('');
+  const [firstName, setFirstname] = useInput('');
+  const [lastName, setLastname] = useInput('');
   const [email, setEmail] = useInput('');
   const [password, setPassword] = useInput('');
   const [error, setError] = useState('');
@@ -17,17 +17,14 @@ export default function SignUp() {
   const { setCurrentUser } = useAuth();
   const history = useHistory();
 
-  const handleLogin = (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleSignUp = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    AuthService.login({ email, password })
-      .then(response => {
+    AuthService.signup({ firstName, lastName, email, password })
+      .then(() => {
         setLoading(false);
-        setCurrentUser(response.data.user);
-        setUserSession(response.data.token, response.data.user);
-
-        history.push('/websites');
+        history.push('/login');
       })
       .catch((error: AxiosError) => {
         setLoading(false);
@@ -43,10 +40,10 @@ export default function SignUp() {
             <div className="bg-light p-5 border shadow" style={{ borderRadius: '1rem' }}>
               <form>
                 <div className="mb-4">
-                  <input type="text" className="form-control" placeholder="Enter Firstname" value={firstname} onChange={setFirstname} />
+                  <input type="text" className="form-control" placeholder="Enter Firstname" value={firstName} onChange={setFirstname} />
                 </div>
                 <div className="mb-4">
-                  <input type="text" className="form-control" placeholder="Enter Lastname" value={lastname} onChange={setLastname} />
+                  <input type="text" className="form-control" placeholder="Enter Lastname" value={lastName} onChange={setLastname} />
                 </div>
                 <div className="mb-4">
                   <input type="email" className="form-control" placeholder="Enter Email" value={email} onChange={setEmail} />
@@ -55,7 +52,7 @@ export default function SignUp() {
                   <input type="password" className="form-control" placeholder="Enter Password" value={password} onChange={setPassword} />
                 </div>
 
-                <button type="submit" className="btn btn-primary w-100 my-3 shadow" onClick={handleLogin} disabled={loading}>
+                <button type="submit" className="btn btn-primary w-100 my-3 shadow" onClick={handleSignUp} disabled={loading}>
                   {loading ? 'Loading...' : 'Signup'}
                 </button>
 

@@ -10,6 +10,7 @@ const login = (data: IUser) => {
 };
 
 const AuthService = {
+  signup,
   login,
 };
 

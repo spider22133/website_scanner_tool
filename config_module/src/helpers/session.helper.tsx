@@ -22,7 +22,6 @@ export const removeUserSession = () => {
 
 function setWithExpiry(key: string, value: string, ttl = 86400) {
   const now = new Date();
-  // now.toLocaleString('de-DE', { timeZone: 'Berlin' });
 
   // `item` is an object which contains the original value
   // as well as the time when it's supposed to expire

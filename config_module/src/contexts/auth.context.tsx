@@ -26,10 +26,11 @@ const AuthContextProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     const token = getUser();
-    if (token) return;
-
-    setUser(token);
-    setLoadingUser(false);
+    if (token) {
+      setUser(token);
+      setLoadingUser(false);
+    }
+    return;
   }, []);
 
   const setCurrentUser = (user: IUser) => {
