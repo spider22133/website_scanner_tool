@@ -2,8 +2,6 @@ import { useInput } from '../../helpers/form-input.helper';
 import React, { useState } from 'react';
 import AuthService from '../../services/auth.service';
 import { useHistory } from 'react-router-dom';
-import { setUserSession } from '../../helpers/session.helper';
-import { useAuth } from '../../contexts/auth.context';
 import { AxiosError } from 'axios';
 
 export default function SignUp() {
@@ -14,7 +12,6 @@ export default function SignUp() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { setCurrentUser } = useAuth();
   const history = useHistory();
 
   const handleSignUp = (e: React.FormEvent<HTMLButtonElement>) => {

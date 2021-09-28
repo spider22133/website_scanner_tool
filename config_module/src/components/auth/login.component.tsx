@@ -46,14 +46,14 @@ export default function LogIn() {
                 <div className="mb-4">
                   <input type="password" className="form-control" placeholder="Enter Password" value={password} onChange={setPassword} />
                 </div>
-                <div className="mb-4 form-check w-100">
+                {/* <div className="mb-4 form-check w-100">
                   <label className="form-check-label">
                     <input type="checkbox" className="form-check-input" /> Remember Me
                   </label>
                   <a href="#" className="float-end">
                     Reset Password
                   </a>
-                </div>
+                </div> */}
                 <button type="submit" className="btn btn-primary w-100 my-3 shadow" onClick={handleLogin} disabled={loading}>
                   {loading ? 'Loading...' : 'Login'}
                 </button>

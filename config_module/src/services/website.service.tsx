@@ -9,7 +9,9 @@ const getWebsiteById = (id: string) => {
   return http.get(`/websites/${id}`);
 };
 
-const update = () => 0;
+const update = (id: string, data: Website) => {
+  return http.put(`/websites/${id}`, data);
+};
 
 const create = (data: Website) => {
   return http.post('/websites/create', data);

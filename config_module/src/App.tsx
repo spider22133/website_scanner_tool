@@ -5,7 +5,7 @@ import { PublicRoute, PrivateRoute } from './helpers/routing.helper';
 import { AuthContextProvider } from './contexts/auth.context';
 import Header from './components/layout/header.component';
 import WebsitesList from './components/websites/websites-list';
-import WebsitePage from './components/websites/website-page.component';
+import WebsitePage from './components/websites/website-edit.component';
 import LogIn from './components/auth/login.component';
 import 'bootstrap/dist/css/bootstrap.css';
 import SignUp from './components/auth/signup.component';
