@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import IWebsite from '../../interfaces/website.interface';
 import IState from '../../interfaces/website-state.interface';
 import PaginationContainer from './../elements/pagination-container.component';
+import { AxiosError } from 'axios';
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -30,15 +31,23 @@ export default function WebsitesList() {
   }, [states]);
 
   const getWebsites = () => {
-    WebsiteDataService.getAll().then(response => {
-      setWebsites(response.data.data);
-    });
+    WebsiteDataService.getAll()
+      .then(response => {
+        setWebsites(response.data.data);
+      })
+      .catch((error: AxiosError) => {
+        console.log('Error: ', error.response?.data.message);
+      });
   };
 
   const getStatesByWebsiteId = (id: number | undefined) => {
-    StatesDataService.getStatesByWebsiteId(id).then(response => {
-      setWebsiteStates(response.data.data);
-    });
+    StatesDataService.getStatesByWebsiteId(id)
+      .then(response => {
+        setWebsiteStates(response.data.data);
+      })
+      .catch((error: AxiosError) => {
+        console.log('Error: ', error.response?.data.message);
+      });
   };
 
   const onPageChange = (page = 1) => {

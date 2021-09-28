@@ -28,9 +28,9 @@ export default function LogIn() {
         history.push('/websites');
       })
       .catch((error: AxiosError) => {
-        setLoading(false);
         setError(error.response?.data.message);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (

@@ -17,7 +17,6 @@ class WebsiteStatesController {
   public getWebsiteStatesByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteId = Number(req.params.id);
-      console.log(websiteId);
       const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findStatesByWebsiteId(websiteId);
 
       res.status(200).json({ data: findAllStatesData, message: 'findStatesByWebsiteId' });
