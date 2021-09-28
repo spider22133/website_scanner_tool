@@ -29,6 +29,11 @@ class WebsitesController {
 
   public updateWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const websiteId = Number(req.params.id);
+      const websiteData: CreateWebsiteDto = req.body;
+      const updateWebsiteData: Website = await this.websiteService.updateWebsite(websiteId, websiteData);
+
+      res.status(200).json({ data: updateWebsiteData, message: 'updated' });
     } catch (error) {
       next(error);
     }
