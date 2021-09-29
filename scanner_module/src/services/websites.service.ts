@@ -41,17 +41,17 @@ class WebsiteService {
     const createWebsiteData: Website = await this.websites.create({ ...websiteData });
     return createWebsiteData;
   }
-}
 
-public async deleteWebsite(userId: number): Promise<User> {
-  if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
+  public async deleteWebsite(websiteId: number): Promise<Website> {
+    if (isEmpty(websiteId)) throw new HttpException(400, "You're not websiteId");
 
-  const findUser: User = await this.users.findByPk(userId);
-  if (!findUser) throw new HttpException(409, "You're not user");
+    const findWebsite: Website = await this.websites.findByPk(websiteId);
+    if (!findWebsite) throw new HttpException(409, "You're not website");
 
-  await this.users.destroy({ where: { id: userId } });
+    await this.websites.destroy({ where: { id: websiteId } });
 
-  return findUser;
+    return findWebsite;
+  }
 }
 
 export default WebsiteService;

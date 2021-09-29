@@ -17,11 +17,16 @@ const create = (data: Website) => {
   return http.post('/websites/create', data);
 };
 
+const deleteWebsite = (id: number | undefined) => {
+  return http.delete(`/websites/${id}`);
+};
+
 const WebsiteDataService = {
   getAll,
   getWebsiteById,
   update,
   create,
+  deleteWebsite,
 };
 
 export default WebsiteDataService;

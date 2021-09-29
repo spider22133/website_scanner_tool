@@ -8,7 +8,7 @@ export default function Header() {
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
         <Link className="navbar-brand" to={'/websites'}>
-          Websites Tool
+          <img src="logo.jpg" alt="logo" width="50" height="50" />
         </Link>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
