@@ -49,6 +49,17 @@ class WebsitesController {
       next(error);
     }
   };
+
+  public deleteWebsite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = Number(req.params.id);
+      const deleteWebsiteData: Website = await this.websiteService.deleteWebsite(websiteId);
+
+      res.status(200).json({ data: deleteWebsiteData, message: 'deleted' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default WebsitesController;
