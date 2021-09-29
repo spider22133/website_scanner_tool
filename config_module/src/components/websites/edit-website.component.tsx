@@ -5,7 +5,7 @@ import WebsiteDataService from '../../services/website.service';
 import { useInput } from '../../helpers/form-input.helper';
 import { AxiosError } from 'axios';
 
-export default function WebsitePage() {
+export default function EditWebsite() {
   const { id } = useParams<{ id: string }>();
   const [website, setWebsite] = useState<IWebsite>();
   const [name, setName] = useInput('');
@@ -53,7 +53,7 @@ export default function WebsitePage() {
             </div>
             <div className="mb-3">
               <label className="form-label">Url address</label>
-              <input className="form-control" type="text" name="url" id="url" placeholder="name@example.com" value={url || Url} onChange={setUrl} />
+              <input className="form-control" type="text" name="url" id="url" placeholder="example.com" value={url || Url} onChange={setUrl} />
             </div>
             <div className="d-flex justify-content-start">
               <button className="btn btn-warning" type="submit">

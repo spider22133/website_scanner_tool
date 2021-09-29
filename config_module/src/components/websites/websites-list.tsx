@@ -1,5 +1,4 @@
 import WebsitesListItem from './webseites-list-item.component';
-import WebsiteInfo from './website-info.component';
 import StatesDataService from '../../services/states.service';
 import StatesTable from './states-table.component';
 import WebsiteDataService from '../../services/website.service';
@@ -15,7 +14,6 @@ export default function WebsitesList() {
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentWebsite, setCurrentWebsite] = useState<IWebsite | null>(null);
   const itemsPerPage = 15;
 
   useEffect(() => {
@@ -58,7 +56,6 @@ export default function WebsitesList() {
 
   const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
-    setCurrentWebsite(website);
     getStatesByWebsiteId(website.id);
     setCurrentPage(1);
   };
@@ -67,10 +64,8 @@ export default function WebsitesList() {
     <div className="container">
       <div className="my-4">
         <div className="row">
-          {' '}
           <div className="col-4">
-            <WebsiteInfo website={currentWebsite ? currentWebsite : websites[0]} />
-            <ul className="list-group mt-4">
+            <ul className="list-group list-group-numbered mt-4">
               {websites &&
                 websites.map((website: IWebsite, index) => (
                   <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
