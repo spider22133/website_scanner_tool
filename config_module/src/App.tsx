@@ -1,6 +1,5 @@
-import React from 'react';
 import './App.css';
-import { Switch, Route } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import { PublicRoute, PrivateRoute } from './helpers/routing.helper';
 import { AuthContextProvider } from './contexts/auth.context';
 
