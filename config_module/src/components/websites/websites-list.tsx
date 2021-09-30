@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import IWebsite from '../../interfaces/website.interface';
 import IState from '../../interfaces/website-state.interface';
@@ -63,10 +62,14 @@ export default function WebsitesList() {
   };
 
   const handleRemove = (id: number | undefined) => {
-    WebsiteDataService.deleteWebsite(id).then(() => {
-      const newList: IWebsite[] = websites.filter(item => item.id !== id);
-      setWebsites(newList);
-    });
+    WebsiteDataService.deleteWebsite(id)
+      .then(() => {
+        const newList: IWebsite[] = websites.filter(item => item.id !== id);
+        setWebsites(newList);
+      })
+      .catch((error: AxiosError) => {
+        console.log('Error: ', error.response?.data.message);
+      });
   };
 
   return (
