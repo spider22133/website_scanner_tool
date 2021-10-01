@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, FC } from 'react';
 import IUser from './../interfaces/user.interface';
 import { getUser, removeUserSession } from './../helpers/session.helper';
 import { useHistory } from 'react-router-dom';
@@ -19,7 +19,7 @@ const AuthContext = createContext<ContextType>({
 
 const useAuth = () => useContext(AuthContext);
 
-const AuthContextProvider: React.FC = ({ children }) => {
+const AuthContextProvider: FC = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const history = useHistory();

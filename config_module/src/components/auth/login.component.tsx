@@ -5,12 +5,14 @@ import { useHistory } from 'react-router-dom';
 import { setUserSession } from '../../helpers/session.helper';
 import { useAuth } from '../../contexts/auth.context';
 import { AxiosError } from 'axios';
+import { useAPIError } from '../../contexts/api-error.context';
 
 export default function LogIn() {
   const [email, setEmail] = useInput('');
   const [password, setPassword] = useInput('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const { addError } = useAPIError();
 
   const { setCurrentUser } = useAuth();
   const history = useHistory();
@@ -28,7 +30,9 @@ export default function LogIn() {
         history.push('/websites');
       })
       .catch((error: AxiosError) => {
-        setError(error.response?.data.message);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       })
       .finally(() => setLoading(false));
   };
@@ -59,14 +63,6 @@ export default function LogIn() {
                 </button>
                 <p className="text-center m-0">
                   No account yet, <a href="/signup">Please Signup</a>
-                </p>
-                <p className="text-center m-0 pt-3">
-                  {error && (
-                    <>
-                      <small style={{ color: 'red' }}>{error}</small>
-                      <br />
-                    </>
-                  )}
                 </p>
               </form>
 

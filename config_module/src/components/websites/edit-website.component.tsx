@@ -4,6 +4,7 @@ import IWebsite from '../../interfaces/website.interface';
 import WebsiteDataService from '../../services/website.service';
 import { useInput } from '../../helpers/form-input.helper';
 import { AxiosError } from 'axios';
+import { useAPIError } from '../../contexts/api-error.context';
 
 export default function EditWebsite() {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +12,8 @@ export default function EditWebsite() {
   const [name, setName] = useInput('');
   const [url, setUrl] = useInput('');
   const [message, setMessage] = useState('');
+
+  const { addError } = useAPIError();
 
   const Name = website ? website.name : '';
   const Url = website ? website.url : '';
@@ -25,7 +28,9 @@ export default function EditWebsite() {
         setWebsite(response.data.data);
       })
       .catch((error: AxiosError) => {
-        setMessage(`Error: ${error.response?.data.message}`);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       });
   };
 
@@ -37,7 +42,9 @@ export default function EditWebsite() {
         setMessage('Website successfully updated!');
       })
       .catch((error: AxiosError) => {
-        setMessage(`Error: ${error.response?.data.message}`);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       });
   };
 

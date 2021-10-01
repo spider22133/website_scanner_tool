@@ -7,6 +7,7 @@ import WebsitesListItem from './webseites-list-item.component';
 import StatesDataService from '../../services/states.service';
 import StatesTable from './states-table.component';
 import WebsiteDataService from '../../services/website.service';
+import { useAPIError } from '../../contexts/api-error.context';
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -14,6 +15,8 @@ export default function WebsitesList() {
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const { addError } = useAPIError();
 
   const itemsPerPage = 15;
 
@@ -35,7 +38,9 @@ export default function WebsitesList() {
         setWebsites(response.data.data);
       })
       .catch((error: AxiosError) => {
-        console.log('Error: ', error.response?.data.message);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       });
   };
 
@@ -45,7 +50,9 @@ export default function WebsitesList() {
         setWebsiteStates(response.data.data);
       })
       .catch((error: AxiosError) => {
-        console.log('Error: ', error.response?.data.message);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       });
   };
 

@@ -2,11 +2,14 @@ import { useState } from 'react';
 import WebsiteDataService from '../../services/website.service';
 import { useInput } from '../../helpers/form-input.helper';
 import { AxiosError } from 'axios';
+import { useAPIError } from '../../contexts/api-error.context';
 
 export default function AddWebsite() {
   const [name, setName] = useInput('');
   const [url, setUrl] = useInput('');
   const [message, setMessage] = useState('');
+
+  const { addError } = useAPIError();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -15,7 +18,9 @@ export default function AddWebsite() {
         setMessage(`${response.data.data.name} successfully added!`);
       })
       .catch((error: AxiosError) => {
-        setMessage(`Error: ${error.response?.data.message}`);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       });
   };
 
