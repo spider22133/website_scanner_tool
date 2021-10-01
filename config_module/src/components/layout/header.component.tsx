@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth.context';
 
 export default function Header() {
@@ -13,14 +13,14 @@ export default function Header() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link className="nav-link" aria-current="page" to={'/websites'}>
+              <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/websites'}>
                 Websites
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/add-website">
+              <NavLink className="nav-link" activeClassName="active" aria-current="page" to="/add-website">
                 Add website
-              </Link>
+              </NavLink>
             </li>
           </ul>
 
