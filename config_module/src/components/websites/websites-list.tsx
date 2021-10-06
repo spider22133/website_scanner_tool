@@ -83,8 +83,8 @@ export default function WebsitesList() {
     <div className="container">
       <div className="my-4">
         <div className="row">
-          <div className="col-5">
-            <ul className="list-group list-group-numbered mt-4">
+          <div className="col col-lg-5 mb-3">
+            <ul className="list-group list-group-numbered">
               {websites &&
                 websites.map((website: IWebsite, index) => (
                   <WebsitesListItem
@@ -98,21 +98,23 @@ export default function WebsitesList() {
                 ))}
             </ul>
           </div>
-          <div className="col-7">
-            <h2>Checks list</h2>
-            <StatesTable states={displayedStates} />
-            <div className="pagination">
-              {states.length > 0 ? (
-                <PaginationContainer
-                  totalItems={states.length}
-                  itemsPerPage={itemsPerPage}
-                  currentPage={currentPage}
-                  pageChange={onPageChange}
-                  setCurrentPage={setCurrentPage}
-                />
-              ) : (
-                ''
-              )}
+          <div className="col col-lg-7">
+            <div className="border border-gray border-2 rounded-2 p-4">
+              <h2>Checks list</h2>
+              <StatesTable states={displayedStates} />
+              <div className="pagination">
+                {states.length > 0 ? (
+                  <PaginationContainer
+                    totalItems={states.length}
+                    itemsPerPage={itemsPerPage}
+                    currentPage={currentPage}
+                    pageChange={onPageChange}
+                    setCurrentPage={setCurrentPage}
+                  />
+                ) : (
+                  ''
+                )}
+              </div>
             </div>
           </div>
         </div>

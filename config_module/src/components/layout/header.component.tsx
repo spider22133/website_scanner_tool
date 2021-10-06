@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth.context';
 
 export default function Header() {
   const { user, unsetCurrentUser } = useAuth();
+  const [toogle, setToogle] = useState(false);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -10,7 +12,14 @@ export default function Header() {
         <Link className="navbar-brand" to={'/websites'}>
           <img src="/logo.jpg" alt="logo" width="50" height="50" />
         </Link>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <button
+          className={`navbar-toggler ${toogle ? '' : 'collapsed'}`}
+          type="button"
+          onClick={() => (toogle == false ? setToogle(true) : setToogle(false))}
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className={`collapse navbar-collapse ${toogle ? 'show' : ''}`} id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/websites'}>
@@ -27,10 +36,12 @@ export default function Header() {
           {user ? (
             <ul className="navbar-nav">
               <li className="nav-item">
-                <div className="nav-link">Hello, {user ? user.email : ''}</div>
+                <div className="nav-link">
+                  Hello, {user.firstName} {user.lastName}
+                </div>
               </li>
               <li className="nav-item">
-                <button className="btn btn-outline-danger" onClick={unsetCurrentUser}>
+                <button className="btn btn-outline-danger btn-sm mt-1" onClick={unsetCurrentUser}>
                   Logout
                 </button>
               </li>
