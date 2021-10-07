@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { WebsiteState } from '@interfaces/website_states.interface';
+import { WebsiteState } from '@/interfaces/website_state.interface';
 import websiteStatesService from '@services/website_states.service';
 
 class WebsiteStatesController {

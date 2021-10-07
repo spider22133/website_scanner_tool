@@ -1,9 +1,9 @@
 import config from 'config';
 import { Sequelize } from 'sequelize';
 import { dbConfig } from '@interfaces/db.interface';
-import UserModel from '@models/users.model';
-import WebsiteModel from '@models/websites.model';
-import WebsiteStateModel from '@/models/website_states.model';
+import UserModel from '@/models/user.model';
+import WebsiteModel from '@/models/website.model';
+import WebsiteStateModel from '@/models/website_state.model';
 import { logger } from '@utils/logger';
 
 const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');

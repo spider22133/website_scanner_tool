@@ -1,6 +1,6 @@
 import DB from '@databases';
 import HttpException from '@exceptions/HttpException';
-import { WebsiteState } from '@interfaces/website_states.interface';
+import { WebsiteState } from '@/interfaces/website_state.interface';
 
 class WebsiteStatesService {
   public website_states = DB.WebsiteStates;

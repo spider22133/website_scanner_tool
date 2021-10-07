@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
-import { WebsiteState } from '@/interfaces/website_states.interface';
+import { WebsiteState } from '@/interfaces/website_state.interface';
 
 export type WebsiteStateCreationAttributes = Optional<WebsiteState, 'id'>;
 

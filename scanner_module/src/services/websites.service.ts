@@ -1,5 +1,5 @@
 import DB from '@databases';
-import { Website } from '@interfaces/websites.interface';
+import { Website } from '@/interfaces/website.interface';
 import CreateWebsiteDto from '@dtos/website.dto';
 import { isEmpty } from '@/utils/util';
 import HttpException from '@/exceptions/HttpException';

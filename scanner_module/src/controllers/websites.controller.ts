@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Website } from '@interfaces/websites.interface';
+import { Website } from '@/interfaces/website.interface';
 import websiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
 

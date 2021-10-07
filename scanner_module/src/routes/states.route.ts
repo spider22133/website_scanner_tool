@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import WebsiteStatesController from '@controllers/website_states.controller';
-import Route from '@interfaces/routes.interface';
+import Route from '@/interfaces/route.interface';
 import authMiddleware from '@/middlewares/auth.middleware';
 
 class WebsiteStatesRoute implements Route {

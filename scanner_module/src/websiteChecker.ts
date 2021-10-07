@@ -1,6 +1,6 @@
 import websiteService from '@services/websites.service';
 import websiteStatesService from '@services/website_states.service';
-import { Website } from '@interfaces/websites.interface';
+import { Website } from '@/interfaces/website.interface';
 import fetch from 'node-fetch';
 import CreateWebsiteDto from '@dtos/website.dto';
 
