@@ -35,10 +35,16 @@ class AuthService {
     if (!isPasswordMatching) throw new HttpException(409, 'Password not matching');
 
     const roles: RoleModel[] = await findUser.getRoles();
+    const authorities = [];
+
+    for (let i = 0; i < roles.length; i++) {
+      authorities.push('ROLE_' + roles[i].name.toUpperCase());
+    }
+
     const tokenData = this.createToken(findUser);
     const cookie = this.createCookie(tokenData);
 
-    return { cookie, findUser, roles, token: tokenData.token };
+    return { cookie, findUser, roles: authorities, token: tokenData.token };
   }
 
   public async logout(userData: User): Promise<User> {

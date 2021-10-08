@@ -4,11 +4,11 @@ import { Website } from '@/interfaces/website.interface';
 import fetch from 'node-fetch';
 import CreateWebsiteDto from '@dtos/website.dto';
 
-class WebsiteChecker {
-  public websiteService = new websiteService();
-  public websiteStatesService = new websiteStatesService();
+export default class WebsiteChecker {
+  public static websiteService = new websiteService();
+  public static websiteStatesService = new websiteStatesService();
 
-  public async checkWebsites(): Promise<void> {
+  public static async checkWebsites(): Promise<void> {
     try {
       const findAllWebsitesData: Website[] = await this.websiteService.findAllWebsites();
 
@@ -28,9 +28,7 @@ class WebsiteChecker {
     }
   }
 
-  private checkWebsiteStatus(url: string): Promise<number> {
+  private static checkWebsiteStatus(url: string): Promise<number> {
     return fetch(url).then(res => res.status);
   }
 }
-
-export default WebsiteChecker;

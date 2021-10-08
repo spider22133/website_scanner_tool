@@ -1,10 +1,10 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional, HasManyRemoveAssociationsMixin, HasManyGetAssociationsMixin } from 'sequelize';
 import { Website } from '@/interfaces/website.interface';
 import { WebsiteStateModel } from '@/models/website_state.model';
 
 export type WebsiteCreationAttributes = Optional<Website, 'id' | 'is_active' | 'name' | 'url'>;
 
-export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> implements Website {
+export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> {
   public id: number;
   public name: string;
   public url: string;
@@ -44,6 +44,7 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
     sourceKey: 'id',
     foreignKey: 'website_id',
     as: 'website_state',
+    onDelete: 'CASCADE',
   });
 
   WebsiteStateModel.belongsTo(WebsiteModel, {
