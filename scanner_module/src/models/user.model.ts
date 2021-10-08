@@ -1,9 +1,19 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import {
+  Sequelize,
+  DataTypes,
+  Model,
+  Optional,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationMixin,
+  BelongsToManyCountAssociationsMixin,
+  Association,
+} from 'sequelize';
 import { User } from '@/interfaces/user.interface';
+import { RoleModel } from './role.model';
 
-export type UserCreationAttributes = Optional<User, 'id' | 'email' | 'password'>;
+export type UserCreationAttributes = Optional<User, 'id'>;
 
-export class UserModel extends Model<User, UserCreationAttributes> implements User {
+export class UserModel extends Model<User, UserCreationAttributes> {
   public id: number;
   public firstName: string;
   public lastName: string;
@@ -12,6 +22,14 @@ export class UserModel extends Model<User, UserCreationAttributes> implements Us
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public getRoles!: BelongsToManyGetAssociationsMixin<RoleModel>; // Note the null assertions!
+  public hasRole!: BelongsToManyHasAssociationMixin<RoleModel, number>;
+  public countRoles!: BelongsToManyCountAssociationsMixin;
+
+  public static associations: {
+    roles: Association<UserModel, RoleModel>;
+  };
 }
 
 export default function (sequelize: Sequelize): typeof UserModel {
@@ -44,6 +62,20 @@ export default function (sequelize: Sequelize): typeof UserModel {
       sequelize,
     },
   );
+
+  UserModel.belongsToMany(RoleModel, {
+    as: 'roles',
+    through: 'user_roles',
+    foreignKey: 'user_id',
+    otherKey: 'role_id',
+  });
+
+  RoleModel.belongsToMany(UserModel, {
+    as: 'users',
+    through: 'user_roles',
+    foreignKey: 'role_id',
+    otherKey: 'user_id',
+  });
 
   return UserModel;
 }

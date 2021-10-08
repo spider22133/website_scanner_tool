@@ -30,5 +30,20 @@ export default function (sequelize: Sequelize): typeof RoleModel {
     },
   );
 
+  RoleModel.create({
+    id: 1,
+    name: 'user',
+  });
+
+  RoleModel.create({
+    id: 2,
+    name: 'moderator',
+  });
+
+  RoleModel.create({
+    id: 3,
+    name: 'admin',
+  });
+
   return RoleModel;
 }

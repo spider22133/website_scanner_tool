@@ -2,6 +2,7 @@ import config from 'config';
 import { Sequelize } from 'sequelize';
 import { dbConfig } from '@interfaces/db.interface';
 import UserModel from '@/models/user.model';
+import RoleModel from '@models/role.model';
 import WebsiteModel from '@/models/website.model';
 import WebsiteStateModel from '@/models/website_state.model';
 import { logger } from '@utils/logger';
@@ -33,6 +34,7 @@ sequelize.authenticate();
 const DB = {
   WebsiteStates: WebsiteStateModel(sequelize),
   Websites: WebsiteModel(sequelize),
+  Roles: RoleModel(sequelize),
   Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
