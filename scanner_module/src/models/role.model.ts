@@ -30,20 +30,23 @@ export default function (sequelize: Sequelize): typeof RoleModel {
     },
   );
 
-  RoleModel.create({
-    id: 1,
-    name: 'user',
-  });
-
-  RoleModel.create({
-    id: 2,
-    name: 'moderator',
-  });
-
-  RoleModel.create({
-    id: 3,
-    name: 'admin',
-  });
+  initRoles();
 
   return RoleModel;
+}
+
+function initRoles() {
+  const ROLES = ['user', 'moderator', 'admin'];
+  ROLES.forEach(async (role, index) => {
+    try {
+      if (!(await RoleModel.findByPk(index + 1))) {
+        await RoleModel.create({
+          id: index + 1,
+          name: role,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
 }

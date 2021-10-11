@@ -6,6 +6,10 @@ class TimerController {
   public timer: NodeJS.Timer;
   public worker: WebsiteChecker;
 
+  constructor(worker: WebsiteChecker) {
+    this.worker = worker;
+  }
+
   get interval(): number {
     return this._interval;
   }
@@ -22,7 +26,7 @@ class TimerController {
       this._interval = newInterval;
 
       this.timer = setInterval(() => {
-        return WebsiteChecker.checkWebsites();
+        return this.worker.checkWebsites();
       }, this._interval);
 
       res.status(200).json({ data: newInterval, message: 'updated' });
@@ -33,7 +37,7 @@ class TimerController {
 
   public run() {
     this.timer = setInterval(() => {
-      return WebsiteChecker.checkWebsites();
+      return this.worker.checkWebsites();
     }, this._interval);
   }
 }

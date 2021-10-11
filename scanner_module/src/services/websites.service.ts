@@ -4,7 +4,6 @@ import CreateWebsiteDto from '@dtos/website.dto';
 import { isEmpty } from '@/utils/util';
 import HttpException from '@/exceptions/HttpException';
 import { WebsiteModel } from '@/models/website.model';
-import WebsiteChecker from 'websiteChecker';
 
 class WebsiteService {
   public websites = DB.Websites;
@@ -30,8 +29,6 @@ class WebsiteService {
 
     await this.websites.update({ ...data }, { where: { id: id } });
 
-    // await WebsiteChecker.checkWebsites();
-
     const updatedWebsite: Website = await this.websites.findByPk(id);
     return updatedWebsite;
   }
@@ -41,8 +38,6 @@ class WebsiteService {
 
     const findWebsite: Website = await this.websites.findOne({ where: { url: websiteData.url } });
     if (findWebsite) throw new HttpException(409, `Url ${websiteData.url} already exists`);
-
-    // await WebsiteChecker.checkWebsites();
 
     const createWebsiteData: Website = await this.websites.create({ ...websiteData });
     return createWebsiteData;

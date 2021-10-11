@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import { Website } from '@/interfaces/website.interface';
 import websiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
+import WebsiteChecker from 'websiteChecker';
 
 class WebsitesController {
   public websiteService = new websiteService();
+  public websiteChecker = new WebsiteChecker();
 
   public getWebsites = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -33,6 +35,8 @@ class WebsitesController {
       const websiteData: CreateWebsiteDto = req.body;
       const updateWebsiteData: Website = await this.websiteService.updateWebsite(websiteId, websiteData);
 
+      await this.websiteChecker.checkWebsite(updateWebsiteData);
+
       res.status(200).json({ data: updateWebsiteData, message: 'updated' });
     } catch (error) {
       next(error);
@@ -43,6 +47,8 @@ class WebsitesController {
     try {
       const websiteData: CreateWebsiteDto = req.body;
       const createWebsiteData: Website = await this.websiteService.createWebsite(websiteData);
+
+      await this.websiteChecker.checkWebsite(createWebsiteData);
 
       res.status(201).json({ data: createWebsiteData, message: 'created' });
     } catch (error) {
