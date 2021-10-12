@@ -5,6 +5,7 @@ import UserModel from '@/models/user.model';
 import RoleModel from '@models/role.model';
 import WebsiteModel from '@/models/website.model';
 import WebsiteStateModel from '@/models/website_state.model';
+import WebsiteErrorModel from '@/models/website_error.model';
 import { logger } from '@utils/logger';
 
 const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');
@@ -33,6 +34,7 @@ sequelize.authenticate();
 
 const DB = {
   WebsiteStates: WebsiteStateModel(sequelize),
+  WebsiteErrors: WebsiteErrorModel(sequelize),
   Websites: WebsiteModel(sequelize),
   Roles: RoleModel(sequelize),
   Users: UserModel(sequelize),

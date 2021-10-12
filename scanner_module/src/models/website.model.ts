@@ -1,6 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, HasManyRemoveAssociationsMixin, HasManyGetAssociationsMixin } from 'sequelize';
 import { Website } from '@/interfaces/website.interface';
 import { WebsiteStateModel } from '@/models/website_state.model';
+import { WebsiteErrorModel } from './website_error.model';
 
 export type WebsiteCreationAttributes = Optional<Website, 'id' | 'is_active' | 'name' | 'url'>;
 
@@ -48,6 +49,18 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
   });
 
   WebsiteStateModel.belongsTo(WebsiteModel, {
+    foreignKey: 'website_id',
+    as: 'website',
+  });
+
+  WebsiteModel.hasMany(WebsiteErrorModel, {
+    sourceKey: 'id',
+    foreignKey: 'website_id',
+    as: 'website_error',
+    onDelete: 'CASCADE',
+  });
+
+  WebsiteErrorModel.belongsTo(WebsiteModel, {
     foreignKey: 'website_id',
     as: 'website',
   });
