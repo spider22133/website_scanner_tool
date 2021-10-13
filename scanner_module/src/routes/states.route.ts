@@ -15,6 +15,7 @@ class WebsiteStatesRoute implements Route {
   private initializeRoutes() {
     this.router.get(`${this.path}`, authMiddleware, this.websiteStatesController.getWebsiteStates);
     this.router.get(`${this.path}/website/:id(\\d+)`, authMiddleware, this.websiteStatesController.getWebsiteStatesByWebsiteId);
+    this.router.get(`${this.path}/website/:id(\\d+)/aggregate`, authMiddleware, this.websiteStatesController.getAggregatedDataByWebsiteId);
   }
 }
 

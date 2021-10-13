@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
+import { useAPIError } from '../../contexts/api-error.context';
+import { getChartData } from '../../helpers/chart.helper';
 import IWebsite from '../../interfaces/website.interface';
 import IState from '../../interfaces/website-state.interface';
+import WebsiteDataService from '../../services/website.service';
 import PaginationContainer from './../elements/pagination-container.component';
 import WebsitesListItem from './webseites-list-item.component';
 import StatesDataService from '../../services/states.service';
 import StatesTable from './states-table.component';
-import WebsiteDataService from '../../services/website.service';
-import { useAPIError } from '../../contexts/api-error.context';
+import Chart from 'react-apexcharts';
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -16,8 +18,8 @@ export default function WebsitesList() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const { series, options } = getChartData(states);
   const { addError } = useAPIError();
-
   const itemsPerPage = 15;
 
   useEffect(() => {
@@ -31,6 +33,12 @@ export default function WebsitesList() {
   useEffect(() => {
     onPageChange();
   }, [states]);
+
+  const setActiveWebsite = (website: IWebsite, index: number) => {
+    setCurrentIndex(index);
+    getStatesByWebsiteId(website.id);
+    setCurrentPage(1);
+  };
 
   const getWebsites = () => {
     WebsiteDataService.getAll()
@@ -60,12 +68,6 @@ export default function WebsitesList() {
     const startItem = (page - 1) * itemsPerPage;
     const endItem = page * itemsPerPage;
     setDisplayedStates(states.slice(startItem, endItem));
-  };
-
-  const setActiveWebsite = (website: IWebsite, index: number) => {
-    setCurrentIndex(index);
-    getStatesByWebsiteId(website.id);
-    setCurrentPage(1);
   };
 
   const handleRemove = (id: number | undefined) => {
@@ -99,6 +101,9 @@ export default function WebsitesList() {
             </ul>
           </div>
           <div className="col col-lg-7">
+            <div className="border border-gray border-2 rounded-2 p-4 mb-3">
+              <Chart options={options} series={series} type="area" height={350} />
+            </div>
             <div className="border border-gray border-2 rounded-2 p-4">
               <h2>Checks list</h2>
               <StatesTable states={displayedStates} />

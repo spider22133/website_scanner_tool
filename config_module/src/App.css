@@ -5,12 +5,21 @@
 .vh-100-c {
   height: calc(100vh - 76px) !important;
 }
-a {text-decoration: none !important;}
+a {
+  text-decoration: none !important;
+}
 
 a:hover, /* OPTIONAL*/
 a:visited,
-a:focus
-{text-decoration: none !important;}
+a:focus {
+  text-decoration: none !important;
+}
+
+h2, .h2 {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
 
 .list-group-item.active {
   color: #212529 !important;

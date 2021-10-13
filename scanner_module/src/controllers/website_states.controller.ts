@@ -24,6 +24,17 @@ class WebsiteStatesController {
       next(error);
     }
   };
+
+  public getAggregatedDataByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = Number(req.params.id);
+      const getAggregatedData: any = await this.websiteStatesService.aggregatedByWebsiteId(websiteId);
+
+      res.status(200).json({ data: getAggregatedData, message: 'findStatesByWebsiteId' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default WebsiteStatesController;
