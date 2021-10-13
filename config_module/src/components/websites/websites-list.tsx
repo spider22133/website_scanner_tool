@@ -15,6 +15,7 @@ export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
   const [states, setWebsiteStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
+  const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -28,6 +29,7 @@ export default function WebsitesList() {
 
   useEffect(() => {
     getStatesByWebsiteId(1);
+    getAggrStates(1);
   }, []);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export default function WebsitesList() {
   const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
     getStatesByWebsiteId(website.id);
+    getAggrStates(website.id);
     setCurrentPage(1);
   };
 
@@ -44,6 +47,18 @@ export default function WebsitesList() {
     WebsiteDataService.getAll()
       .then(response => {
         setWebsites(response.data.data);
+      })
+      .catch((error: AxiosError) => {
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
+      });
+  };
+
+  const getAggrStates = (id: number | undefined) => {
+    StatesDataService.getAggregatedDataByWebsiteId(id)
+      .then(response => {
+        setAggrStates(response.data.data);
       })
       .catch((error: AxiosError) => {
         if (error.response) {
@@ -101,8 +116,28 @@ export default function WebsitesList() {
             </ul>
           </div>
           <div className="col col-lg-7">
+            <div className="border border-danger border-2 rounded-2 p-4 mb-3">
+              <h2 className=" text-danger">Error list</h2>
+            </div>
             <div className="border border-gray border-2 rounded-2 p-4 mb-3">
               <Chart options={options} series={series} type="area" height={350} />
+              <div className="d-flex aggregates justify-content-center w-100 text-center">
+                <div className="me-5">
+                  Average
+                  <br />
+                  <p style={{ color: 'black' }}>{Math.round(aggrStates ? aggrStates.avg : 0) / 1000} Sec(s)</p>
+                </div>
+                <div className="me-5">
+                  The fastest
+                  <br />
+                  <p style={{ color: 'black' }}>{(aggrStates ? aggrStates.min : 0) / 1000} Sec(s)</p>
+                </div>
+                <div className="me-5">
+                  The slowest
+                  <br />
+                  <p style={{ color: 'black' }}>{(aggrStates ? aggrStates.max : 0) / 1000} Sec(s)</p>
+                </div>
+              </div>
             </div>
             <div className="border border-gray border-2 rounded-2 p-4">
               <h2>Checks list</h2>

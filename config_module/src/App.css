@@ -30,3 +30,9 @@ h2, .h2 {
 .btn svg {
   margin-bottom: 4px;
 }
+.aggregates {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 900 !important;
+  color: #9f9f9f;
+}
