@@ -16,7 +16,7 @@ export default function WebsitesListItem({ website, index, currentIndex, handleR
   return (
     <>
       <li
-        className={`list-group-item d-flex justify-content-between list-group-item-action align-items-start ${
+        className={`list-group-item border-2 d-flex justify-content-between list-group-item-action align-items-start ${
           index === currentIndex ? 'active' : ''
         }`}
         onClick={() => setActiveWebsite(website, index)}

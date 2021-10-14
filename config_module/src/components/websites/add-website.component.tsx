@@ -1,21 +1,38 @@
 import { useState } from 'react';
 import WebsiteDataService from '../../services/website.service';
-import { useInput } from '../../helpers/form-input.helper';
 import { AxiosError } from 'axios';
+import { useAPIError } from '../../contexts/api-error.context';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import IWebsite from '../../interfaces/website.interface';
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required('Name is required').min(4),
+  url: Yup.string().required('Username is required').url('Url is invalid'),
+});
 
 export default function AddWebsite() {
-  const [name, setName] = useInput('');
-  const [url, setUrl] = useInput('');
   const [message, setMessage] = useState('');
+  const { addError } = useAPIError();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    WebsiteDataService.create({ name: name, url: url })
+  const onSubmit: SubmitHandler<IWebsite> = data => {
+    const { name, url } = data;
+    WebsiteDataService.create({ name, url })
       .then(response => {
         setMessage(`${response.data.data.name} successfully added!`);
       })
       .catch((error: AxiosError) => {
-        setMessage(`Error: ${error.response?.data.message}`);
+        if (error.response) {
+          addError(error.response.data.message, error.response.status);
+        }
       });
   };
 
@@ -24,14 +41,22 @@ export default function AddWebsite() {
       <div className="my-4">
         <h1>Add website</h1>
         <div className="col-6">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-group mb-3">
               <label className="form-label">Website name</label>
-              <input className="form-control" type="text" name="name" id="name" placeholder="Name" value={name} onChange={setName} />
+              <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" placeholder="Name" {...register('name')} />
+              <div className="invalid-feedback">{errors.name?.message}</div>
             </div>
-            <div className="mb-3">
+            <div className="form-group mb-3">
               <label className="form-label">Url address</label>
-              <input className="form-control" type="text" name="url" id="url" placeholder="example.com" value={url} onChange={setUrl} />
+              <input
+                className={`form-control ${errors.url ? 'is-invalid' : ''}`}
+                type="text"
+                id="url"
+                placeholder="http://example.com"
+                {...register('url')}
+              />
+              <div className="invalid-feedback">{errors.url?.message}</div>
             </div>
             <div className="d-flex justify-content-start">
               <button className="btn btn-warning" type="submit">

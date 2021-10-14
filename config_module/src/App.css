@@ -1,9 +1,26 @@
-a {text-decoration: none !important;}
+#root {
+  position: relative;
+  min-height: 100vh;
+}
+.vh-100-c {
+  height: calc(100vh - 76px) !important;
+}
+a {
+  text-decoration: none !important;
+}
 
 a:hover, /* OPTIONAL*/
 a:visited,
-a:focus
-{text-decoration: none !important;}
+a:focus {
+  text-decoration: none !important;
+}
+
+h2,
+.h2 {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
 
 .list-group-item.active {
   color: #212529 !important;
@@ -11,6 +28,18 @@ a:focus
   border-color: #0d6efd !important;
   border-width: 1px !important;
 }
+
+.scrollable {
+  max-height: calc(100vh - 101px);
+  overflow-y: scroll;
+}
+
 .btn svg {
   margin-bottom: 4px;
+}
+.aggregates {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 900 !important;
+  color: #9f9f9f;
 }

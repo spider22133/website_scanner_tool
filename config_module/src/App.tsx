@@ -11,18 +11,23 @@ import SignUp from './components/auth/signup.component';
 import AddWebsite from './components/websites/add-website.component';
 
 import 'bootstrap/dist/css/bootstrap.css';
+import { APIErrorProvider } from './contexts/api-error.context';
+import { APIErrorNotification } from './components/elements/error-notification.component';
 
 function App() {
   return (
     <AuthContextProvider>
-      <Header />
-      <Switch>
-        <PublicRoute exact path={['/', '/login']} component={LogIn} />
-        <PublicRoute exact path={['/signup']} component={SignUp} />
-        <PrivateRoute exact path={'/websites'} component={WebsitesList} />
-        <PrivateRoute path="/websites/:id" component={EditWebsite} />
-        <PrivateRoute exact path="/add-website" component={AddWebsite} />
-      </Switch>
+      <APIErrorProvider>
+        <Header />
+        <Switch>
+          <PublicRoute exact path={['/', '/login']} component={LogIn} />
+          <PublicRoute exact path={['/signup']} component={SignUp} />
+          <PrivateRoute exact path={'/websites'} component={WebsitesList} />
+          <PrivateRoute path="/websites/:id" component={EditWebsite} />
+          <PrivateRoute exact path="/add-website" component={AddWebsite} />
+        </Switch>
+        <APIErrorNotification />
+      </APIErrorProvider>
     </AuthContextProvider>
   );
 }

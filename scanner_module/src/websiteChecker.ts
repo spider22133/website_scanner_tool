@@ -1,35 +1,63 @@
 import websiteService from '@services/websites.service';
 import websiteStatesService from '@services/website_states.service';
-import { Website } from '@interfaces/websites.interface';
+import websiteErrorService from '@services/website_error.service';
+import { Website } from '@/interfaces/website.interface';
 import fetch from 'node-fetch';
-import CreateWebsiteDto from '@dtos/website.dto';
+
+const HTTP_CODE_404 = 404;
+const HTTP_CODE_200 = 200;
 
 class WebsiteChecker {
   public websiteService = new websiteService();
   public websiteStatesService = new websiteStatesService();
+  public websiteErrorService = new websiteErrorService();
 
   public async checkWebsites(): Promise<void> {
     try {
       const findAllWebsitesData: Website[] = await this.websiteService.findAllWebsites();
 
       for (const website of findAllWebsitesData) {
-        const start = new Date().getTime();
-        const status = await this.checkWebsiteStatus(website.url);
-        const end = new Date().getTime() - start;
-        const websiteToUpdate: CreateWebsiteDto = { name: website.name, url: website.url, is_active: true };
-
-        if (status === 200) {
-          await this.websiteService.updateWebsite(website.id, websiteToUpdate);
-          await this.websiteStatesService.createWebsiteState(website.id, end, status);
-        }
+        this.checkWebsite(website);
       }
     } catch (error) {
       console.log(error);
     }
   }
+  public async checkWebsite(website: Website): Promise<void> {
+    try {
+      const start = new Date().getTime();
+      const { status, msg } = await this.checkWebsiteStatus(website.url);
+      const end = new Date().getTime() - start;
 
-  private checkWebsiteStatus(url: string): Promise<number> {
-    return fetch(url).then(res => res.status);
+      if (status == HTTP_CODE_200) {
+        return await this.sendStatus(website, end, status);
+      }
+      await this.sendError(website, status, msg);
+    } catch (error) {
+      switch (error.code) {
+        case 'ENOTFOUND':
+          await this.sendError(website, HTTP_CODE_404, error.message);
+          break;
+
+        default:
+          await this.sendError(website, error.code, error.message);
+          break;
+      }
+    }
+  }
+
+  private async sendStatus(website: Website, end: number, status: number) {
+    await this.websiteService.updateWebsite(website.id, { ...website, is_active: true });
+    await this.websiteStatesService.createWebsiteState(website.id, end, status);
+  }
+
+  private async sendError(website: Website, status: number, msg = '') {
+    await this.websiteService.updateWebsite(website.id, { ...website, is_active: false });
+    await this.websiteErrorService.createWebsiteError(website.id, status, msg);
+  }
+
+  private checkWebsiteStatus(url: string): Promise<{ status: number; msg: string }> {
+    return fetch(url).then(res => ({ status: res.status, msg: res.statusText }));
   }
 }
 

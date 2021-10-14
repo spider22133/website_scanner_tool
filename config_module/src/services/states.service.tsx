@@ -8,7 +8,12 @@ const getStatesByWebsiteId = (id: number | undefined) => {
   return http.get(`/website-states/website/${id}`);
 };
 
+const getAggregatedDataByWebsiteId = (id: number | undefined) => {
+  return http.get(`/website-states/website/${id}/aggregate`);
+};
+
 const StatesDataService = {
+  getAggregatedDataByWebsiteId,
   getAll,
   getStatesByWebsiteId,
 };

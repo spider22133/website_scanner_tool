@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { WebsiteState } from '@interfaces/website_states.interface';
+import { WebsiteState } from '@/interfaces/website_state.interface';
 import websiteStatesService from '@services/website_states.service';
 
 class WebsiteStatesController {
@@ -20,6 +20,17 @@ class WebsiteStatesController {
       const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findStatesByWebsiteId(websiteId);
 
       res.status(200).json({ data: findAllStatesData, message: 'findStatesByWebsiteId' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAggregatedDataByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = Number(req.params.id);
+      const getAggregatedData: any = await this.websiteStatesService.aggregatedByWebsiteId(websiteId);
+
+      res.status(200).json({ data: getAggregatedData, message: 'findStatesByWebsiteId' });
     } catch (error) {
       next(error);
     }

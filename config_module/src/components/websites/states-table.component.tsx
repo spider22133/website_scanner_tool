@@ -11,7 +11,6 @@ export default function StatesTable({ states }: Props) {
         <thead>
           <tr>
             <th>Id</th>
-            <th>Website id</th>
             <th>Answer code</th>
             <th>Answer time</th>
           </tr>
@@ -21,7 +20,6 @@ export default function StatesTable({ states }: Props) {
             states.map((state: IState, index) => (
               <tr key={index}>
                 <td>{state.id}</td>
-                <td>{state.website_id}</td>
                 <td>{state.answer_code}</td>
                 <td>{state.answer_time} ms</td>
               </tr>

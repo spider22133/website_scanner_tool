@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import TimerController from '@controllers/timer.controller';
-import Route from '@interfaces/routes.interface';
+import Route from '@/interfaces/route.interface';
 
 class TimerRoute implements Route {
   public path = '/timer';

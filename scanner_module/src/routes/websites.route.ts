@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import WebsitesController from '@controllers/websites.controller';
-import Route from '@interfaces/routes.interface';
+import Route from '@/interfaces/route.interface';
 import CreateWebsiteDto from '@dtos/website.dto';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@/middlewares/auth.middleware';
