@@ -4,7 +4,7 @@ import Route from '@/interfaces/route.interface';
 import authMiddleware from '@/middlewares/auth.middleware';
 
 class WebsiteErrorsRoute implements Route {
-  public path = '/website';
+  public path = '/website-errors';
   public router = Router();
   public websiteErrorsController = new WebsiteErrorsController();
 
@@ -13,7 +13,7 @@ class WebsiteErrorsRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/:id(\\d+)/errors`, authMiddleware, this.websiteErrorsController.getWebsiteErrorsByWebsiteId);
+    this.router.get(`${this.path}/website/:id(\\d+)`, authMiddleware, this.websiteErrorsController.getWebsiteErrorsByWebsiteId);
   }
 }
 

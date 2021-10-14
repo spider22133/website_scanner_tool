@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, FC } from 'react';
-import { errorObj } from '../interfaces/error.interface';
+type errorObj = {
+  message: string;
+  status: number;
+};
 
 type APIErrorType = {
   error: errorObj | null;

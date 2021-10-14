@@ -13,6 +13,11 @@ class WebsiteErrorService {
     const findErrors: WebsiteError[] = await this.website_errors.findAll({ where: { website_id: websiteId } });
     return findErrors;
   }
+
+  public async createWebsiteError(website_id: number, answer_code: number, answer_text: string): Promise<WebsiteError> {
+    const createUserData: WebsiteError = await this.website_errors.create({ website_id, answer_code, answer_text });
+    return createUserData;
+  }
 }
 
 export default WebsiteErrorService;

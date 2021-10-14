@@ -4,5 +4,4 @@ export default interface IState {
   answer_code: number;
   answer_time: number;
   createdAt: string;
-  [key: string]: number | string;
 }

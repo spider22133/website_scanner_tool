@@ -5,10 +5,6 @@ export const getChartData = (data: IState[]): { series: ApexAxisChartSeries; opt
   const answerTimes: number[] = [];
   const createdTimes: string[] = [];
 
-  const addZero = (i: number): string | number => {
-    return i < 10 ? '0' + i : i;
-  };
-
   data.forEach(e => {
     const date = new Date(e.createdAt);
     const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`;
@@ -69,4 +65,8 @@ export const getChartData = (data: IState[]): { series: ApexAxisChartSeries; opt
   };
 
   return { series, options };
+};
+
+export const addZero = (i: number): string | number => {
+  return i < 10 ? '0' + i : i;
 };

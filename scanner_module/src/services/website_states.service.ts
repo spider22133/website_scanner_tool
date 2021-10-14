@@ -16,6 +16,11 @@ class WebsiteStatesService {
     return findStates;
   }
 
+  public async createWebsiteState(website_id: number, answer_time: number, answer_code: number): Promise<WebsiteState> {
+    const createUserData: WebsiteState = await this.website_states.create({ website_id, answer_time, answer_code });
+    return createUserData;
+  }
+
   public async aggregatedByWebsiteId(website_id: number): Promise<{ avg: number; min: number; max: number }> {
     const [{ avg, min, max }]: any = await this.website_states.findAll({
       where: { website_id },
