@@ -43,3 +43,16 @@ h2,
   font-weight: 900 !important;
   color: #9f9f9f;
 }
+
+.list-group-item {
+  margin-bottom: 3px !important;
+}
+
+.list-group-item.active {
+  border-width: 2px !important;
+  margin-top: 0 !important;
+}
+
+.list-group-item {
+  border-width: 2px !important;
+}

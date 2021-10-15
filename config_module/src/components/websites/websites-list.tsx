@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { getChartData } from '../../helpers/chart.helper';
 import IWebsite from '../../interfaces/website.interface';
 import IState from '../../interfaces/website-state.interface';
 import WebsiteDataService from '../../services/website.service';
@@ -8,12 +7,12 @@ import PaginationContainer from './../elements/pagination-container.component';
 import WebsitesListItem from './webseites-list-item.component';
 import StatesDataService from '../../services/states.service';
 import StatesTable from './states-table.component';
-import Chart from 'react-apexcharts';
 import ErrorTable from './error-table.component';
 import ErrorsDataService from '../../services/errors.service';
 import IWebsiteError from '../../interfaces/error.interface';
 import fetchData from '../../helpers/fetch-data.helper';
 import { useAPIError } from '../../contexts/api-error.context';
+import Chart from '../elements/chart.component';
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -24,7 +23,6 @@ export default function WebsitesList() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { series, options } = getChartData(states);
   const { addError } = useAPIError();
   const itemsPerPage = 15;
 
@@ -105,14 +103,14 @@ export default function WebsitesList() {
           <div className="col col-lg-7 scrollable">
             {errors.length > 0 ? (
               <div className="border border-danger border-2 rounded-2 p-4 mb-3">
-                <h2 className=" text-danger">Error list</h2>
+                <h2 className="">Error list</h2>
                 <ErrorTable errors={errors} />
               </div>
             ) : (
               ''
             )}
             <div className="border border-gray border-2 rounded-2 p-4 mb-3">
-              <Chart options={options} series={series} type="area" height={350} />
+              <Chart states={states} />
               <div className="d-flex aggregates justify-content-center w-100 text-center">
                 <div className="me-5">
                   Average
