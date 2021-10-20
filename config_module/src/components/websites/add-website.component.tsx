@@ -6,18 +6,25 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import IWebsite from '../../interfaces/website.interface';
+import { sleep } from '../../helpers/animation.helper';
+
+type Props = {
+  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
+  getWebsites: () => Promise<void>;
+};
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(4),
   url: Yup.string().required('Username is required').url('Url is invalid'),
 });
 
-export default function AddWebsite() {
+export default function AddWebsite({ setShowAddForm, getWebsites }: Props) {
   const [message, setMessage] = useState('');
   const { addError } = useAPIError();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
@@ -26,8 +33,16 @@ export default function AddWebsite() {
   const onSubmit: SubmitHandler<IWebsite> = data => {
     const { name, url } = data;
     WebsiteDataService.create({ name, url })
-      .then(response => {
+      .then(async response => {
         setMessage(`${response.data.data.name} successfully added!`);
+
+        await sleep(1500);
+        setMessage('');
+        await sleep(500);
+
+        setShowAddForm(false);
+        getWebsites();
+        reset();
       })
       .catch((error: AxiosError) => {
         if (error.response) {
@@ -37,36 +52,34 @@ export default function AddWebsite() {
   };
 
   return (
-    <div className="container">
-      <div className="my-4">
-        <h1>Add website</h1>
-        <div className="col-6">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-group mb-3">
-              <label className="form-label">Website name</label>
-              <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" placeholder="Name" {...register('name')} />
-              <div className="invalid-feedback">{errors.name?.message}</div>
-            </div>
-            <div className="form-group mb-3">
-              <label className="form-label">Url address</label>
-              <input
-                className={`form-control ${errors.url ? 'is-invalid' : ''}`}
-                type="text"
-                id="url"
-                placeholder="http://example.com"
-                {...register('url')}
-              />
-              <div className="invalid-feedback">{errors.url?.message}</div>
-            </div>
-            <div className="d-flex justify-content-start">
-              <button className="btn btn-warning" type="submit">
-                Submit
-              </button>
-              <div className="m-0 p-2 text-success">{message && <>{message}</>}</div>
-            </div>
-          </form>
+    <div className=" p-4">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="form-group mb-3">
+          <label className="form-label">Website name</label>
+          <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" {...register('name')} />
+          <div className="invalid-feedback">{errors.name?.message}</div>
         </div>
-      </div>
+        <div className="form-group mb-3">
+          <label className="form-label">Url address</label>
+          <input
+            className={`form-control ${errors.url ? 'is-invalid' : ''}`}
+            type="text"
+            id="url"
+            placeholder="http://example.com"
+            {...register('url')}
+          />
+          <div className="invalid-feedback">{errors.url?.message}</div>
+        </div>
+        <div className="d-flex justify-content-start">
+          <button className="btn btn-warning" type="submit">
+            Submit
+          </button>
+          <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
+            Cancel
+          </button>
+          <div className="m-0 p-2 text-success">{message && <>{message}</>}</div>
+        </div>
+      </form>
     </div>
   );
 }

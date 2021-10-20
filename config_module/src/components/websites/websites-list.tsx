@@ -13,6 +13,14 @@ import IWebsiteError from '../../interfaces/error.interface';
 import fetchData from '../../helpers/fetch-data.helper';
 import { useAPIError } from '../../contexts/api-error.context';
 import Chart from '../elements/chart.component';
+import { IoAdd } from 'react-icons/io5';
+import AddWebsite from './add-website.component';
+import { motion } from 'framer-motion';
+
+const variants = {
+  open: { height: '100%', opacity: 1 },
+  closed: { height: 0, opacity: 0 },
+};
 
 export default function WebsitesList() {
   const [websites, setWebsites] = useState<IWebsite[]>([]);
@@ -22,6 +30,7 @@ export default function WebsitesList() {
   const [errors, setWebsiteErrors] = useState<IWebsiteError[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const { addError } = useAPIError();
   const itemsPerPage = 15;
@@ -82,10 +91,10 @@ export default function WebsitesList() {
   };
 
   return (
-    <div className="container-fluid">
+    <div className="container">
       <div className="my-4">
         <div className="row">
-          <div className="col col-lg-5 mb-3">
+          <div className="col col-lg-5 mb-3 d-flex flex-column list-component">
             <ul className="list-group list-group-numbered">
               {websites &&
                 websites.map((website: IWebsite, index) => (
@@ -99,6 +108,25 @@ export default function WebsitesList() {
                   />
                 ))}
             </ul>
+            <motion.div
+              animate={showAddForm ? 'open' : 'closed'}
+              variants={variants}
+              initial="closed"
+              transition={{ ease: 'easeOut', duration: '0.5' }}
+            >
+              <AddWebsite getWebsites={getWebsites} setShowAddForm={setShowAddForm} />
+            </motion.div>
+            {!showAddForm ? (
+              <button
+                className="btn btn-outline-primary btn-sm rounded-2 mb-1"
+                style={{ zIndex: 1 }}
+                type="button"
+                title="Add"
+                onClick={() => setShowAddForm(showAddForm => !showAddForm)}
+              >
+                <IoAdd size="1.7em" />
+              </button>
+            ) : null}
           </div>
           <div className="col col-lg-7 scrollable">
             {errors.length > 0 ? (
@@ -110,24 +138,7 @@ export default function WebsitesList() {
               ''
             )}
             <div className="border border-gray border-2 rounded-2 p-4 mb-3">
-              <Chart states={states} />
-              <div className="d-flex aggregates justify-content-center w-100 text-center">
-                <div className="me-5">
-                  Average
-                  <br />
-                  <p style={{ color: 'black' }}>{Math.round(aggrStates ? aggrStates.avg : 0) / 1000} Sec(s)</p>
-                </div>
-                <div className="me-5">
-                  The fastest
-                  <br />
-                  <p style={{ color: 'black' }}>{(aggrStates ? aggrStates.min : 0) / 1000} Sec(s)</p>
-                </div>
-                <div className="me-5">
-                  The slowest
-                  <br />
-                  <p style={{ color: 'black' }}>{(aggrStates ? aggrStates.max : 0) / 1000} Sec(s)</p>
-                </div>
-              </div>
+              <Chart states={states} aggrStates={aggrStates} />
             </div>
             <div className="border border-gray border-2 rounded-2 p-4">
               <h2>Check list</h2>

@@ -24,7 +24,6 @@ function App() {
           <PublicRoute exact path={['/signup']} component={SignUp} />
           <PrivateRoute exact path={'/websites'} component={WebsitesList} />
           <PrivateRoute path="/websites/:id" component={EditWebsite} />
-          <PrivateRoute exact path="/add-website" component={AddWebsite} />
         </Switch>
         <APIErrorNotification />
       </APIErrorProvider>

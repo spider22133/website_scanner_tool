@@ -5,8 +5,9 @@ import { addZero } from '../../helpers/chart.helper';
 import IState from '../../interfaces/website-state.interface';
 type Props = {
   states: IState[];
+  aggrStates: { avg: number; min: number; max: number } | undefined;
 };
-export default function Chart({ states }: Props) {
+export default function Chart({ states, aggrStates }: Props) {
   const [series, setSeries] = useState<ApexAxisChartSeries>([
     {
       name: 'Answer Time:',
@@ -77,6 +78,23 @@ export default function Chart({ states }: Props) {
   return (
     <>
       <ReactApexChart options={options} series={series} type="area" height={350} />
+      <div className="d-flex aggregates justify-content-center w-100 text-center">
+        <div className="me-5">
+          Average
+          <br />
+          <p style={{ color: 'black' }}>{Math.round(aggrStates ? aggrStates.avg : 0) / 1000} Sec(s)</p>
+        </div>
+        <div className="me-5">
+          The fastest
+          <br />
+          <p style={{ color: 'black' }}>{(aggrStates ? aggrStates.min : 0) / 1000} Sec(s)</p>
+        </div>
+        <div className="me-5">
+          The slowest
+          <br />
+          <p style={{ color: 'black' }}>{(aggrStates ? aggrStates.max : 0) / 1000} Sec(s)</p>
+        </div>
+      </div>
     </>
   );
 }

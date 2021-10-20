@@ -26,11 +26,6 @@ export default function Header() {
                 Websites
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" activeClassName="active" aria-current="page" to="/add-website">
-                Add website
-              </NavLink>
-            </li>
           </ul>
 
           {user ? (
