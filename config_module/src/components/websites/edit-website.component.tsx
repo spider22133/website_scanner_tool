@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import IWebsite from '../../interfaces/website.interface';
 import WebsiteDataService from '../../services/website.service';
 import { AxiosError } from 'axios';
@@ -7,6 +7,8 @@ import { useAPIError } from '../../contexts/api-error.context';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import { useAppDispatch } from '../../store';
+import { updateWebsite } from '../../slices/websites.slice';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(4),
@@ -19,6 +21,7 @@ export default function EditWebsite() {
   const [message, setMessage] = useState('');
 
   const { addError } = useAPIError();
+  const dispatch = useAppDispatch();
   const Name = website ? website.name : '';
   const Url = website ? website.url : '';
 
@@ -54,16 +57,11 @@ export default function EditWebsite() {
   const onSubmit: SubmitHandler<IWebsite> = data => {
     const { name, url } = data;
     console.log(data);
-    WebsiteDataService.update(id, { name: name || Name, url: url || Url })
-      .then(response => {
-        setWebsite(response.data.data);
+    dispatch(updateWebsite({ id, name: name || Name, url: url || Url })).then(async response => {
+      if (updateWebsite.fulfilled.match(response)) {
         setMessage('Website successfully updated!');
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          addError(error.response.data.message, error.response.status);
-        }
-      });
+      }
+    });
   };
 
   return (

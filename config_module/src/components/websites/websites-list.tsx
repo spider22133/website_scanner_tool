@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AxiosError } from 'axios';
 import IWebsite from '../../interfaces/website.interface';
 import IState from '../../interfaces/website-state.interface';
-import WebsiteDataService from '../../services/website.service';
 import PaginationContainer from './../elements/pagination-container.component';
 import WebsitesListItem from './webseites-list-item.component';
 import StatesDataService from '../../services/states.service';
@@ -17,13 +15,17 @@ import { IoAdd } from 'react-icons/io5';
 import AddWebsite from './add-website.component';
 import { motion } from 'framer-motion';
 
+import { retrieveWebsites } from '../../slices/websites.slice';
+import { RootState, useAppDispatch } from '../../store';
+import { useSelector } from 'react-redux';
+
 const variants = {
   open: { height: '100%', opacity: 1 },
   closed: { height: 0, opacity: 0 },
 };
 
 export default function WebsitesList() {
-  const [websites, setWebsites] = useState<IWebsite[]>([]);
+  const websites = useSelector((state: RootState) => state.websites);
   const [states, setWebsiteStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
@@ -31,18 +33,18 @@ export default function WebsitesList() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
-
+  const dispatch = useAppDispatch();
   const { addError } = useAPIError();
   const itemsPerPage = 15;
 
   useEffect(() => {
-    getWebsites();
-  }, [websites.length]);
+    dispatch(retrieveWebsites());
+  }, []);
 
   useEffect(() => {
-    getStatesByWebsiteId(1);
-    getErrorsByWebsiteId(1);
-    getAggrStates(1);
+    getStatesByWebsiteId('1');
+    getErrorsByWebsiteId('1');
+    getAggrStates('1');
   }, []);
 
   useEffect(() => {
@@ -57,31 +59,16 @@ export default function WebsitesList() {
     setCurrentPage(1);
   };
 
-  const getWebsites = async () => {
-    await fetchData(WebsiteDataService.getAll(), setWebsites, addError);
-  };
-
-  const getAggrStates = (id: number | undefined) => {
+  const getAggrStates = (id: string) => {
     fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates, addError);
   };
 
-  const getStatesByWebsiteId = (id: number | undefined) => {
+  const getStatesByWebsiteId = (id: string) => {
     fetchData(StatesDataService.getStatesByWebsiteId(id), setWebsiteStates, addError);
   };
 
-  const getErrorsByWebsiteId = (id: number | undefined) => {
+  const getErrorsByWebsiteId = (id: string) => {
     fetchData(ErrorsDataService.getErrorsByWebsiteId(id), setWebsiteErrors, addError);
-  };
-
-  const handleRemove = (id: number | undefined) => {
-    WebsiteDataService.deleteWebsite(id)
-      .then(() => {
-        const newList: IWebsite[] = websites.filter(item => item.id !== id);
-        setWebsites(newList);
-      })
-      .catch((error: AxiosError) => {
-        console.log('Error: ', error.response?.data.message);
-      });
   };
 
   const onPageChange = (page = 1) => {
@@ -98,14 +85,7 @@ export default function WebsitesList() {
             <ul className="list-group list-group-numbered">
               {websites &&
                 websites.map((website: IWebsite, index) => (
-                  <WebsitesListItem
-                    setActiveWebsite={setActiveWebsite}
-                    handleRemove={handleRemove}
-                    key={index}
-                    index={index}
-                    currentIndex={currentIndex}
-                    website={website}
-                  />
+                  <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
                 ))}
             </ul>
             <motion.div
@@ -114,7 +94,7 @@ export default function WebsitesList() {
               initial="closed"
               transition={{ ease: 'easeOut', duration: '0.5' }}
             >
-              <AddWebsite getWebsites={getWebsites} setShowAddForm={setShowAddForm} />
+              <AddWebsite setShowAddForm={setShowAddForm} />
             </motion.div>
             {!showAddForm ? (
               <button

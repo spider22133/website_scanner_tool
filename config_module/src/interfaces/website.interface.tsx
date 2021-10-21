@@ -1,5 +1,5 @@
 export default interface IWebsite {
-  id?: number;
+  id: string;
   name: string;
   url: string;
   is_active?: boolean;

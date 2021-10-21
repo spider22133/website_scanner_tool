@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import WebsiteDataService from '../../services/website.service';
 import { AxiosError } from 'axios';
 import { useAPIError } from '../../contexts/api-error.context';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+
 import IWebsite from '../../interfaces/website.interface';
 import { sleep } from '../../helpers/animation.helper';
 
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { useAppDispatch } from '../../store';
+import { createWebsite } from '../../slices/websites.slice';
+
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
-  getWebsites: () => Promise<void>;
 };
 
 const validationSchema = Yup.object().shape({
@@ -18,7 +21,7 @@ const validationSchema = Yup.object().shape({
   url: Yup.string().required('Username is required').url('Url is invalid'),
 });
 
-export default function AddWebsite({ setShowAddForm, getWebsites }: Props) {
+export default function AddWebsite({ setShowAddForm }: Props) {
   const [message, setMessage] = useState('');
   const { addError } = useAPIError();
   const {
@@ -30,19 +33,22 @@ export default function AddWebsite({ setShowAddForm, getWebsites }: Props) {
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit: SubmitHandler<IWebsite> = data => {
-    const { name, url } = data;
-    WebsiteDataService.create({ name, url })
+  const dispatch = useAppDispatch();
+
+  const onSubmit: SubmitHandler<IWebsite> = async data => {
+    dispatch(createWebsite(data))
       .then(async response => {
-        setMessage(`${response.data.data.name} successfully added!`);
+        if (createWebsite.fulfilled.match(response)) {
+          const website = response.payload;
+          setMessage(`${website.name} successfully added!`);
 
-        await sleep(1500);
-        setMessage('');
-        await sleep(500);
+          await sleep(1500);
+          setMessage('');
+          await sleep(500);
 
-        setShowAddForm(false);
-        getWebsites();
-        reset();
+          setShowAddForm(false);
+          reset();
+        }
       })
       .catch((error: AxiosError) => {
         if (error.response) {

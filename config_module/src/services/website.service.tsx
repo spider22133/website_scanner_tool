@@ -1,6 +1,9 @@
 import http from '../http-connection';
-import Website from '../interfaces/website.interface';
-
+import IWebsite from '../interfaces/website.interface';
+type createProps = {
+  name: string;
+  url: string;
+};
 const getAll = () => {
   return http.get('/websites');
 };
@@ -9,15 +12,16 @@ const getWebsiteById = (id: string) => {
   return http.get(`/websites/${id}`);
 };
 
-const update = (id: string, data: Website) => {
-  return http.put(`/websites/${id}`, data);
+const update = (data: IWebsite) => {
+  const { id, name, url } = data;
+  return http.put(`/websites/${id}`, { name, url });
 };
 
-const create = (data: Website) => {
+const create = (data: createProps) => {
   return http.post('/websites/create', data);
 };
 
-const deleteWebsite = (id: number | undefined) => {
+const deleteWebsite = (id: string) => {
   return http.delete(`/websites/${id}`);
 };
 

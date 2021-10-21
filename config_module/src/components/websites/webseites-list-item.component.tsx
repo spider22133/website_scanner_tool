@@ -1,18 +1,24 @@
 import { Link } from 'react-router-dom';
 import IWebsite from '../../interfaces/website.interface';
 import { IoTrashOutline, IoCreateOutline } from 'react-icons/io5';
+import { useAppDispatch } from '../../store';
+import { deleteWebsite } from '../../slices/websites.slice';
 
 type Props = {
   index: number;
   website: IWebsite;
   currentIndex: number;
-  handleRemove: (id: number | undefined) => void;
   setActiveWebsite: SetActiveTutorial;
 };
 
 type SetActiveTutorial = (website: IWebsite, index: number) => void;
 
-export default function WebsitesListItem({ website, index, currentIndex, handleRemove, setActiveWebsite }: Props) {
+export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: Props) {
+  const dispatch = useAppDispatch();
+  const handleRemove = (id: string) => {
+    dispatch(deleteWebsite({ id }));
+  };
+
   return (
     <>
       <li

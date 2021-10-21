@@ -1,6 +1,6 @@
 import http from '../http-connection';
 
-const getErrorsByWebsiteId = (id: number | undefined) => {
+const getErrorsByWebsiteId = (id: string) => {
   return http.get(`/website-errors/website/${id}`);
 };
 
