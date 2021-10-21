@@ -33,7 +33,7 @@ class WebsitesController {
     try {
       const websiteId = Number(req.params.id);
       const websiteData: CreateWebsiteDto = req.body;
-      const { status, msg } = await new WebsiteChecker().checkUrl(websiteData.url);
+      const { status, msg } = await this.websiteChecker.checkUrl(websiteData.url);
 
       if (status !== 200) next(msg);
 
@@ -47,7 +47,7 @@ class WebsitesController {
   public createWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteData: CreateWebsiteDto = req.body;
-      const { status, msg } = await new WebsiteChecker().checkUrl(websiteData.url);
+      const { status, msg } = await this.websiteChecker.checkUrl(websiteData.url);
 
       if (status !== 200) next(msg);
 

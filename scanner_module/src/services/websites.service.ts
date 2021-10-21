@@ -4,7 +4,6 @@ import CreateWebsiteDto from '@dtos/website.dto';
 import { isEmpty } from '@/utils/util';
 import HttpException from '@/exceptions/HttpException';
 import { WebsiteModel } from '@/models/website.model';
-import WebsiteChecker from '@/websiteChecker';
 
 class WebsiteService {
   public websites = DB.Websites;
