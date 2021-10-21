@@ -4,6 +4,7 @@ import CreateWebsiteDto from '@dtos/website.dto';
 import { isEmpty } from '@/utils/util';
 import HttpException from '@/exceptions/HttpException';
 import { WebsiteModel } from '@/models/website.model';
+import WebsiteChecker from '@/websiteChecker';
 
 class WebsiteService {
   public websites = DB.Websites;
@@ -24,10 +25,10 @@ class WebsiteService {
   }
 
   public async updateWebsite(id: number, data: CreateWebsiteDto): Promise<Website> {
-    // const findWebsite: Website = await this.websites.findByPk(id);
-    // TODO: error if no website exists with id
+    const findWebsite: Website = await this.websites.findByPk(id);
+    if (!findWebsite) throw new HttpException(409, 'There is no website with such id');
 
-    await this.websites.update({ ...data }, { where: { id: id } });
+    await this.websites.update({ ...data, is_active: true }, { where: { id: id } });
 
     const updatedWebsite: Website = await this.websites.findByPk(id);
     return updatedWebsite;
@@ -39,7 +40,7 @@ class WebsiteService {
     const findWebsite: Website = await this.websites.findOne({ where: { url: websiteData.url } });
     if (findWebsite) throw new HttpException(409, `Url ${websiteData.url} already exists`);
 
-    const createWebsiteData: Website = await this.websites.create({ ...websiteData });
+    const createWebsiteData: Website = await this.websites.create({ ...websiteData, is_active: true });
     return createWebsiteData;
   }
 

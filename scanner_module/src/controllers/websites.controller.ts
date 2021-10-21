@@ -33,10 +33,11 @@ class WebsitesController {
     try {
       const websiteId = Number(req.params.id);
       const websiteData: CreateWebsiteDto = req.body;
-      const updateWebsiteData: Website = await this.websiteService.updateWebsite(websiteId, websiteData);
+      const { status, msg } = await new WebsiteChecker().checkUrl(websiteData.url);
 
-      await this.websiteChecker.checkWebsite(updateWebsiteData);
+      if (status !== 200) next(msg);
 
+      const updateWebsiteData = await this.websiteService.updateWebsite(websiteId, websiteData);
       res.status(200).json({ data: updateWebsiteData, message: 'updated' });
     } catch (error) {
       next(error);
@@ -46,10 +47,11 @@ class WebsitesController {
   public createWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteData: CreateWebsiteDto = req.body;
-      const createWebsiteData: Website = await this.websiteService.createWebsite(websiteData);
+      const { status, msg } = await new WebsiteChecker().checkUrl(websiteData.url);
 
-      await this.websiteChecker.checkWebsite(createWebsiteData);
+      if (status !== 200) next(msg);
 
+      const createWebsiteData = await this.websiteService.createWebsite(websiteData);
       res.status(201).json({ data: createWebsiteData, message: 'created' });
     } catch (error) {
       next(error);

@@ -23,6 +23,14 @@ class WebsiteChecker {
       console.log(error);
     }
   }
+  public async checkUrl(url: string) {
+    try {
+      const { status, msg } = await this.checkWebsiteStatus(url);
+
+      return { status, msg };
+    } catch (error) {}
+  }
+
   public async checkWebsite(website: Website): Promise<void> {
     try {
       const start = new Date().getTime();
