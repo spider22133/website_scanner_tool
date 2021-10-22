@@ -9,8 +9,9 @@ import { sleep } from '../../helpers/animation.helper';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import { useAppDispatch } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import { createWebsite } from '../../slices/websites.slice';
+import { useSelector } from 'react-redux';
 
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -22,6 +23,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function AddWebsite({ setShowAddForm }: Props) {
+  const { loading } = useSelector((state: RootState) => state.websites);
   const [message, setMessage] = useState('');
   const { addError } = useAPIError();
   const {
@@ -78,7 +80,7 @@ export default function AddWebsite({ setShowAddForm }: Props) {
         </div>
         <div className="d-flex justify-content-start">
           <button className="btn btn-warning" type="submit">
-            Submit
+            {loading ? 'Loading...' : 'Submit'}
           </button>
           <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
             Cancel

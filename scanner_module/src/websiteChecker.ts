@@ -3,6 +3,7 @@ import websiteStatesService from '@services/website_states.service';
 import websiteErrorService from '@services/website_error.service';
 import { Website } from '@/interfaces/website.interface';
 import fetch from 'node-fetch';
+import HttpException from './exceptions/HttpException';
 
 const HTTP_CODE_404 = 404;
 const HTTP_CODE_200 = 200;
@@ -24,11 +25,7 @@ class WebsiteChecker {
     }
   }
   public async checkUrl(url: string) {
-    try {
-      const { status, msg } = await this.checkWebsiteStatus(url);
-
-      return { status, msg };
-    } catch (error) {}
+    return await this.checkWebsiteStatus(url);
   }
 
   public async checkWebsite(website: Website): Promise<void> {

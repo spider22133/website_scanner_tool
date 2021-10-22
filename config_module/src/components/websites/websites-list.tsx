@@ -25,7 +25,7 @@ const variants = {
 };
 
 export default function WebsitesList() {
-  const websites = useSelector((state: RootState) => state.websites);
+  const { websites, loading } = useSelector((state: RootState) => state.websites);
   const [states, setWebsiteStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();

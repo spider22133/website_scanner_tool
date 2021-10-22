@@ -2,13 +2,14 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import IWebsite from '../interfaces/website.interface';
 import WebsiteDataService from '../services/website.service';
 import { AxiosError } from 'axios';
-import { number } from 'yup/lib/locale';
 
-const initialState = [] as IWebsite[];
+const initialState = {
+  websites: [] as IWebsite[],
+  loading: false as boolean,
+};
 
 interface ValidationErrors {
-  errorMessage: string;
-  field_errors: Record<string, string>;
+  message: string;
 }
 
 export const createWebsite = createAsyncThunk<
@@ -17,9 +18,17 @@ export const createWebsite = createAsyncThunk<
   {
     rejectValue: ValidationErrors;
   }
->('websites/create', async ({ name, url }, { rejectWithValue }) => {
-  const res = await WebsiteDataService.create({ name, url });
-  return res.data.data;
+>('websites/create', async ({ name, url }, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await WebsiteDataService.create({ name, url });
+    return res.data.data;
+  } catch (err: any) {
+    const error: AxiosError<ValidationErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    return rejectWithValue(error.response.data);
+  }
 });
 
 export const retrieveWebsites = createAsyncThunk<
@@ -60,18 +69,55 @@ const websiteSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: builder => {
+    // Create website
+    builder.addCase(createWebsite.pending, (state, {}) => {
+      state.loading = true;
+    });
     builder.addCase(createWebsite.fulfilled, (state, { payload }) => {
-      state.push(payload);
+      state.loading = false;
+      state.websites.push(payload);
+    });
+    builder.addCase(createWebsite.rejected, (state, { payload }) => {
+      if (payload) {
+        state.loading = false;
+        console.log('###########', payload.message);
+      }
+    });
+
+    // Retrieve websites
+    builder.addCase(retrieveWebsites.pending, (state, {}) => {
+      state.loading = true;
     });
     builder.addCase(retrieveWebsites.fulfilled, (state, { payload }) => {
-      return [...payload];
+      state.loading = false;
+      state.websites = payload;
+    });
+    builder.addCase(retrieveWebsites.rejected, (state, { payload }) => {
+      if (payload) {
+        state.loading = false;
+        console.log('###########', payload.message);
+      }
+    });
+
+    // Update website
+    builder.addCase(updateWebsite.pending, (state, {}) => {
+      state.loading = true;
     });
     builder.addCase(updateWebsite.fulfilled, (state, { payload }) => {
-      state[payload.id as unknown as number] = payload;
+      state.loading = false;
+      state.websites[payload.id as unknown as number] = payload;
     });
+    builder.addCase(updateWebsite.rejected, (state, { payload }) => {
+      if (payload) {
+        state.loading = false;
+        console.log('###########', payload.message);
+      }
+    });
+
+    // Delete website
     builder.addCase(deleteWebsite.fulfilled, (state, { payload }) => {
-      const newList: IWebsite[] = state.filter(item => item.id !== payload.id);
-      return [...newList];
+      const newList: IWebsite[] = state.websites.filter(item => item.id !== payload.id);
+      state.websites = newList;
     });
   },
 });
