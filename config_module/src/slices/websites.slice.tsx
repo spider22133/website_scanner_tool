@@ -39,9 +39,18 @@ export const retrieveWebsites = createAsyncThunk<
   {
     rejectValue: httpErrors;
   }
->('websites/retrieve', async (_, { rejectWithValue }) => {
-  const res = await WebsiteDataService.getAll();
-  return res.data.data;
+>('websites/retrieve', async (_, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await WebsiteDataService.getAll();
+    return res.data.data;
+  } catch (err: any) {
+    const error: AxiosError<httpErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    dispatch(setMessage(error.response.data.message));
+    return rejectWithValue(error.response.data);
+  }
 });
 
 export const updateWebsite = createAsyncThunk<
@@ -50,9 +59,18 @@ export const updateWebsite = createAsyncThunk<
   {
     rejectValue: httpErrors;
   }
->('websites/update', async (data, { rejectWithValue }) => {
-  const response = await WebsiteDataService.update(data);
-  return response.data.data;
+>('websites/update', async (data, { rejectWithValue, dispatch }) => {
+  try {
+    const response = await WebsiteDataService.update(data);
+    return response.data.data;
+  } catch (err: any) {
+    const error: AxiosError<httpErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    dispatch(setMessage(error.response.data.message));
+    return rejectWithValue(error.response.data);
+  }
 });
 
 export const deleteWebsite = createAsyncThunk<
@@ -61,9 +79,18 @@ export const deleteWebsite = createAsyncThunk<
   {
     rejectValue: httpErrors;
   }
->('websites/delete', async ({ id }) => {
-  await WebsiteDataService.deleteWebsite(id);
-  return { id };
+>('websites/delete', async ({ id }, { rejectWithValue, dispatch }) => {
+  try {
+    await WebsiteDataService.deleteWebsite(id);
+    return { id };
+  } catch (err: any) {
+    const error: AxiosError<httpErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    dispatch(setMessage(error.response.data.message));
+    return rejectWithValue(error.response.data);
+  }
 });
 
 const websiteSlice = createSlice({
