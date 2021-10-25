@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { AxiosError } from 'axios';
-import { useAPIError } from '../../contexts/api-error.context';
+import { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 import IWebsite from '../../interfaces/website.interface';
@@ -12,6 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { RootState, useAppDispatch } from '../../store';
 import { createWebsite } from '../../slices/websites.slice';
 import { useSelector } from 'react-redux';
+import { clearMessage } from '../../slices/message.slice';
 
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,8 +23,7 @@ const validationSchema = Yup.object().shape({
 
 export default function AddWebsite({ setShowAddForm }: Props) {
   const { loading } = useSelector((state: RootState) => state.websites);
-  const [message, setMessage] = useState('');
-  const { addError } = useAPIError();
+  const { message } = useSelector((state: RootState) => state.message);
   const {
     register,
     handleSubmit,
@@ -37,26 +35,19 @@ export default function AddWebsite({ setShowAddForm }: Props) {
 
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    dispatch(clearMessage());
+  }, [dispatch]);
+
   const onSubmit: SubmitHandler<IWebsite> = async data => {
-    dispatch(createWebsite(data))
-      .then(async response => {
-        if (createWebsite.fulfilled.match(response)) {
-          const website = response.payload;
-          setMessage(`${website.name} successfully added!`);
+    dispatch(createWebsite(data)).then(async response => {
+      if (createWebsite.fulfilled.match(response)) {
+        await sleep(1000);
 
-          await sleep(1500);
-          setMessage('');
-          await sleep(500);
-
-          setShowAddForm(false);
-          reset();
-        }
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          addError(error.response.data.message, error.response.status);
-        }
-      });
+        setShowAddForm(false);
+        reset();
+      }
+    });
   };
 
   return (
@@ -85,8 +76,14 @@ export default function AddWebsite({ setShowAddForm }: Props) {
           <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
             Cancel
           </button>
-          <div className="m-0 p-2 text-success">{message && <>{message}</>}</div>
         </div>
+        {message && (
+          <div className="form-group mt-3">
+            <div className="alert alert-danger" role="alert">
+              {message}
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

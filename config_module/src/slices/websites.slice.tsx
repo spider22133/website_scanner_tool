@@ -2,13 +2,14 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import IWebsite from '../interfaces/website.interface';
 import WebsiteDataService from '../services/website.service';
 import { AxiosError } from 'axios';
+import { setMessage } from './message.slice';
 
 const initialState = {
   websites: [] as IWebsite[],
   loading: false as boolean,
 };
 
-interface ValidationErrors {
+interface httpErrors {
   message: string;
 }
 
@@ -16,17 +17,18 @@ export const createWebsite = createAsyncThunk<
   IWebsite,
   IWebsite,
   {
-    rejectValue: ValidationErrors;
+    rejectValue: httpErrors;
   }
 >('websites/create', async ({ name, url }, { rejectWithValue, dispatch }) => {
   try {
     const res = await WebsiteDataService.create({ name, url });
     return res.data.data;
   } catch (err: any) {
-    const error: AxiosError<ValidationErrors> = err;
+    const error: AxiosError<httpErrors> = err;
     if (!error.response) {
       throw err;
     }
+    dispatch(setMessage(error.response.data.message));
     return rejectWithValue(error.response.data);
   }
 });
@@ -35,7 +37,7 @@ export const retrieveWebsites = createAsyncThunk<
   IWebsite[],
   void,
   {
-    rejectValue: ValidationErrors;
+    rejectValue: httpErrors;
   }
 >('websites/retrieve', async (_, { rejectWithValue }) => {
   const res = await WebsiteDataService.getAll();
@@ -46,7 +48,7 @@ export const updateWebsite = createAsyncThunk<
   IWebsite,
   IWebsite,
   {
-    rejectValue: ValidationErrors;
+    rejectValue: httpErrors;
   }
 >('websites/update', async (data, { rejectWithValue }) => {
   const response = await WebsiteDataService.update(data);
@@ -57,7 +59,7 @@ export const deleteWebsite = createAsyncThunk<
   { id: string },
   { id: string },
   {
-    rejectValue: ValidationErrors;
+    rejectValue: httpErrors;
   }
 >('websites/delete', async ({ id }) => {
   await WebsiteDataService.deleteWebsite(id);
@@ -80,7 +82,6 @@ const websiteSlice = createSlice({
     builder.addCase(createWebsite.rejected, (state, { payload }) => {
       if (payload) {
         state.loading = false;
-        console.log('###########', payload.message);
       }
     });
 
@@ -110,7 +111,6 @@ const websiteSlice = createSlice({
     builder.addCase(updateWebsite.rejected, (state, { payload }) => {
       if (payload) {
         state.loading = false;
-        console.log('###########', payload.message);
       }
     });
 
