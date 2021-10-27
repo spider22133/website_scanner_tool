@@ -4,6 +4,7 @@ import { CreateUserDto } from '@dtos/users.dto';
 import HttpException from '@exceptions/HttpException';
 import { User } from '@/interfaces/user.interface';
 import { isEmpty } from '@utils/util';
+import { Role } from '@/interfaces/role.interface';
 
 class UserService {
   public users = DB.Users;
@@ -20,6 +21,14 @@ class UserService {
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;
+  }
+
+  public async findUserRoles(userId: number): Promise<Role[]> {
+    if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
+
+    const findRoles: Role[] = await (await this.users.findByPk(userId)).getRoles();
+
+    return findRoles;
   }
 
   public async createUser(userData: CreateUserDto): Promise<User> {

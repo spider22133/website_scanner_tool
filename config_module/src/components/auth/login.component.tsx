@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AuthService from '../../services/auth.service';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -39,8 +39,9 @@ export default function LogIn() {
         setLoading(false);
         setCurrentUser(response.data.user);
         setUserSession(response.data.token, response.data.user);
-
-        history.push('/websites');
+        console.log(response.data.user.id);
+        AuthService.getUserRoles(response.data.user.id).then(response => console.log(response.data.data));
+        // history.push('/websites');
       })
       .catch((error: AxiosError) => {
         if (error.response) {

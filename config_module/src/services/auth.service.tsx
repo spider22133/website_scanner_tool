@@ -9,9 +9,14 @@ const login = (data: IUser) => {
   return http.post('/login', data);
 };
 
+const getUserRoles = (id: string) => {
+  return http.get(`/users/${id}/roles`);
+};
+
 const AuthService = {
   signup,
   login,
+  getUserRoles,
 };
 
 export default AuthService;

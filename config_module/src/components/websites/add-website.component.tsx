@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 import IWebsite from '../../interfaces/website.interface';
