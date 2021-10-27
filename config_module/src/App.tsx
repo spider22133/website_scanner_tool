@@ -25,7 +25,6 @@ function App() {
           <PrivateRoute exact path={'/websites'} component={WebsitesList} />
           <PrivateRoute path="/websites/:id" component={EditWebsite} />
         </Switch>
-        <APIErrorNotification />
       </APIErrorProvider>
     </AuthContextProvider>
   );

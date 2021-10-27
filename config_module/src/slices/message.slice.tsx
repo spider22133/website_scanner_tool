@@ -1,18 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  message: '' as string,
-};
+export interface iniState {
+  id: string;
+  message: string;
+}
+
+const initialState: iniState[] = [];
 
 const messageSlice = createSlice({
   name: 'message',
   initialState,
   reducers: {
-    setMessage: (state, action) => {
-      return { message: action.payload };
+    setMessage: (state, { payload }) => {
+      const index = state.findIndex(item => item.id === payload.id);
+      if (index === -1) state.push(payload);
+      else
+        state[index] = {
+          ...state[index],
+          ...payload,
+        };
     },
-    clearMessage: () => {
-      return { message: '' };
+    clearMessage: (state, { payload }) => {
+      const newList: iniState[] = state.filter(item => item.id !== payload);
+      return [...newList];
     },
   },
 });

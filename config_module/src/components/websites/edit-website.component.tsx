@@ -12,21 +12,25 @@ import { RootState, useAppDispatch } from '../../store';
 import { useSelector } from 'react-redux';
 import { clearMessage } from '../../slices/message.slice';
 import { updateWebsite } from '../../slices/websites.slice';
+import { type } from 'os';
+import { sleep } from '../../helpers/animation.helper';
+import { APIErrorNotification } from '../elements/error-notification.component';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(4),
   url: Yup.string().required('Username is required').url('Url is invalid'),
 });
 
-export default function EditWebsite() {
-  const { id } = useParams<{ id: string }>();
-  const [website, setWebsite] = useState<IWebsite>();
-  const [message, setMessage] = useState('');
+type Props = {
+  website: IWebsite;
+  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
+  showAddForm: boolean;
+};
 
-  const { addError } = useAPIError();
+export default function EditWebsite({ website, setShowAddForm, showAddForm }: Props) {
+  const { loading } = useSelector((state: RootState) => state.websites);
+  const messages = useSelector((state: RootState) => state.messages);
   const dispatch = useAppDispatch();
-  const Name = website ? website.name : '';
-  const Url = website ? website.url : '';
 
   const {
     register,
@@ -38,69 +42,53 @@ export default function EditWebsite() {
   });
 
   useEffect(() => {
-    getWebsiteById(id);
-  }, []);
-
-  useEffect(() => {
     reset(website);
   }, [website]);
 
-  const getWebsiteById = (id: string) => {
-    WebsiteDataService.getWebsiteById(id)
-      .then(response => {
-        setWebsite(response.data.data);
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          addError(error.response.data.message, error.response.status);
-        }
-      });
-  };
-
   const onSubmit: SubmitHandler<IWebsite> = data => {
     const { name, url } = data;
-    console.log(data);
-    dispatch(updateWebsite({ id, name: name || Name, url: url || Url })).then(async response => {
+    dispatch(updateWebsite({ id: website.id, name: name || website.name, url: url || website.url })).then(async response => {
       if (updateWebsite.fulfilled.match(response)) {
-        setMessage('Website successfully updated!');
+        dispatch(clearMessage(website.id));
+        await sleep(1000);
+        setShowAddForm(false);
+        reset();
       }
     });
   };
-
   return (
-    <div className="container">
-      <div className="my-4">
-        <h1>Edit {website ? website.name : ''}</h1>
-        <div className="col-6">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-group mb-3">
-              <label className="form-label">Website name</label>
-              <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" placeholder="Name" {...register('name')} />
-              <div className="invalid-feedback">{errors.name?.message}</div>
-            </div>
-            <div className="form-group mb-3">
-              <label className="form-label">Url address</label>
-              <input
-                className={`form-control ${errors.url ? 'is-invalid' : ''}`}
-                type="text"
-                id="url"
-                placeholder="http://example.com"
-                {...register('url')}
-              />
-              <div className="invalid-feedback">{errors.url?.message}</div>
-            </div>
-            <div className="d-flex justify-content-start">
-              <button className="btn btn-warning me-1" type="submit">
-                Submit
-              </button>
-              <button type="button" onClick={() => reset()} className="btn btn-secondary">
-                Reset
-              </button>
-              <div className="m-0 p-2 text-success">{message && <>{message}</>}</div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    <>
+      {showAddForm ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="my-4">
+          <div className="form-group mb-3">
+            <label className="form-label">Website name</label>
+            <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" placeholder="Name" {...register('name')} />
+            <div className="invalid-feedback">{errors.name?.message}</div>
+          </div>
+          <div className="form-group mb-3">
+            <label className="form-label">Url address</label>
+            <input
+              className={`form-control ${errors.url ? 'is-invalid' : ''}`}
+              type="text"
+              id="url"
+              placeholder="http://example.com"
+              {...register('url')}
+            />
+            <div className="invalid-feedback">{errors.url?.message}</div>
+          </div>
+          <div className="d-flex justify-content-start">
+            <button className="btn btn-warning me-1" type="submit">
+              {loading ? 'Loading...' : 'Submit'}
+            </button>
+            <button type="button" onClick={() => reset()} className="btn btn-secondary">
+              Reset
+            </button>
+          </div>
+          <APIErrorNotification messages={messages} websiteId={website.id} />
+        </form>
+      ) : (
+        ' '
+      )}
+    </>
   );
 }

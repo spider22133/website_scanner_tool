@@ -13,42 +13,27 @@ interface httpErrors {
   message: string;
 }
 
+type onSubmit = {
+  data: IWebsite;
+  id: string;
+};
+
 export const createWebsite = createAsyncThunk<
   IWebsite,
-  IWebsite,
+  onSubmit,
   {
     rejectValue: httpErrors;
   }
->('websites/create', async ({ name, url }, { rejectWithValue, dispatch }) => {
+>('websites/create', async ({ data, id }, { rejectWithValue, dispatch }) => {
   try {
-    const res = await WebsiteDataService.create({ name, url });
+    const res = await WebsiteDataService.create({ name: data.name, url: data.url });
     return res.data.data;
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err;
     if (!error.response) {
       throw err;
     }
-    dispatch(setMessage(error.response.data.message));
-    return rejectWithValue(error.response.data);
-  }
-});
-
-export const retrieveWebsites = createAsyncThunk<
-  IWebsite[],
-  void,
-  {
-    rejectValue: httpErrors;
-  }
->('websites/retrieve', async (_, { rejectWithValue, dispatch }) => {
-  try {
-    const res = await WebsiteDataService.getAll();
-    return res.data.data;
-  } catch (err: any) {
-    const error: AxiosError<httpErrors> = err;
-    if (!error.response) {
-      throw err;
-    }
-    dispatch(setMessage(error.response.data.message));
+    dispatch(setMessage({ id, message: error.response.data.message }));
     return rejectWithValue(error.response.data);
   }
 });
@@ -63,6 +48,27 @@ export const updateWebsite = createAsyncThunk<
   try {
     const response = await WebsiteDataService.update(data);
     return response.data.data;
+  } catch (err: any) {
+    const error: AxiosError<httpErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+
+    dispatch(setMessage({ id: data.id, message: error.response.data.message }));
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const retrieveWebsites = createAsyncThunk<
+  IWebsite[],
+  void,
+  {
+    rejectValue: httpErrors;
+  }
+>('websites/retrieve', async (_, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await WebsiteDataService.getAll();
+    return res.data.data;
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err;
     if (!error.response) {
@@ -123,7 +129,6 @@ const websiteSlice = createSlice({
     builder.addCase(retrieveWebsites.rejected, (state, { payload }) => {
       if (payload) {
         state.loading = false;
-        console.log('###########', payload.message);
       }
     });
 
@@ -132,8 +137,13 @@ const websiteSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(updateWebsite.fulfilled, (state, { payload }) => {
+      const index = state.websites.findIndex(item => item.id === payload.id);
+
       state.loading = false;
-      state.websites[payload.id as unknown as number] = payload;
+      state.websites[index] = {
+        ...state.websites[index],
+        ...payload,
+      };
     });
     builder.addCase(updateWebsite.rejected, (state, { payload }) => {
       if (payload) {

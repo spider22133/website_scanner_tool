@@ -1,29 +1,27 @@
-import { useAPIError } from '../../contexts/api-error.context';
+import { iniState } from '../../slices/message.slice';
 
-export const APIErrorNotification = () => {
-  const { error, removeError } = useAPIError();
+type Props = {
+  websiteId: string;
+  messages: iniState[];
+};
+export const APIErrorNotification = ({ messages, websiteId }: Props) => {
   return (
-    <div
-      className={`toast position-absolute align-items-center fade ${error ? 'show' : 'hide'} bottom-0 end-0 m-3`}
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <div className="d-flex">
-        <div className="toast-body">
-          {error && (
-            <>
-              <small style={{ color: 'red' }}>
-                Status code: {error.status}
-                <br />
-                Error: {error.message}
-              </small>
-              <br />
-            </>
-          )}
+    <>
+      {messages.length !== 0 ? (
+        <div className="form-group mt-3">
+          {messages.map(({ message, id }, index) => {
+            return id === websiteId ? (
+              <div key={index} className="alert alert-danger" role="alert">
+                <div>{message}</div>
+              </div>
+            ) : (
+              ''
+            );
+          })}
         </div>
-        <button type="button" className="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onClick={removeError}></button>
-      </div>
-    </div>
+      ) : (
+        ''
+      )}
+    </>
   );
 };

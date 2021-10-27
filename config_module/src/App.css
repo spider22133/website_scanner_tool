@@ -2,9 +2,11 @@
   position: relative;
   min-height: 100vh;
 }
+
 .vh-100-c {
   height: calc(100vh - 76px) !important;
 }
+
 a {
   text-decoration: none !important;
 }
@@ -37,6 +39,7 @@ h2,
 .btn svg {
   margin-bottom: 4px;
 }
+
 .aggregates {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 12px;
@@ -65,6 +68,11 @@ h2,
 .list-component .btn-outline-primary {
   border-width: 2px;
 }
-.list-component .btn-outline-primary svg{
+
+.list-component .btn-outline-primary svg {
   margin-bottom: 0;
+}
+
+.list-group-numbered > li::before {
+  position: absolute;
 }

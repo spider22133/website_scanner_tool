@@ -21,11 +21,11 @@ import { useSelector } from 'react-redux';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
-  closed: { height: 0, opacity: 0 },
+  closed: { height: '0px', opacity: 0 },
 };
 
 export default function WebsitesList() {
-  const { websites, loading } = useSelector((state: RootState) => state.websites);
+  const { websites } = useSelector((state: RootState) => state.websites);
   const [states, setWebsiteStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
@@ -94,7 +94,7 @@ export default function WebsitesList() {
               initial="closed"
               transition={{ ease: 'easeOut', duration: '0.5' }}
             >
-              <AddWebsite setShowAddForm={setShowAddForm} />
+              <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
             </motion.div>
             {!showAddForm ? (
               <button

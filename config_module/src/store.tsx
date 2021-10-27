@@ -7,7 +7,7 @@ import websiteReducer from './slices/websites.slice';
 const reducer = {
   // auth: authReducer,
   websites: websiteReducer,
-  message: messageReducer,
+  messages: messageReducer,
 };
 
 const store = configureStore({
