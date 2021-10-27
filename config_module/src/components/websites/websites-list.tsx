@@ -9,7 +9,6 @@ import ErrorTable from './error-table.component';
 import ErrorsDataService from '../../services/errors.service';
 import IWebsiteError from '../../interfaces/error.interface';
 import fetchData from '../../helpers/fetch-data.helper';
-import { useAPIError } from '../../contexts/api-error.context';
 import Chart from '../elements/chart.component';
 import { IoAdd } from 'react-icons/io5';
 import AddWebsite from './add-website.component';
@@ -34,7 +33,6 @@ export default function WebsitesList() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
   const dispatch = useAppDispatch();
-  const { addError } = useAPIError();
   const itemsPerPage = 15;
 
   useEffect(() => {
@@ -60,15 +58,15 @@ export default function WebsitesList() {
   };
 
   const getAggrStates = (id: string) => {
-    fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates, addError);
+    fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates);
   };
 
   const getStatesByWebsiteId = (id: string) => {
-    fetchData(StatesDataService.getStatesByWebsiteId(id), setWebsiteStates, addError);
+    fetchData(StatesDataService.getStatesByWebsiteId(id), setWebsiteStates);
   };
 
   const getErrorsByWebsiteId = (id: string) => {
-    fetchData(ErrorsDataService.getErrorsByWebsiteId(id), setWebsiteErrors, addError);
+    fetchData(ErrorsDataService.getErrorsByWebsiteId(id), setWebsiteErrors);
   };
 
   const onPageChange = (page = 1) => {

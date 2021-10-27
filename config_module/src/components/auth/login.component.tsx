@@ -6,7 +6,6 @@ import { useHistory } from 'react-router-dom';
 import { setUserSession } from '../../helpers/session.helper';
 import { useAuth } from '../../contexts/auth.context';
 import { AxiosError } from 'axios';
-import { useAPIError } from '../../contexts/api-error.context';
 import * as Yup from 'yup';
 import IUser from '../../interfaces/user.interface';
 
@@ -20,8 +19,6 @@ const validationSchema = Yup.object().shape({
 
 export default function LogIn() {
   const [loading, setLoading] = useState(false);
-
-  const { addError } = useAPIError();
   const { setCurrentUser } = useAuth();
   const history = useHistory();
 
@@ -47,7 +44,7 @@ export default function LogIn() {
       })
       .catch((error: AxiosError) => {
         if (error.response) {
-          addError(error.response.data.message, error.response.status);
+          console.log(error.response.data.message, error.response.status);
         }
       })
       .finally(() => setLoading(false));
