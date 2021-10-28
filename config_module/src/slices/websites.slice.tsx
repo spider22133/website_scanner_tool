@@ -3,24 +3,21 @@ import IWebsite from '../interfaces/website.interface';
 import WebsiteDataService from '../services/website.service';
 import { AxiosError } from 'axios';
 import { setMessage } from './message.slice';
+import httpErrors from '../interfaces/api.error.interface';
 
 const initialState = {
   websites: [] as IWebsite[],
   loading: false as boolean,
 };
 
-interface httpErrors {
-  message: string;
-}
-
-type onSubmit = {
+type setErrorType = {
   data: IWebsite;
   id: string;
 };
 
 export const createWebsite = createAsyncThunk<
   IWebsite,
-  onSubmit,
+  setErrorType,
   {
     rejectValue: httpErrors;
   }
@@ -112,10 +109,8 @@ const websiteSlice = createSlice({
       state.loading = false;
       state.websites.push(payload);
     });
-    builder.addCase(createWebsite.rejected, (state, { payload }) => {
-      if (payload) {
-        state.loading = false;
-      }
+    builder.addCase(createWebsite.rejected, state => {
+      state.loading = false;
     });
 
     // Retrieve websites
@@ -126,10 +121,8 @@ const websiteSlice = createSlice({
       state.loading = false;
       state.websites = payload;
     });
-    builder.addCase(retrieveWebsites.rejected, (state, { payload }) => {
-      if (payload) {
-        state.loading = false;
-      }
+    builder.addCase(retrieveWebsites.rejected, state => {
+      state.loading = false;
     });
 
     // Update website
@@ -145,10 +138,8 @@ const websiteSlice = createSlice({
         ...payload,
       };
     });
-    builder.addCase(updateWebsite.rejected, (state, { payload }) => {
-      if (payload) {
-        state.loading = false;
-      }
+    builder.addCase(updateWebsite.rejected, state => {
+      state.loading = false;
     });
 
     // Delete website

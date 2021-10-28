@@ -3,4 +3,6 @@ export default interface IUser {
   lastName?: string;
   email: string;
   password: string;
+  roles?: string[];
+  token?: string;
 }

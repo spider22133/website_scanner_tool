@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import AuthService from '../../services/auth.service';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useHistory } from 'react-router-dom';
-import { setUserSession } from '../../helpers/session.helper';
-import { useAuth } from '../../contexts/auth.context';
-import { AxiosError } from 'axios';
 import * as Yup from 'yup';
 import IUser from '../../interfaces/user.interface';
+import { RootState, useAppDispatch } from '../../store';
+import { login } from '../../slices/auth.slice';
+import { useSelector } from 'react-redux';
+import { APIErrorNotification } from '../elements/error-notification.component';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required('Email is required').email('Email is invalid'),
@@ -18,9 +17,10 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function LogIn() {
-  const [loading, setLoading] = useState(false);
-  const { setCurrentUser } = useAuth();
+  const { loading } = useSelector((state: RootState) => state.auth);
+  const messages = useSelector((state: RootState) => state.messages);
   const history = useHistory();
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -31,24 +31,7 @@ export default function LogIn() {
   });
 
   const onSubmit: SubmitHandler<IUser> = data => {
-    const { email, password } = data;
-    setLoading(true);
-
-    AuthService.login({ email, password })
-      .then(response => {
-        setLoading(false);
-        setCurrentUser(response.data.user);
-        setUserSession(response.data.token, response.data.user);
-        console.log(response.data.user.id);
-        AuthService.getUserRoles(response.data.user.id).then(response => console.log(response.data.data));
-        // history.push('/websites');
-      })
-      .catch((error: AxiosError) => {
-        if (error.response) {
-          console.log(error.response.data.message, error.response.status);
-        }
-      })
-      .finally(() => setLoading(false));
+    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/websites'));
   };
 
   return (
@@ -88,8 +71,7 @@ export default function LogIn() {
                   No account yet, <a href="/signup">Please Signup</a>
                 </p>
               </form>
-
-              <br />
+              <APIErrorNotification messages={messages} websiteId="login" />
             </div>
           </div>
         </div>

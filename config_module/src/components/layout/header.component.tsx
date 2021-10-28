@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/auth.context';
+import { logout } from '../../slices/auth.slice';
+import { RootState, useAppDispatch } from '../../store';
 
 export default function Header() {
-  const { user, unsetCurrentUser } = useAuth();
+  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
   const [toogle, setToogle] = useState(false);
+
+  const dispatch = useAppDispatch();
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -28,7 +32,7 @@ export default function Header() {
             </li>
           </ul>
 
-          {user ? (
+          {isLoggedIn ? (
             <ul className="navbar-nav">
               <li className="nav-item">
                 <div className="nav-link">
@@ -36,7 +40,7 @@ export default function Header() {
                 </div>
               </li>
               <li className="nav-item">
-                <button className="btn btn-outline-danger btn-sm mt-1" onClick={unsetCurrentUser}>
+                <button className="btn btn-outline-danger btn-sm mt-1" onClick={() => dispatch(logout())}>
                   Logout
                 </button>
               </li>

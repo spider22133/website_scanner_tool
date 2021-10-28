@@ -1,8 +1,10 @@
 import IUser from '../interfaces/user.interface';
 
-export const setUserSession = (token: string, user: IUser) => {
-  setWithExpiry('token', token);
-  setWithExpiry('user', JSON.stringify(user));
+export const setUserSession = (user: IUser) => {
+  if (user.token) {
+    setWithExpiry('token', user.token);
+    setWithExpiry('user', JSON.stringify(user));
+  }
 };
 
 export const userIsLogged = () => {
