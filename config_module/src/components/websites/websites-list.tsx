@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { retrieveWebsites } from '../../slices/websites.slice';
 import { RootState, useAppDispatch } from '../../store';
 import { useSelector } from 'react-redux';
+import { getStatesByWebsiteId, selectAllStates } from '../../slices/states.slice';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -24,26 +25,25 @@ const variants = {
 };
 
 export default function WebsitesList() {
+  const itemsPerPage = 15;
+  const dispatch = useAppDispatch();
+
   const { websites } = useSelector((state: RootState) => state.websites);
-  const [states, setWebsiteStates] = useState<IState[]>([]);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const states = useSelector(selectAllStates);
+
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
   const [errors, setWebsiteErrors] = useState<IWebsiteError[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
-  const dispatch = useAppDispatch();
-  const itemsPerPage = 15;
 
   useEffect(() => {
     dispatch(retrieveWebsites());
-  }, []);
-
-  useEffect(() => {
-    getStatesByWebsiteId('1');
-    getErrorsByWebsiteId('1');
+    dispatch(getStatesByWebsiteId('1'));
     getAggrStates('1');
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     onPageChange();
@@ -51,18 +51,16 @@ export default function WebsitesList() {
 
   const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
-    getErrorsByWebsiteId(website.id);
-    getStatesByWebsiteId(website.id);
-    getAggrStates(website.id);
     setCurrentPage(1);
+
+    dispatch(getStatesByWebsiteId(website.id));
+
+    getErrorsByWebsiteId(website.id);
+    getAggrStates(website.id);
   };
 
   const getAggrStates = (id: string) => {
     fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates);
-  };
-
-  const getStatesByWebsiteId = (id: string) => {
-    fetchData(StatesDataService.getStatesByWebsiteId(id), setWebsiteStates);
   };
 
   const getErrorsByWebsiteId = (id: string) => {
@@ -72,6 +70,7 @@ export default function WebsitesList() {
   const onPageChange = (page = 1) => {
     const startItem = (page - 1) * itemsPerPage;
     const endItem = page * itemsPerPage;
+    console.log(states);
     setDisplayedStates(states.slice(startItem, endItem));
   };
 
@@ -86,6 +85,7 @@ export default function WebsitesList() {
                   <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
                 ))}
             </ul>
+
             <motion.div
               animate={showAddForm ? 'open' : 'closed'}
               variants={variants}
@@ -94,17 +94,19 @@ export default function WebsitesList() {
             >
               <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
             </motion.div>
-            {!showAddForm ? (
-              <button
-                className="btn btn-outline-primary btn-sm rounded-2 mb-1"
-                style={{ zIndex: 1 }}
-                type="button"
-                title="Add"
-                onClick={() => setShowAddForm(showAddForm => !showAddForm)}
-              >
-                <IoAdd size="1.7em" />
-              </button>
-            ) : null}
+
+            {(user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
+              (!showAddForm ? (
+                <button
+                  className="btn btn-outline-primary btn-sm rounded-2 mb-1"
+                  style={{ zIndex: 1 }}
+                  type="button"
+                  title="Add"
+                  onClick={() => setShowAddForm(showAddForm => !showAddForm)}
+                >
+                  <IoAdd size="1.7em" />
+                </button>
+              ) : null)}
           </div>
           <div className="col col-lg-7 scrollable">
             {errors.length > 0 ? (
@@ -115,9 +117,7 @@ export default function WebsitesList() {
             ) : (
               ''
             )}
-            <div className="border border-gray border-2 rounded-2 p-4 mb-3">
-              <Chart states={states} aggrStates={aggrStates} />
-            </div>
+            <div className="border border-gray border-2 rounded-2 p-4 mb-3">{<Chart states={states} aggrStates={aggrStates} />}</div>
             <div className="border border-gray border-2 rounded-2 p-4">
               <h2>Check list</h2>
               <StatesTable states={displayedStates} />

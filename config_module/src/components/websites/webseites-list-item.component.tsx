@@ -1,10 +1,11 @@
 import IWebsite from '../../interfaces/website.interface';
 import { IoTrashOutline, IoCreateOutline } from 'react-icons/io5';
-import { useAppDispatch } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import { deleteWebsite } from '../../slices/websites.slice';
 import EditWebsite from './edit-website.component';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
 
 type Props = {
   index: number;
@@ -21,6 +22,8 @@ const variants = {
 };
 
 export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: Props) {
+  const { user } = useSelector((state: RootState) => state.auth);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -43,19 +46,23 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
             <a href={website.url}>{website.url}</a>
           </div>
           <div className="">
-            <button className="btn btn-outline-warning rounded-2 ms-2" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
-              <IoCreateOutline />
-            </button>
-            <button
-              className="btn btn-outline-danger rounded-2 ms-2"
-              type="button"
-              title="Delete"
-              onClick={() => {
-                window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
-              }}
-            >
-              <IoTrashOutline />
-            </button>
+            {(user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
+              <button className="btn btn-outline-warning rounded-2 ms-2" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
+                <IoCreateOutline />
+              </button>
+            )}
+            {user.roles.includes('ROLE_ADMIN') && (
+              <button
+                className="btn btn-outline-danger rounded-2 ms-2"
+                type="button"
+                title="Delete"
+                onClick={() => {
+                  window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+                }}
+              >
+                <IoTrashOutline />
+              </button>
+            )}
           </div>
         </div>
 
