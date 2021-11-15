@@ -7,7 +7,7 @@ import { RootState } from '../store';
 
 export const getStatesByWebsiteId = createAsyncThunk('states/getStatesByWebsiteId', async (id: string) => {
   const res = await StatesDataService.getStatesByWebsiteId(id);
-
+  console.log('&&&&&&&&&&&&', res);
   const normalized = normalize<
     any,
     {
@@ -27,6 +27,7 @@ const stateSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getStatesByWebsiteId.fulfilled, (state, { payload }) => {
+      if (Object.keys(payload).length == 0) '';
       statesAdapter.setAll(state, payload.states);
     });
   },
