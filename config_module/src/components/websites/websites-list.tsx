@@ -95,7 +95,8 @@ export default function WebsitesList() {
               <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
             </motion.div>
 
-            {(user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
+            {user.roles &&
+              (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
               (!showAddForm ? (
                 <button
                   className="btn btn-outline-primary btn-sm rounded-2 mb-1"

@@ -46,12 +46,12 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
             <a href={website.url}>{website.url}</a>
           </div>
           <div className="">
-            {(user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
+            {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
               <button className="btn btn-outline-warning rounded-2 ms-2" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
                 <IoCreateOutline />
               </button>
             )}
-            {user.roles.includes('ROLE_ADMIN') && (
+            {user.roles && user.roles.includes('ROLE_ADMIN') && (
               <button
                 className="btn btn-outline-danger rounded-2 ms-2"
                 type="button"
