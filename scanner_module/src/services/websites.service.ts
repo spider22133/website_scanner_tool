@@ -4,13 +4,13 @@ import CreateWebsiteDto from '@dtos/website.dto';
 import { isEmpty } from '@/utils/util';
 import HttpException from '@/exceptions/HttpException';
 import { WebsiteModel } from '@/models/website.model';
+import { Op } from 'sequelize';
 
 class WebsiteService {
   public websites = DB.Websites;
 
   public async findAllWebsites(): Promise<Website[]> {
-    const allWebsites: Website[] = await this.websites.findAll();
-    return allWebsites;
+    return await this.websites.findAll();
   }
 
   public async findWebsiteById(websiteId: number): Promise<Website> {
@@ -29,8 +29,7 @@ class WebsiteService {
 
     await this.websites.update({ ...data, is_active: true }, { where: { id: id } });
 
-    const updatedWebsite: Website = await this.websites.findByPk(id);
-    return updatedWebsite;
+    return await this.websites.findByPk(id);
   }
 
   public async createWebsite(websiteData: CreateWebsiteDto): Promise<Website> {
@@ -39,12 +38,11 @@ class WebsiteService {
     const findWebsite: Website = await this.websites.findOne({ where: { url: websiteData.url } });
     if (findWebsite) throw new HttpException(409, `Url ${websiteData.url} already exists`);
 
-    const createWebsiteData: Website = await this.websites.create({ ...websiteData, is_active: true });
-    return createWebsiteData;
+    return await this.websites.create({ ...websiteData, is_active: true });
   }
 
   public async deleteWebsite(websiteId: number): Promise<Website> {
-    if (isEmpty(websiteId)) throw new HttpException(400, "You're not websiteId");
+    if (isEmpty(websiteId)) throw new HttpException(400, "This isn't websiteId");
 
     const findWebsite: WebsiteModel = await this.websites.findByPk(websiteId);
     if (!findWebsite) throw new HttpException(409, "You're not website");
@@ -52,6 +50,14 @@ class WebsiteService {
     await this.websites.destroy({ where: { id: websiteId } });
 
     return findWebsite;
+  }
+  public async searchQuery(data: string): Promise<Website[]> {
+    console.log(data);
+    return await this.websites.findAll({
+      where: {
+        [Op.or]: [{ name: { [Op.like]: `%${data}%` } }, { url: { [Op.like]: `%${data}%` } }],
+      },
+    });
   }
 }
 

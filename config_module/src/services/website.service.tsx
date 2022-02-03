@@ -25,12 +25,17 @@ const deleteWebsite = (id: string) => {
   return http.delete(`/websites/${id}`);
 };
 
+const searchInWebsites = (query: string) => {
+  return http.get(`/websites/q=${query}`);
+};
+
 const WebsiteDataService = {
   getAll,
   getWebsiteById,
   update,
   create,
   deleteWebsite,
+  searchInWebsites,
 };
 
 export default WebsiteDataService;

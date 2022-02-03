@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import IWebsite from '../interfaces/website.interface';
 import WebsiteDataService from '../services/website.service';
 import { AxiosError } from 'axios';
@@ -76,6 +76,26 @@ export const retrieveWebsites = createAsyncThunk<
   }
 });
 
+export const queryWebsites = createAsyncThunk<
+  IWebsite[],
+  string,
+  {
+    rejectValue: httpErrors;
+  }
+>('websites/query', async (query, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await WebsiteDataService.searchInWebsites(query);
+    return res.data.data;
+  } catch (err: any) {
+    const error: AxiosError<httpErrors> = err;
+    if (!error.response) {
+      throw err;
+    }
+    dispatch(setMessage(error.response.data.message));
+    return rejectWithValue(error.response.data);
+  }
+});
+
 export const deleteWebsite = createAsyncThunk<
   { id: string },
   { id: string },
@@ -142,10 +162,21 @@ const websiteSlice = createSlice({
       state.loading = false;
     });
 
+    // Search in websites
+    builder.addCase(queryWebsites.pending, (state, {}) => {
+      state.loading = true;
+    });
+    builder.addCase(queryWebsites.fulfilled, (state, { payload }) => {
+      state.loading = false;
+      state.websites = payload;
+    });
+    builder.addCase(queryWebsites.rejected, state => {
+      state.loading = false;
+    });
+
     // Delete website
     builder.addCase(deleteWebsite.fulfilled, (state, { payload }) => {
-      const newList: IWebsite[] = state.websites.filter(item => item.id !== payload.id);
-      state.websites = newList;
+      state.websites = state.websites.filter(item => item.id !== payload.id);
     });
   },
 });
