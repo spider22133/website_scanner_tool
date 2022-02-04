@@ -52,7 +52,6 @@ class WebsiteService {
     return findWebsite;
   }
   public async searchQuery(data: string): Promise<Website[]> {
-    console.log(data);
     return await this.websites.findAll({
       where: {
         [Op.or]: [{ name: { [Op.like]: `%${data}%` } }, { url: { [Op.like]: `%${data}%` } }],

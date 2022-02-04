@@ -26,7 +26,7 @@ const deleteWebsite = (id: string) => {
 };
 
 const searchInWebsites = (query: string) => {
-  return http.get(`/websites/q=${query}`);
+  return query ? http.get(`/websites/q=${query}`) : getAll();
 };
 
 const WebsiteDataService = {

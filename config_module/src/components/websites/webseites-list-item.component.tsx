@@ -15,10 +15,8 @@ type Props = {
   index: number;
   website: IWebsite;
   currentIndex: number;
-  setActiveWebsite: SetActiveTutorial;
+  setActiveWebsite: (website: IWebsite, index: number) => void;
 };
-
-type SetActiveTutorial = (website: IWebsite, index: number) => void;
 
 const variants = {
   open: { opacity: 1 },

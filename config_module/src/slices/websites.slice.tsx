@@ -169,6 +169,7 @@ const websiteSlice = createSlice({
     builder.addCase(queryWebsites.fulfilled, (state, { payload }) => {
       state.loading = false;
       state.websites = payload;
+      console.log(payload);
     });
     builder.addCase(queryWebsites.rejected, state => {
       state.loading = false;
