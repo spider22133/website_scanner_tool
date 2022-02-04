@@ -9,6 +9,7 @@ export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> {
   public id: number;
   public name: string;
   public url: string;
+  public is_hidden: boolean;
   public is_active: boolean;
 
   public readonly createdAt!: Date;
@@ -28,6 +29,11 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
       },
       url: {
         type: DataTypes.STRING(255),
+      },
+      is_hidden: {
+        allowNull: false,
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
       },
       is_active: {
         allowNull: false,

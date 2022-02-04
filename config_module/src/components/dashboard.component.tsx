@@ -78,39 +78,41 @@ const DashboardComponent: React.FC = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: 'grey.A100' }} className="vh-100-c">
+    <Box sx={{ bgcolor: 'grey.A100' }}>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} lg={5}>
-            <Paper sx={{ p: 3, mb: 2 }}>
-              <SearchFilterBar />
-            </Paper>
-            <Paper sx={{ p: 3, mb: 2 }}>
-              <WebsitesList currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
-            </Paper>
-            <motion.div
-              animate={showAddForm ? 'open' : 'closed'}
-              variants={variants}
-              initial="closed"
-              transition={{ ease: 'easeOut', duration: '0.5' }}
-            >
-              <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
-            </motion.div>
+            <Box sx={{ position: { lg: 'sticky' }, top: { lg: 16 } }}>
+              <Paper sx={{ p: 3, mb: 2 }}>
+                <SearchFilterBar />
+              </Paper>
+              <Paper sx={{ p: 3, mb: 2 }}>
+                <WebsitesList currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
+              </Paper>
+              <motion.div
+                animate={showAddForm ? 'open' : 'closed'}
+                variants={variants}
+                initial="closed"
+                transition={{ ease: 'easeOut', duration: '0.5' }}
+              >
+                <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
+              </motion.div>
 
-            {user.roles &&
-              (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
-              (!showAddForm ? (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => setShowAddForm(showAddForm => !showAddForm)}
-                  startIcon={<AddCircleOutlineOutlinedIcon />}
-                >
-                  Add new
-                </Button>
-              ) : null)}
+              {user.roles &&
+                (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
+                (!showAddForm ? (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => setShowAddForm(showAddForm => !showAddForm)}
+                    startIcon={<AddCircleOutlineOutlinedIcon />}
+                  >
+                    Add new
+                  </Button>
+                ) : null)}
+            </Box>
           </Grid>
-          <Grid item xs={12} lg={7} className="scrollable">
+          <Grid item xs={12} lg={7}>
             {errors.length > 0 ? (
               <div className="border border-danger border-2 rounded-2 p-4 mb-3">
                 <h2 className="">Error list</h2>

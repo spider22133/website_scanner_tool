@@ -31,7 +31,7 @@ export default function LogIn() {
   });
 
   const onSubmit: SubmitHandler<IUser> = data => {
-    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/websites'));
+    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/dashboard'));
   };
 
   return (

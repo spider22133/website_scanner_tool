@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: 'white' }}>
       <div className="container-fluid">
-        <Link className="navbar-brand" to={'/websites'}>
+        <Link className="navbar-brand" to={'/dashboard'}>
           <img src="/logo.jpg" alt="logo" width="50" height="50" />
         </Link>
         <button
@@ -26,8 +26,8 @@ export default function Header() {
         <div className={`collapse navbar-collapse ${toogle ? 'show' : ''}`} id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/websites'}>
-                Websites
+              <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/dashboard'}>
+                Dashboard
               </NavLink>
             </li>
           </ul>

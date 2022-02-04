@@ -5,7 +5,7 @@ import EditWebsite from './edit-website.component';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
-import { IconButton, Stack } from '@mui/material';
+import { IconButton, ListItem, Stack, useTheme } from '@mui/material';
 import EditIcon from '@mui/icons-material/EditOutlined';
 import Visibility from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
@@ -25,12 +25,13 @@ const variants = {
 
 export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: Props) {
   const { user } = useSelector((state: RootState) => state.auth);
-
   const [showAddForm, setShowAddForm] = useState(false);
   const [value, setValue] = useState({
     toggleVisible: false,
   });
+
   const dispatch = useAppDispatch();
+  const theme = useTheme();
 
   const handleRemove = (id: string) => {
     dispatch(deleteWebsite({ id }));
@@ -38,11 +39,12 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
 
   return (
     <>
-      <li
-        className={`list-group-item border-2 d-flex flex-column list-group-item-action ${index === currentIndex ? 'active' : ''}`}
+      <ListItem
+        className={`d-flex flex-column`}
+        sx={{ my: 0.5, border: `2px solid ${index === currentIndex ? theme.palette.info.main : theme.palette.grey.A200}`, borderRadius: 1 }}
         onClick={() => setActiveWebsite(website, index)}
       >
-        <div className="d-flex justify-content-between align-items-start align-items-center w-100" style={{ paddingLeft: '15px' }}>
+        <div className="d-flex justify-content-between align-items-start align-items-center w-100">
           <div className="ms-2 me-auto">
             <div className="fw-bold">
               {website.name}{' '}
@@ -90,7 +92,7 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
         >
           <EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} website={website} />
         </motion.div>
-      </li>
+      </ListItem>
     </>
   );
 }
