@@ -3,20 +3,16 @@ import { queryWebsites } from '../../slices/websites.slice';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
 import Visibility from '@mui/icons-material/VisibilityOutlined';
-import React, { useState } from 'react';
+import React from 'react';
 import { useAppDispatch } from '../../store';
 
-type Props = {};
+type Props = {
+  value: boolean;
+  handleClickToggle?: () => void;
+};
 
-const SearchFilterBar: React.FC<Props> = ({}) => {
+const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
   const dispatch = useAppDispatch();
-  const [value, setValue] = useState({
-    toggleVisible: false,
-  });
-
-  const handleClickToggle = () => {
-    setValue({ toggleVisible: !value.toggleVisible });
-  };
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
@@ -39,7 +35,7 @@ const SearchFilterBar: React.FC<Props> = ({}) => {
       </Typography>
       <Box sx={{ ml: '0 !important' }}>
         <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end" sx={{ mr: 1 }}>
-          {value.toggleVisible ? <VisibilityOff /> : <Visibility />}
+          {value ? <VisibilityOff /> : <Visibility />}
         </IconButton>
       </Box>
     </Stack>

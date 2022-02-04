@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import IWebsite from '../interfaces/website.interface';
 import IState from '../interfaces/website-state.interface';
 import PaginationContainer from './elements/pagination-container.component';
-import WebsitesListItem from './websites/webseites-list-item.component';
 import StatesDataService from '../services/states.service';
 import StatesTable from './websites/states-table.component';
 import ErrorTable from './websites/error-table.component';
@@ -14,14 +13,11 @@ import Chart from './elements/chart.component';
 import AddWebsite from './websites/add-website.component';
 import { motion } from 'framer-motion';
 
-import { queryWebsites, retrieveWebsites } from '../slices/websites.slice';
+import { retrieveWebsites } from '../slices/websites.slice';
 import { RootState, useAppDispatch } from '../store';
 import { useSelector } from 'react-redux';
 import { getStatesByWebsiteId, selectAllStates } from '../slices/states.slice';
-import { Stack, IconButton, InputAdornment, TextField, Typography, Box, Container, useTheme, Paper, Grid, Button } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import Visibility from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
+import { Box, Container, Paper, Grid, Button } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import WebsitesList from './websites/websites-list';
 import SearchFilterBar from './elements/search-filter-bar.component';
@@ -43,6 +39,9 @@ const DashboardComponent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [value, setValue] = useState({
+    toggleVisible: false,
+  });
 
   useEffect(() => {
     dispatch(retrieveWebsites());
@@ -77,6 +76,10 @@ const DashboardComponent: React.FC = () => {
     setDisplayedStates(states.slice(startItem, endItem));
   };
 
+  const handleClickToggle = () => {
+    setValue({ toggleVisible: !value.toggleVisible });
+  };
+
   return (
     <Box sx={{ bgcolor: 'grey.A100' }}>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
@@ -84,10 +87,10 @@ const DashboardComponent: React.FC = () => {
           <Grid item xs={12} lg={5}>
             <Box sx={{ position: { lg: 'sticky' }, top: { lg: 16 } }}>
               <Paper sx={{ p: 3, mb: 2 }}>
-                <SearchFilterBar />
+                <SearchFilterBar value={value.toggleVisible} handleClickToggle={handleClickToggle} />
               </Paper>
               <Paper sx={{ p: 3, mb: 2 }}>
-                <WebsitesList currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
+                <WebsitesList currentIndex={currentIndex} showHidden={value.toggleVisible} setActiveWebsite={setActiveWebsite} />
               </Paper>
               <motion.div
                 animate={showAddForm ? 'open' : 'closed'}

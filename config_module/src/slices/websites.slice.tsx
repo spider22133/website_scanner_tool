@@ -43,6 +43,7 @@ export const updateWebsite = createAsyncThunk<
   }
 >('websites/update', async (data, { rejectWithValue, dispatch }) => {
   try {
+    console.log(data);
     const response = await WebsiteDataService.update(data);
     return response.data.data;
   } catch (err: any) {

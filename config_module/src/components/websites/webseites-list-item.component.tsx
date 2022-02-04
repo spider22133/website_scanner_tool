@@ -1,6 +1,6 @@
 import IWebsite from '../../interfaces/website.interface';
 import { RootState, useAppDispatch } from '../../store';
-import { deleteWebsite } from '../../slices/websites.slice';
+import { deleteWebsite, updateWebsite } from '../../slices/websites.slice';
 import EditWebsite from './edit-website.component';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -15,6 +15,7 @@ type Props = {
   index: number;
   website: IWebsite;
   currentIndex: number;
+  showHidden: boolean;
   setActiveWebsite: (website: IWebsite, index: number) => void;
 };
 
@@ -23,12 +24,9 @@ const variants = {
   closed: { opacity: 0 },
 };
 
-export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite }: Props) {
+export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite, showHidden }: Props) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [value, setValue] = useState({
-    toggleVisible: false,
-  });
 
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -37,8 +35,8 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
     dispatch(deleteWebsite({ id }));
   };
 
-  return (
-    <>
+  const listItem = () => {
+    return (
       <ListItem
         className={`d-flex flex-column`}
         sx={{ my: 0.5, border: `2px solid ${index === currentIndex ? theme.palette.info.main : theme.palette.grey.A200}`, borderRadius: 1 }}
@@ -58,10 +56,10 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
                 aria-label="toggle visibility"
                 onClick={e => {
                   e.stopPropagation();
-                  setValue({ toggleVisible: !value.toggleVisible });
+                  dispatch(updateWebsite({ ...website, is_hidden: !website.is_hidden }));
                 }}
               >
-                {value.toggleVisible ? <VisibilityOff /> : <Visibility />}
+                {website.is_hidden ? <VisibilityOff /> : <Visibility />}
               </IconButton>
               {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
                 <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
@@ -93,6 +91,8 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
           <EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} website={website} />
         </motion.div>
       </ListItem>
-    </>
-  );
+    );
+  };
+
+  return <>{showHidden ? listItem() : !website.is_hidden && listItem()}</>;
 }

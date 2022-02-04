@@ -24,6 +24,7 @@ class WebsiteService {
   }
 
   public async updateWebsite(id: number, data: CreateWebsiteDto): Promise<Website> {
+    console.log(data);
     const findWebsite: Website = await this.websites.findByPk(id);
     if (!findWebsite) throw new HttpException(409, 'There is no website with such id');
 

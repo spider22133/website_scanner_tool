@@ -13,8 +13,8 @@ const getWebsiteById = (id: string) => {
 };
 
 const update = (data: IWebsite) => {
-  const { id, name, url } = data;
-  return http.put(`/websites/${id}`, { name, url });
+  const { id, name, url, is_hidden } = data;
+  return http.put(`/websites/${id}`, { name, url, is_hidden });
 };
 
 const create = (data: createProps) => {
