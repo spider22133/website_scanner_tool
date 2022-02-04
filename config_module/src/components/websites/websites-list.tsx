@@ -14,12 +14,15 @@ import { IoAdd } from 'react-icons/io5';
 import AddWebsite from './add-website.component';
 import { motion } from 'framer-motion';
 
-import { retrieveWebsites } from '../../slices/websites.slice';
+import { queryWebsites, retrieveWebsites } from '../../slices/websites.slice';
 import { RootState, useAppDispatch } from '../../store';
 import { useSelector } from 'react-redux';
 import { getStatesByWebsiteId, selectAllStates } from '../../slices/states.slice';
-import { InputAdornment, TextField } from '@mui/material';
+import { Stack, IconButton, InputAdornment, TextField, Typography, Box, Container, useTheme, Paper, Grid, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import Visibility from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -29,6 +32,7 @@ const variants = {
 export default function WebsitesList() {
   const itemsPerPage = 15;
   const dispatch = useAppDispatch();
+  const theme = useTheme();
 
   const { websites } = useSelector((state: RootState) => state.websites);
   const { user } = useSelector((state: RootState) => state.auth);
@@ -40,6 +44,10 @@ export default function WebsitesList() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
+
+  const [value, setValue] = useState({
+    toggleVisible: false,
+  });
 
   useEffect(() => {
     dispatch(retrieveWebsites());
@@ -54,11 +62,10 @@ export default function WebsitesList() {
   const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
     setCurrentPage(1);
-
-    dispatch(getStatesByWebsiteId(website.id));
-
     getErrorsByWebsiteId(website.id);
     getAggrStates(website.id);
+
+    dispatch(getStatesByWebsiteId(website.id));
   };
 
   const getAggrStates = (id: string) => {
@@ -76,31 +83,49 @@ export default function WebsitesList() {
     setDisplayedStates(states.slice(startItem, endItem));
   };
 
-  // TODO Search Component
+  const handleClickToggle = () => {
+    setValue({ toggleVisible: !value.toggleVisible });
+  };
 
   return (
-    <div className="container">
-      <div className="my-4">
-        <div className="row">
-          <div className="col col-lg-5 mb-3 d-flex flex-column list-component">
-            <TextField
-              variant="outlined"
-              label="Search"
-              sx={{ mb: 2 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <ul className="list-group list-group-numbered">
-              {websites &&
-                websites.map((website: IWebsite, index) => (
-                  <WebsitesListItem setActiveWebsite={setActiveWebsite} key={index} index={index} currentIndex={currentIndex} website={website} />
-                ))}
-            </ul>
+    <Box sx={{ bgcolor: 'grey.A100' }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} lg={5}>
+            <Paper sx={{ p: 3, mb: 2 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+                <TextField
+                  variant="outlined"
+                  label="Search"
+                  onChange={e => dispatch(queryWebsites(e.target.value))}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                  size="small"
+                  fullWidth
+                />
+                <Typography variant="body2" sx={{ width: 135 }}>
+                  Show hidden:
+                </Typography>
+                <Box sx={{ ml: '0 !important' }}>
+                  <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end" sx={{ mr: 1 }}>
+                    {value.toggleVisible ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </Box>
+              </Stack>
+            </Paper>
+            <Paper sx={{ p: 3, mb: 2 }}>
+              <ul className="list-group list-group-numbered">
+                {websites &&
+                  websites.map((website: IWebsite, index) => (
+                    <WebsitesListItem key={index} index={index} currentIndex={currentIndex} website={website} setActiveWebsite={setActiveWebsite} />
+                  ))}
+              </ul>
+            </Paper>
 
             <motion.div
               animate={showAddForm ? 'open' : 'closed'}
@@ -114,18 +139,17 @@ export default function WebsitesList() {
             {user.roles &&
               (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
               (!showAddForm ? (
-                <button
-                  className="btn btn-outline-primary btn-sm rounded-2 mb-1"
-                  style={{ zIndex: 1 }}
-                  type="button"
-                  title="Add"
+                <Button
+                  variant="outlined"
+                  color="primary"
                   onClick={() => setShowAddForm(showAddForm => !showAddForm)}
+                  startIcon={<AddCircleOutlineOutlinedIcon />}
                 >
-                  <IoAdd size="1.7em" />
-                </button>
+                  Add new
+                </Button>
               ) : null)}
-          </div>
-          <div className="col col-lg-7 scrollable">
+          </Grid>
+          <Grid item xs={12} lg={7} className="scrollable">
             {errors.length > 0 ? (
               <div className="border border-danger border-2 rounded-2 p-4 mb-3">
                 <h2 className="">Error list</h2>
@@ -134,8 +158,8 @@ export default function WebsitesList() {
             ) : (
               ''
             )}
-            <div className="border border-gray border-2 rounded-2 p-4 mb-3">{<Chart states={states} aggrStates={aggrStates} />}</div>
-            <div className="border border-gray border-2 rounded-2 p-4">
+            <Paper sx={{ p: 4, mb: 2 }}>{<Chart states={states} aggrStates={aggrStates} />}</Paper>
+            <Paper sx={{ p: 4, mb: 2 }}>
               <h2>Check list</h2>
               <StatesTable states={displayedStates} />
               <div className="pagination">
@@ -151,10 +175,10 @@ export default function WebsitesList() {
                   ''
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }

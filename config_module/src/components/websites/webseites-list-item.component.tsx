@@ -1,11 +1,15 @@
 import IWebsite from '../../interfaces/website.interface';
-import { IoTrashOutline, IoCreateOutline } from 'react-icons/io5';
 import { RootState, useAppDispatch } from '../../store';
 import { deleteWebsite } from '../../slices/websites.slice';
 import EditWebsite from './edit-website.component';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
+import { IconButton, Stack } from '@mui/material';
+import EditIcon from '@mui/icons-material/EditOutlined';
+import Visibility from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 
 type Props = {
   index: number;
@@ -25,6 +29,9 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [value, setValue] = useState({
+    toggleVisible: false,
+  });
   const dispatch = useAppDispatch();
 
   const handleRemove = (id: string) => {
@@ -46,23 +53,33 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
             <a href={website.url}>{website.url}</a>
           </div>
           <div className="">
-            {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
-              <button className="btn btn-outline-warning rounded-2 ms-2" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
-                <IoCreateOutline />
-              </button>
-            )}
-            {user.roles && user.roles.includes('ROLE_ADMIN') && (
-              <button
-                className="btn btn-outline-danger rounded-2 ms-2"
-                type="button"
-                title="Delete"
-                onClick={() => {
-                  window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+            <Stack direction="row" alignItems="center">
+              <IconButton
+                aria-label="toggle visibility"
+                onClick={e => {
+                  e.stopPropagation();
+                  setValue({ toggleVisible: !value.toggleVisible });
                 }}
               >
-                <IoTrashOutline />
-              </button>
-            )}
+                {value.toggleVisible ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+              {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
+                <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
+                  <EditIcon />
+                </IconButton>
+              )}
+              {user.roles && user.roles.includes('ROLE_ADMIN') && (
+                <IconButton
+                  aria-label="edit"
+                  color="error"
+                  onClick={() => {
+                    window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Stack>
           </div>
         </div>
 

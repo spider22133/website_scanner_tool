@@ -11,6 +11,7 @@ import { createWebsite } from '../../slices/websites.slice';
 import { useSelector } from 'react-redux';
 import { clearMessage } from '../../slices/message.slice';
 import { APIErrorNotification } from '../elements/error-notification.component';
+import { Paper } from '@mui/material';
 
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -50,33 +51,35 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
   return (
     <>
       {showAddForm ? (
-        <form onSubmit={handleSubmit(onSubmit)} className="my-4">
-          <div className="form-group mb-3">
-            <label className="form-label">Website name</label>
-            <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" {...register('name')} />
-            <div className="invalid-feedback">{errors.name?.message}</div>
-          </div>
-          <div className="form-group mb-3">
-            <label className="form-label">Url address</label>
-            <input
-              className={`form-control ${errors.url ? 'is-invalid' : ''}`}
-              type="text"
-              id="url"
-              placeholder="http://example.com"
-              {...register('url')}
-            />
-            <div className="invalid-feedback">{errors.url?.message}</div>
-          </div>
-          <div className="d-flex justify-content-start">
-            <button className="btn btn-warning" type="submit">
-              {loading ? 'Loading...' : 'Submit'}
-            </button>
-            <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
-              Cancel
-            </button>
-          </div>
-          <APIErrorNotification messages={messages} websiteId="add" />
-        </form>
+        <Paper sx={{ p: 3, mb: 2 }}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-group mb-3">
+              <label className="form-label">Website name</label>
+              <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" {...register('name')} />
+              <div className="invalid-feedback">{errors.name?.message}</div>
+            </div>
+            <div className="form-group mb-3">
+              <label className="form-label">Url address</label>
+              <input
+                className={`form-control ${errors.url ? 'is-invalid' : ''}`}
+                type="text"
+                id="url"
+                placeholder="http://example.com"
+                {...register('url')}
+              />
+              <div className="invalid-feedback">{errors.url?.message}</div>
+            </div>
+            <div className="d-flex justify-content-start">
+              <button className="btn btn-warning" type="submit">
+                {loading ? 'Loading...' : 'Submit'}
+              </button>
+              <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
+                Cancel
+              </button>
+            </div>
+            <APIErrorNotification messages={messages} websiteId="add" />
+          </form>
+        </Paper>
       ) : (
         ''
       )}
