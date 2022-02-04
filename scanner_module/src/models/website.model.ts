@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes, Model, Optional, HasManyRemoveAssociationsMixin, HasManyGetAssociationsMixin } from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { Website } from '@/interfaces/website.interface';
 import { WebsiteStateModel } from '@/models/website_state.model';
 import { WebsiteErrorModel } from './website_error.model';

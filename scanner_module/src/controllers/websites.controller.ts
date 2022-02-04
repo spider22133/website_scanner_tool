@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { Website } from '@/interfaces/website.interface';
-import websiteService from '@services/websites.service';
+import WebsiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
 import WebsiteChecker from 'websiteChecker';
 
 class WebsitesController {
-  public websiteService = new websiteService();
+  public websiteService = new WebsiteService();
   public websiteChecker = new WebsiteChecker();
 
   public getWebsites = async (req: Request, res: Response, next: NextFunction) => {
@@ -64,6 +64,17 @@ class WebsitesController {
       const deleteWebsiteData: Website = await this.websiteService.deleteWebsite(websiteId);
 
       res.status(200).json({ data: deleteWebsiteData, message: 'deleted' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public searchWebsite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const searchString = String(req.params.query);
+      const searchWebsiteData: Website[] = await this.websiteService.searchQuery(searchString);
+
+      res.status(200).json({ data: searchWebsiteData });
     } catch (error) {
       next(error);
     }
