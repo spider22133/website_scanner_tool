@@ -18,6 +18,8 @@ import { retrieveWebsites } from '../../slices/websites.slice';
 import { RootState, useAppDispatch } from '../../store';
 import { useSelector } from 'react-redux';
 import { getStatesByWebsiteId, selectAllStates } from '../../slices/states.slice';
+import { InputAdornment, TextField } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -79,6 +81,18 @@ export default function WebsitesList() {
       <div className="my-4">
         <div className="row">
           <div className="col col-lg-5 mb-3 d-flex flex-column list-component">
+            <TextField
+              variant="outlined"
+              label="Search"
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
             <ul className="list-group list-group-numbered">
               {websites &&
                 websites.map((website: IWebsite, index) => (

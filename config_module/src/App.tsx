@@ -7,7 +7,7 @@ import WebsitesList from './components/websites/websites-list';
 import EditWebsite from './components/websites/edit-website.component';
 import LogIn from './components/auth/login.component';
 import SignUp from './components/auth/signup.component';
-import { createTheme, ThemeProvider } from '@mui/system';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
