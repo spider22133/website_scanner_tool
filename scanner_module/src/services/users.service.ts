@@ -4,13 +4,13 @@ import { CreateUserDto } from '@dtos/users.dto';
 import HttpException from '@exceptions/HttpException';
 import { User } from '@/interfaces/user.interface';
 import { isEmpty } from '@utils/util';
+import { Role } from '@/interfaces/role.interface';
 
 class UserService {
   public users = DB.Users;
 
   public async findAllUser(): Promise<User[]> {
-    const allUser: User[] = await this.users.findAll();
-    return allUser;
+    return await this.users.findAll();
   }
 
   public async findUserById(userId: number): Promise<User> {
@@ -22,6 +22,12 @@ class UserService {
     return findUser;
   }
 
+  public async findUserRoles(userId: number): Promise<Role[]> {
+    if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
+
+    return await (await this.users.findByPk(userId)).getRoles();
+  }
+
   public async createUser(userData: CreateUserDto): Promise<User> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
 
@@ -29,8 +35,7 @@ class UserService {
     if (findUser) throw new HttpException(409, `You're email ${userData.email} already exists`);
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const createUserData: User = await this.users.create({ ...userData, password: hashedPassword });
-    return createUserData;
+    return await this.users.create({ ...userData, password: hashedPassword });
   }
 
   public async updateUser(userId: number, userData: CreateUserDto): Promise<User> {
@@ -42,8 +47,7 @@ class UserService {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     await this.users.update({ ...userData, password: hashedPassword }, { where: { id: userId } });
 
-    const updateUser: User = await this.users.findByPk(userId);
-    return updateUser;
+    return await this.users.findByPk(userId);
   }
 
   public async deleteUser(userId: number): Promise<User> {

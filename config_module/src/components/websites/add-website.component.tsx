@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 import IWebsite from '../../interfaces/website.interface';
@@ -11,9 +10,12 @@ import { RootState, useAppDispatch } from '../../store';
 import { createWebsite } from '../../slices/websites.slice';
 import { useSelector } from 'react-redux';
 import { clearMessage } from '../../slices/message.slice';
+import { APIErrorNotification } from '../elements/error-notification.component';
+import { Paper } from '@mui/material';
 
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
+  showAddForm: boolean;
 };
 
 const validationSchema = Yup.object().shape({
@@ -21,9 +23,10 @@ const validationSchema = Yup.object().shape({
   url: Yup.string().required('Username is required').url('Url is invalid'),
 });
 
-export default function AddWebsite({ setShowAddForm }: Props) {
+export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
   const { loading } = useSelector((state: RootState) => state.websites);
-  const { message } = useSelector((state: RootState) => state.message);
+  const messages = useSelector((state: RootState) => state.messages);
+
   const {
     register,
     handleSubmit,
@@ -35,56 +38,51 @@ export default function AddWebsite({ setShowAddForm }: Props) {
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(clearMessage());
-  }, [dispatch]);
-
   const onSubmit: SubmitHandler<IWebsite> = async data => {
-    dispatch(createWebsite(data)).then(async response => {
+    dispatch(createWebsite({ data, id: 'add' })).then(async response => {
       if (createWebsite.fulfilled.match(response)) {
+        dispatch(clearMessage('add'));
         await sleep(1000);
-
         setShowAddForm(false);
         reset();
       }
     });
   };
-
   return (
-    <div className=" p-4">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="form-group mb-3">
-          <label className="form-label">Website name</label>
-          <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" {...register('name')} />
-          <div className="invalid-feedback">{errors.name?.message}</div>
-        </div>
-        <div className="form-group mb-3">
-          <label className="form-label">Url address</label>
-          <input
-            className={`form-control ${errors.url ? 'is-invalid' : ''}`}
-            type="text"
-            id="url"
-            placeholder="http://example.com"
-            {...register('url')}
-          />
-          <div className="invalid-feedback">{errors.url?.message}</div>
-        </div>
-        <div className="d-flex justify-content-start">
-          <button className="btn btn-warning" type="submit">
-            {loading ? 'Loading...' : 'Submit'}
-          </button>
-          <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
-            Cancel
-          </button>
-        </div>
-        {message && (
-          <div className="form-group mt-3">
-            <div className="alert alert-danger" role="alert">
-              {message}
+    <>
+      {showAddForm ? (
+        <Paper sx={{ p: 3, mb: 2 }}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-group mb-3">
+              <label className="form-label">Website name</label>
+              <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" {...register('name')} />
+              <div className="invalid-feedback">{errors.name?.message}</div>
             </div>
-          </div>
-        )}
-      </form>
-    </div>
+            <div className="form-group mb-3">
+              <label className="form-label">Url address</label>
+              <input
+                className={`form-control ${errors.url ? 'is-invalid' : ''}`}
+                type="text"
+                id="url"
+                placeholder="http://example.com"
+                {...register('url')}
+              />
+              <div className="invalid-feedback">{errors.url?.message}</div>
+            </div>
+            <div className="d-flex justify-content-start">
+              <button className="btn btn-warning" type="submit">
+                {loading ? 'Loading...' : 'Submit'}
+              </button>
+              <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
+                Cancel
+              </button>
+            </div>
+            <APIErrorNotification messages={messages} websiteId="add" />
+          </form>
+        </Paper>
+      ) : (
+        ''
+      )}
+    </>
   );
 }
