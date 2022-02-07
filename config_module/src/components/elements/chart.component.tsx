@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { addZero } from '../../helpers/chart.helper';
 import IState from '../../interfaces/website-state.interface';
+import { useTheme } from '@mui/material';
 type Props = {
   states: IState[];
   aggrStates: { avg: number; min: number; max: number } | undefined;
 };
 export default function Chart({ states, aggrStates }: Props) {
+  const theme = useTheme();
   const [series, setSeries] = useState<ApexAxisChartSeries>([
     {
       name: 'Answer Time:',
@@ -19,6 +21,7 @@ export default function Chart({ states, aggrStates }: Props) {
     chart: {
       type: 'area',
       height: 350,
+      group: '',
       toolbar: {
         tools: {
           pan: false,
@@ -44,6 +47,12 @@ export default function Chart({ states, aggrStates }: Props) {
     },
     xaxis: {
       categories: [0],
+      tickPlacement: 'between',
+      tickAmount: 15,
+      labels: {
+        offsetY: 10,
+        hideOverlappingLabels: true,
+      },
     },
     yaxis: {
       labels: {
@@ -58,6 +67,7 @@ export default function Chart({ states, aggrStates }: Props) {
     legend: {
       horizontalAlign: 'left',
     },
+    colors: [theme.palette.info.main],
   });
 
   useEffect(() => {
