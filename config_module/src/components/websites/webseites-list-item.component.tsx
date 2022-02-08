@@ -5,7 +5,7 @@ import EditWebsite from './edit-website.component';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
-import { IconButton, ListItem, Stack, useTheme } from '@mui/material';
+import { Badge, IconButton, Link, ListItem, Stack, Tooltip, useTheme } from '@mui/material';
 import EditIcon from '@mui/icons-material/EditOutlined';
 import Visibility from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
@@ -48,34 +48,42 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
               {website.name}{' '}
               {website.is_active ? <span className="badge bg-success ms-2">Online</span> : <span className="badge bg-danger ms-2">Offline</span>}
             </div>
-            <a href={website.url}>{website.url}</a>
+            <Link href={website.url} underline="none" variant="body2">
+              {website.url}
+            </Link>
           </div>
           <div className="">
             <Stack direction="row" alignItems="center">
-              <IconButton
-                aria-label="toggle visibility"
-                onClick={e => {
-                  e.stopPropagation();
-                  dispatch(updateWebsite({ ...website, is_hidden: !website.is_hidden }));
-                }}
-              >
-                {website.is_hidden ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-              {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
-                <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
-                  <EditIcon />
-                </IconButton>
-              )}
-              {user.roles && user.roles.includes('ROLE_ADMIN') && (
+              <Tooltip title={website.is_hidden ? 'Show' : 'Hide'} arrow>
                 <IconButton
-                  aria-label="edit"
-                  color="error"
-                  onClick={() => {
-                    window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+                  aria-label="toggle visibility"
+                  onClick={e => {
+                    e.stopPropagation();
+                    dispatch(updateWebsite({ ...website, is_hidden: !website.is_hidden }));
                   }}
                 >
-                  <DeleteIcon />
+                  {website.is_hidden ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
+              </Tooltip>
+              {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
+                <Tooltip title="Edit" arrow>
+                  <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {user.roles && user.roles.includes('ROLE_ADMIN') && (
+                <Tooltip title="Delete" arrow>
+                  <IconButton
+                    aria-label="edit"
+                    color="error"
+                    onClick={() => {
+                      window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               )}
             </Stack>
           </div>

@@ -1,5 +1,3 @@
-import { createServer, Server as HttpServer } from 'http';
-
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 import compression from 'compression';
@@ -16,6 +14,7 @@ import Routes from '@/interfaces/route.interface';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 import { Server } from 'socket.io';
+import { createServer, Server as HttpServer } from 'http';
 
 class App {
   public app: express.Application;
@@ -31,7 +30,7 @@ class App {
     this.httpServer = createServer(this.app);
     this.io = new Server(this.httpServer);
 
-    this.connectToDatabase();
+    App.connectToDatabase();
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
     this.initializeSwagger();
@@ -51,7 +50,7 @@ class App {
     return this.httpServer;
   }
 
-  private connectToDatabase() {
+  private static connectToDatabase() {
     DB.sequelize.sync({ force: false });
   }
 

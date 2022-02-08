@@ -4,7 +4,6 @@ import WebsiteErrorService from '@services/website_error.service';
 import { Website } from '@/interfaces/website.interface';
 import fetch from 'node-fetch';
 import mailer from '@utils/mailer';
-import { Request, Response } from 'express';
 import { Socket } from 'socket.io';
 
 const HTTP_CODE_404 = 404;
@@ -15,6 +14,10 @@ class WebsiteChecker {
   public websiteStatesService = new WebsiteStatesService();
   public websiteErrorService = new WebsiteErrorService();
   public socket: Socket;
+
+  public connectSocket = (socket: Socket) => {
+    this.socket = socket;
+  };
 
   public async checkWebsites(): Promise<void> {
     try {
@@ -67,10 +70,6 @@ class WebsiteChecker {
   private static checkWebsiteStatus(url: string): Promise<{ status: number; msg: string }> {
     return fetch(url).then(res => ({ status: res.status, msg: res.statusText }));
   }
-
-  public connectSocket = (socket: Socket) => {
-    this.socket = socket;
-  };
 }
 
 export default WebsiteChecker;

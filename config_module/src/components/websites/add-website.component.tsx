@@ -1,17 +1,17 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
-
 import IWebsite from '../../interfaces/website.interface';
 import { sleep } from '../../helpers/animation.helper';
-
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import { RootState, useAppDispatch } from '../../store';
 import { createWebsite } from '../../slices/websites.slice';
 import { useSelector } from 'react-redux';
 import { clearMessage } from '../../slices/message.slice';
 import { APIErrorNotification } from '../elements/error-notification.component';
-import { Paper } from '@mui/material';
+import { Button, Paper, Stack } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import LoadingButton from '@mui/lab/LoadingButton';
+import React from 'react';
 
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,14 +69,14 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
               />
               <div className="invalid-feedback">{errors.url?.message}</div>
             </div>
-            <div className="d-flex justify-content-start">
-              <button className="btn btn-warning" type="submit">
+            <Stack spacing={2} direction="row">
+              <LoadingButton variant="contained" type="submit" color="primary" endIcon={<SendIcon />} loading={loading} loadingPosition="end">
                 {loading ? 'Loading...' : 'Submit'}
-              </button>
-              <button className="btn btn-outline-warning ms-2" onClick={() => setShowAddForm(false)}>
+              </LoadingButton>
+              <Button variant="outlined" type="submit" color="primary" onClick={() => setShowAddForm(false)}>
                 Cancel
-              </button>
-            </div>
+              </Button>
+            </Stack>
             <APIErrorNotification messages={messages} websiteId="add" />
           </form>
         </Paper>

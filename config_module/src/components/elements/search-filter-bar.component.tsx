@@ -1,4 +1,4 @@
-import { Box, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Box, IconButton, InputAdornment, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { queryWebsites } from '../../slices/websites.slice';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
@@ -34,9 +34,11 @@ const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
         Show hidden:
       </Typography>
       <Box sx={{ ml: '0 !important' }}>
-        <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end" sx={{ mr: 1 }}>
-          {value ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
+        <Tooltip title={value ? 'Hide' : 'Show'} arrow>
+          <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end" sx={{ mr: 1 }}>
+            {value ? <VisibilityOff /> : <Visibility />}
+          </IconButton>
+        </Tooltip>
       </Box>
     </Stack>
   );

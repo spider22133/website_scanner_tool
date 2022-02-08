@@ -1,5 +1,3 @@
-import * as http from 'http';
-
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 import 'dotenv/config';
@@ -20,7 +18,7 @@ validateEnv();
 const websiteChecker = new WebsiteChecker();
 const timer = new TimerController(websiteChecker);
 
-timer.interval = 36000;
+timer.interval = 3600000;
 timer.run();
 
 const app = new App([
