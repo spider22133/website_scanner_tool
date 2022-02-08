@@ -1,3 +1,5 @@
+import { createServer, Server as HttpServer } from 'http';
+
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 import compression from 'compression';
@@ -13,16 +15,21 @@ import DB from '@databases';
 import Routes from '@/interfaces/route.interface';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
+import { Server } from 'socket.io';
 
 class App {
   public app: express.Application;
   public port: string | number;
   public env: string;
+  public httpServer: HttpServer;
+  public io: Server;
 
   constructor(routes: Routes[]) {
     this.app = express();
     this.port = process.env.PORT || 3000;
     this.env = process.env.NODE_ENV || 'development';
+    this.httpServer = createServer(this.app);
+    this.io = new Server(this.httpServer);
 
     this.connectToDatabase();
     this.initializeMiddlewares();
@@ -32,7 +39,7 @@ class App {
   }
 
   public listen() {
-    this.app.listen(this.port, () => {
+    this.httpServer.listen(this.port, () => {
       logger.info(`=================================`);
       logger.info(`======= ENV: ${this.env} =======`);
       logger.info(`🚀 App listening on the port ${this.port}`);
@@ -41,7 +48,7 @@ class App {
   }
 
   public getServer() {
-    return this.app;
+    return this.httpServer;
   }
 
   private connectToDatabase() {

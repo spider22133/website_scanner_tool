@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import WebsiteChecker from 'websiteChecker';
+import WebsiteChecker from '@/websiteChecker.class';
 
 class TimerController {
   private _interval = 3600000;

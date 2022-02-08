@@ -24,11 +24,10 @@ class WebsiteService {
   }
 
   public async updateWebsite(id: number, data: CreateWebsiteDto): Promise<Website> {
-    console.log(data);
     const findWebsite: Website = await this.websites.findByPk(id);
     if (!findWebsite) throw new HttpException(409, 'There is no website with such id');
 
-    await this.websites.update({ ...data, is_active: true }, { where: { id: id } });
+    await this.websites.update(data, { where: { id: id } });
 
     return await this.websites.findByPk(id);
   }
@@ -39,7 +38,7 @@ class WebsiteService {
     const findWebsite: Website = await this.websites.findOne({ where: { url: websiteData.url } });
     if (findWebsite) throw new HttpException(409, `Url ${websiteData.url} already exists`);
 
-    return await this.websites.create({ ...websiteData, is_active: true });
+    return await this.websites.create(websiteData);
   }
 
   public async deleteWebsite(websiteId: number): Promise<Website> {

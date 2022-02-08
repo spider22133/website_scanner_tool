@@ -13,6 +13,7 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
+    "@types/nodemailer": "^6.4.4",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
@@ -23,7 +24,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "envalid": "^7.2.1",
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "helmet": "^4.6.0",
     "hpp": "^0.2.3",
     "jest": "^27.3.1",
@@ -31,7 +32,9 @@
     "morgan": "^1.10.0",
     "mysql2": "^2.3.2",
     "node-fetch": "^2.6.5",
+    "nodemailer": "^6.7.2",
     "sequelize": "^6.15.0",
+    "socket.io": "^4.4.1",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.1.6",
     "ts-jest": "^27.0.7",

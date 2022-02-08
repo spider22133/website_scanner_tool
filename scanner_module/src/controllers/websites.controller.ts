@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Website } from '@/interfaces/website.interface';
 import WebsiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
-import WebsiteChecker from 'websiteChecker';
+import WebsiteChecker from '@/websiteChecker.class';
 
 class WebsitesController {
   public websiteService = new WebsiteService();
@@ -37,7 +37,7 @@ class WebsitesController {
 
       if (status !== 200) next(msg);
 
-      const updateWebsiteData = await this.websiteService.updateWebsite(websiteId, websiteData);
+      const updateWebsiteData = await this.websiteService.updateWebsite(websiteId, { ...websiteData, is_active: true });
       res.status(200).json({ data: updateWebsiteData, message: 'updated' });
     } catch (error) {
       next(error);
@@ -51,7 +51,7 @@ class WebsitesController {
 
       if (status !== 200) next(msg);
 
-      const createWebsiteData = await this.websiteService.createWebsite(websiteData);
+      const createWebsiteData = await this.websiteService.createWebsite({ ...websiteData, is_active: true });
       res.status(201).json({ data: createWebsiteData, message: 'created' });
     } catch (error) {
       next(error);

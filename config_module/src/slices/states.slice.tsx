@@ -17,7 +17,6 @@ export const getStatesByWebsiteId = createAsyncThunk<
 >('states/getStatesByWebsiteId', async (id, { rejectWithValue, dispatch }) => {
   try {
     const res = await StatesDataService.getStatesByWebsiteId(id);
-    console.log('&&&&&&&&&&&&', res);
 
     if (Object.keys(res.data.data).length == 0) dispatch(setMessage('empty'));
 

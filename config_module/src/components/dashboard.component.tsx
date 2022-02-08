@@ -21,6 +21,7 @@ import { Box, Container, Paper, Grid, Button } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import WebsitesList from './websites/websites-list';
 import SearchFilterBar from './elements/search-filter-bar.component';
+import socketIOClient from 'socket.io-client';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -28,6 +29,7 @@ const variants = {
 };
 
 const DashboardComponent: React.FC = () => {
+  const ENDPOINT = 'http://localhost:3001/';
   const itemsPerPage = 15;
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -42,6 +44,16 @@ const DashboardComponent: React.FC = () => {
   const [value, setValue] = useState({
     toggleVisible: false,
   });
+
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT);
+    socket.on('updateWebsites', (data: any) => {
+      if (data === 'changed') dispatch(retrieveWebsites());
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     dispatch(retrieveWebsites());
