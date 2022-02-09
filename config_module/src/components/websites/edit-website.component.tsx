@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import IWebsite from '../../interfaces/website.interface';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -10,6 +10,9 @@ import { clearMessage } from '../../slices/message.slice';
 import { updateWebsite } from '../../slices/websites.slice';
 import { sleep } from '../../helpers/animation.helper';
 import { APIErrorNotification } from '../elements/error-notification.component';
+import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Stack } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SendIcon from '@mui/icons-material/Send';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(4),
@@ -55,30 +58,26 @@ export default function EditWebsite({ website, setShowAddForm, showAddForm }: Pr
     <>
       {showAddForm ? (
         <form onSubmit={handleSubmit(onSubmit)} className="my-4">
-          <div className="form-group mb-3">
-            <label className="form-label">Website name</label>
-            <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" placeholder="Name" {...register('name')} />
-            <div className="invalid-feedback">{errors.name?.message}</div>
-          </div>
-          <div className="form-group mb-3">
-            <label className="form-label">Url address</label>
-            <input
-              className={`form-control ${errors.url ? 'is-invalid' : ''}`}
-              type="text"
-              id="url"
-              placeholder="http://example.com"
-              {...register('url')}
-            />
-            <div className="invalid-feedback">{errors.url?.message}</div>
-          </div>
-          <div className="d-flex justify-content-start">
-            <button className="btn btn-warning me-1" type="submit">
+          <Stack spacing={2} direction="column">
+            <FormControl size="small" error={!!errors.name}>
+              <InputLabel htmlFor="name">Website name</InputLabel>
+              <OutlinedInput id="name" size="small" label="Website name" {...register('name')} />
+              <FormHelperText id="name-error-text">{errors.name?.message}</FormHelperText>
+            </FormControl>
+            <FormControl size="small" error={!!errors.url}>
+              <InputLabel htmlFor="url">Url address</InputLabel>
+              <OutlinedInput id="url" size="small" label="Url address" placeholder="http://example.com" {...register('url')} />
+              <FormHelperText id="url-error-text">{errors.url?.message}</FormHelperText>
+            </FormControl>
+          </Stack>
+          <Stack spacing={2} mt={2} direction="row">
+            <LoadingButton variant="contained" type="submit" color="primary" endIcon={<SendIcon />} loading={loading} loadingPosition="end">
               {loading ? 'Loading...' : 'Submit'}
-            </button>
-            <button type="button" onClick={() => reset()} className="btn btn-secondary">
+            </LoadingButton>
+            <Button variant="outlined" type="submit" color="primary" onClick={() => reset()}>
               Reset
-            </button>
-          </div>
+            </Button>
+          </Stack>
           <APIErrorNotification messages={messages} websiteId={website.id} />
         </form>
       ) : (

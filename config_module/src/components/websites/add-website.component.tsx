@@ -8,7 +8,7 @@ import { createWebsite } from '../../slices/websites.slice';
 import { useSelector } from 'react-redux';
 import { clearMessage } from '../../slices/message.slice';
 import { APIErrorNotification } from '../elements/error-notification.component';
-import { Button, Paper, Stack } from '@mui/material';
+import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Paper, Stack } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import LoadingButton from '@mui/lab/LoadingButton';
 import React from 'react';
@@ -53,23 +53,19 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
       {showAddForm ? (
         <Paper sx={{ p: 3, mb: 2 }}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-group mb-3">
-              <label className="form-label">Website name</label>
-              <input className={`form-control ${errors.name ? 'is-invalid' : ''}`} type="text" id="name" {...register('name')} />
-              <div className="invalid-feedback">{errors.name?.message}</div>
-            </div>
-            <div className="form-group mb-3">
-              <label className="form-label">Url address</label>
-              <input
-                className={`form-control ${errors.url ? 'is-invalid' : ''}`}
-                type="text"
-                id="url"
-                placeholder="http://example.com"
-                {...register('url')}
-              />
-              <div className="invalid-feedback">{errors.url?.message}</div>
-            </div>
-            <Stack spacing={2} direction="row">
+            <Stack spacing={2} direction="column">
+              <FormControl size="small" error={!!errors.name}>
+                <InputLabel htmlFor="name">Website name</InputLabel>
+                <OutlinedInput id="name" size="small" label="Website name" {...register('name')} />
+                <FormHelperText id="name-error-text">{errors.name?.message}</FormHelperText>
+              </FormControl>
+              <FormControl size="small" error={!!errors.url}>
+                <InputLabel htmlFor="url">Url address</InputLabel>
+                <OutlinedInput id="url" size="small" label="Url address" placeholder="http://example.com" {...register('url')} />
+                <FormHelperText id="url-error-text">{errors.url?.message}</FormHelperText>
+              </FormControl>
+            </Stack>
+            <Stack spacing={2} mt={2} direction="row">
               <LoadingButton variant="contained" type="submit" color="primary" endIcon={<SendIcon />} loading={loading} loadingPosition="end">
                 {loading ? 'Loading...' : 'Submit'}
               </LoadingButton>
