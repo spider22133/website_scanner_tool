@@ -4,4 +4,5 @@ export default interface IWebsite {
   url: string;
   is_hidden?: boolean;
   is_active?: boolean;
+  updatedAt?: string;
 }

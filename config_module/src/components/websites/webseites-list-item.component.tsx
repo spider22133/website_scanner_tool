@@ -5,11 +5,17 @@ import EditWebsite from './edit-website.component';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
-import { Badge, IconButton, Link, ListItem, Stack, Tooltip, useTheme } from '@mui/material';
+import { Chip, IconButton, Link, ListItem, Stack, Tooltip, useTheme } from '@mui/material';
 import EditIcon from '@mui/icons-material/EditOutlined';
 import Visibility from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
+import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en.json';
+
+TimeAgo.addDefaultLocale(en);
 
 type Props = {
   index: number;
@@ -27,6 +33,7 @@ const variants = {
 export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite, showHidden }: Props) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [showAddForm, setShowAddForm] = useState(false);
+  const timeAgo = new TimeAgo('en-US');
 
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -53,37 +60,53 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
             </Link>
           </div>
           <div className="">
-            <Stack direction="row" alignItems="center">
-              <Tooltip title={website.is_hidden ? 'Show' : 'Hide'} arrow>
-                <IconButton
-                  aria-label="toggle visibility"
-                  onClick={e => {
-                    e.stopPropagation();
-                    dispatch(updateWebsite({ ...website, is_hidden: !website.is_hidden }));
-                  }}
-                >
-                  {website.is_hidden ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </Tooltip>
-              {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
-                <Tooltip title="Edit" arrow>
-                  <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
-                    <EditIcon />
+            <Stack direction="column" alignItems="flex-end">
+              <Stack direction="row" alignItems="center">
+                <Tooltip title="Check" arrow>
+                  <IconButton aria-label="check">
+                    <SensorsOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-              )}
-              {user.roles && user.roles.includes('ROLE_ADMIN') && (
-                <Tooltip title="Delete" arrow>
+                <Tooltip title={website.is_hidden ? 'Show' : 'Hide'} arrow>
                   <IconButton
-                    aria-label="edit"
-                    color="error"
-                    onClick={() => {
-                      window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+                    aria-label="toggle visibility"
+                    onClick={e => {
+                      e.stopPropagation();
+                      dispatch(updateWebsite({ ...website, is_hidden: !website.is_hidden }));
                     }}
                   >
-                    <DeleteIcon />
+                    {website.is_hidden ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </Tooltip>
+                {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
+                  <Tooltip title="Edit" arrow>
+                    <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {user.roles && user.roles.includes('ROLE_ADMIN') && (
+                  <Tooltip title="Delete" arrow>
+                    <IconButton
+                      aria-label="edit"
+                      color="error"
+                      onClick={() => {
+                        window.confirm('Are you sure you wish to delete this item?') ? handleRemove(website.id) : '';
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Stack>
+              {website.updatedAt && (
+                <Chip
+                  icon={<DoneAllOutlinedIcon />}
+                  sx={{ '& .MuiChip-iconSmall': { ml: '5px' } }}
+                  variant="outlined"
+                  size="small"
+                  label={timeAgo.format(new Date(website.updatedAt))}
+                />
               )}
             </Stack>
           </div>

@@ -28,7 +28,7 @@ class App {
     this.port = process.env.PORT || 3000;
     this.env = process.env.NODE_ENV || 'development';
     this.httpServer = createServer(this.app);
-    this.io = new Server(this.httpServer);
+    this.io = new Server(this.httpServer, { cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] } });
 
     App.connectToDatabase();
     this.initializeMiddlewares();
