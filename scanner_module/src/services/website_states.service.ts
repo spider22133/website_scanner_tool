@@ -9,12 +9,28 @@ class WebsiteStatesService {
     return await this.website_states.findAll();
   }
 
+  public async findAllWebsiteErrorStates(): Promise<WebsiteState[]> {
+    return await this.website_states.findAll({ where: { is_error: true } });
+  }
+
   public async findStatesByWebsiteId(websiteId: number): Promise<WebsiteState[]> {
     return await this.website_states.findAll({ where: { website_id: websiteId } });
   }
 
-  public async createWebsiteState(website_id: number, answer_time: number, answer_code: number): Promise<WebsiteState> {
-    return await this.website_states.create({ website_id, answer_time, answer_code });
+  public async findErrorStatesByWebsiteId(websiteId: number): Promise<WebsiteState[]> {
+    return await this.website_states.findAll({ where: { website_id: websiteId, is_error: true } });
+  }
+
+  public async findLatestStateByWebsiteId(websiteId: number): Promise<WebsiteState> {
+    return await this.website_states.findOne({ limit: 1, where: { website_id: websiteId }, order: [['createdAt', 'DESC']] });
+  }
+
+  public async createWebsiteState(data: WebsiteState): Promise<WebsiteState> {
+    return await this.website_states.create(data);
+  }
+
+  public async createWebsiteErrorState(data: WebsiteState): Promise<WebsiteState> {
+    return await this.website_states.create(data);
   }
 
   public async aggregatedByWebsiteId(website_id: number): Promise<{ avg: number; min: number; max: number }> {

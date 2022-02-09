@@ -1,4 +1,5 @@
 import { AxiosResponse, AxiosError } from 'axios';
+import React from 'react';
 
 export default async function fetchData(promise: Promise<AxiosResponse<any>>, setter: React.Dispatch<React.SetStateAction<any>>): Promise<void> {
   promise

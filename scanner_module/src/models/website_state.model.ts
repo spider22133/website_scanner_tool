@@ -8,6 +8,8 @@ export class WebsiteStateModel extends Model<WebsiteState, WebsiteStateCreationA
   public website_id: number;
   public answer_code: number;
   public answer_time: number;
+  public answer_text: string;
+  public is_error: boolean;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -29,6 +31,12 @@ export default function (sequelize: Sequelize): typeof WebsiteStateModel {
       },
       answer_time: {
         type: DataTypes.INTEGER,
+      },
+      answer_text: {
+        type: DataTypes.TEXT,
+      },
+      is_error: {
+        type: DataTypes.BOOLEAN,
       },
     },
     {

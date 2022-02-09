@@ -13,10 +13,10 @@ class WebsiteChecker {
   public websiteService = new WebsiteService();
   public websiteStatesService = new WebsiteStatesService();
   public websiteErrorService = new WebsiteErrorService();
-  public socket: Socket;
+  private _socket: Socket;
 
   public connectSocket = (socket: Socket) => {
-    this.socket = socket;
+    this._socket = socket;
   };
 
   public async checkWebsites(): Promise<void> {
@@ -50,18 +50,18 @@ class WebsiteChecker {
 
   private async sendStatus(website: Website, end: number, status: number) {
     const web = await this.websiteService.updateWebsite(website.id, { ...website, is_active: true });
-    await this.websiteStatesService.createWebsiteState(website.id, end, status);
+    await this.websiteStatesService.createWebsiteState({ website_id: website.id, answer_time: end, answer_code: status });
 
     // Client should update websites state
-    if (web.is_active === true && website.is_active === false) this.socket.emit('updateWebsites', 'changed');
+    if (web.is_active === true && website.is_active === false) this._socket.emit('updateWebsites', 'changed');
   }
 
   private async sendError(website: Website, status: number, msg = '') {
     await this.websiteService.updateWebsite(website.id, { ...website, is_active: false });
-    await this.websiteErrorService.createWebsiteError(website.id, status, msg);
+    await this.websiteStatesService.createWebsiteErrorState({ website_id: website.id, answer_code: status, answer_text: msg, is_error: true });
 
     // Client should update websites state
-    this.socket.emit('updateWebsites', 'changed');
+    this._socket.emit('updateWebsites', 'changed');
 
     //Send mail
     mailer(website, status, msg).catch(console.error);

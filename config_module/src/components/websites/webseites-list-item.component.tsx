@@ -2,7 +2,7 @@ import IWebsite from '../../interfaces/website.interface';
 import { RootState, useAppDispatch } from '../../store';
 import { deleteWebsite, updateWebsite } from '../../slices/websites.slice';
 import EditWebsite from './edit-website.component';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { Chip, IconButton, Link, ListItem, Stack, Tooltip, useTheme } from '@mui/material';
@@ -14,6 +14,9 @@ import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
+import fetchData from '../../helpers/fetch-data.helper';
+import StatesDataService from '../../services/states.service';
+import IState from '../../interfaces/website-state.interface';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -33,14 +36,23 @@ const variants = {
 export default function WebsitesListItem({ website, index, currentIndex, setActiveWebsite, showHidden }: Props) {
   const { user } = useSelector((state: RootState) => state.auth);
   const [showAddForm, setShowAddForm] = useState(false);
-  const timeAgo = new TimeAgo('en-US');
+  const [latestState, setLatestState] = useState<IState>();
 
+  const timeAgo = new TimeAgo('en-US');
   const dispatch = useAppDispatch();
   const theme = useTheme();
 
   const handleRemove = (id: string) => {
     dispatch(deleteWebsite({ id }));
   };
+
+  const getLatestState = (id: string) => {
+    fetchData(StatesDataService.getLatestStateByWebsiteId(id), setLatestState);
+  };
+
+  useEffect(() => {
+    website && getLatestState(website.id);
+  }, []);
 
   const listItem = () => {
     return (
@@ -99,13 +111,13 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
                   </Tooltip>
                 )}
               </Stack>
-              {website.updatedAt && (
+              {latestState && (
                 <Chip
                   icon={<DoneAllOutlinedIcon />}
                   sx={{ '& .MuiChip-iconSmall': { ml: '5px' } }}
                   variant="outlined"
                   size="small"
-                  label={timeAgo.format(new Date(website.updatedAt))}
+                  label={timeAgo.format(new Date(latestState.createdAt))}
                 />
               )}
             </Stack>

@@ -48,7 +48,7 @@ const stateSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder.addCase(getStatesByWebsiteId.fulfilled, (state, { payload }) => {
-      if (Object.keys(payload).length == 0) return console.log('empty');
+      if (Object.keys(payload).length == 0) return;
       statesAdapter.setAll(state, payload.states);
     });
   },
