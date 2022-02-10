@@ -17,7 +17,7 @@ import { retrieveWebsites } from '../slices/websites.slice';
 import { RootState, useAppDispatch } from '../store';
 import { useSelector } from 'react-redux';
 import { getStatesByWebsiteId, selectAllStates } from '../slices/states.slice';
-import { Box, Container, Paper, Grid, Button } from '@mui/material';
+import { Box, Container, Paper, Grid, Button, Alert } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import WebsitesList from './websites/websites-list';
 import SearchFilterBar from './elements/search-filter-bar.component';
@@ -136,24 +136,28 @@ const DashboardComponent: React.FC = () => {
             ) : (
               ''
             )}
-            <Paper sx={{ p: 4, mb: 2 }}>{<Chart states={states} aggrStates={aggrStates} />}</Paper>
             <Paper sx={{ p: 4, mb: 2 }}>
-              <h2>Check list</h2>
-              <StatesTable states={displayedStates} />
-              <div className="pagination">
-                {states.length > 0 ? (
-                  <PaginationContainer
-                    totalItems={states.length}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    pageChange={onPageChange}
-                    setCurrentPage={setCurrentPage}
-                  />
-                ) : (
-                  ''
-                )}
-              </div>
+              {states.length > 0 ? <Chart states={states} aggrStates={aggrStates} /> : <Alert severity="warning">No data!</Alert>}
             </Paper>
+            {states.length > 0 && (
+              <Paper sx={{ p: 4, mb: 2 }}>
+                <h2>Check list</h2>
+                <StatesTable states={displayedStates} />
+                <div className="pagination">
+                  {states.length > 0 ? (
+                    <PaginationContainer
+                      totalItems={states.length}
+                      itemsPerPage={itemsPerPage}
+                      currentPage={currentPage}
+                      pageChange={onPageChange}
+                      setCurrentPage={setCurrentPage}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </Paper>
+            )}
           </Grid>
         </Grid>
       </Container>

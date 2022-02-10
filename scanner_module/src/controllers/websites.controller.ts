@@ -3,10 +3,12 @@ import { Website } from '@/interfaces/website.interface';
 import WebsiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
 import WebsiteChecker from '@/websiteChecker.class';
+import WebsiteStatesService from '@services/website_states.service';
 
 class WebsitesController {
   public websiteService = new WebsiteService();
   public websiteChecker = new WebsiteChecker();
+  public websiteStatesService = new WebsiteStatesService();
 
   public getWebsites = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -39,6 +41,18 @@ class WebsitesController {
 
       const updateWebsiteData = await this.websiteService.updateWebsite(websiteId, { ...websiteData, is_active: true });
       res.status(200).json({ data: updateWebsiteData, message: 'updated' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public checkWebsite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = Number(req.params.id);
+      const findOne: Website = await this.websiteService.findWebsiteById(websiteId);
+      await this.websiteChecker.checkWebsite(findOne);
+      const latestState = await this.websiteStatesService.findLatestStateByWebsiteId(websiteId);
+      res.status(200).json({ data: latestState, message: 'checked' });
     } catch (error) {
       next(error);
     }

@@ -17,6 +17,10 @@ const update = (data: IWebsite) => {
   return http.put(`/websites/${id}`, { name, url, is_hidden });
 };
 
+const checkStatus = (id: string) => {
+  return http.get(`/websites/${id}/check`);
+};
+
 const create = (data: createProps) => {
   return http.post('/websites/create', data);
 };
@@ -36,6 +40,7 @@ const WebsiteDataService = {
   create,
   deleteWebsite,
   searchInWebsites,
+  checkStatus,
 };
 
 export default WebsiteDataService;

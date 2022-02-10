@@ -17,6 +17,7 @@ import en from 'javascript-time-ago/locale/en.json';
 import fetchData from '../../helpers/fetch-data.helper';
 import StatesDataService from '../../services/states.service';
 import IState from '../../interfaces/website-state.interface';
+import WebsiteDataService from '../../services/website.service';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -50,6 +51,10 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
     fetchData(StatesDataService.getLatestStateByWebsiteId(id), setLatestState);
   };
 
+  const checkStatus = (id: string) => {
+    fetchData(WebsiteDataService.checkStatus(id), setLatestState);
+  };
+
   useEffect(() => {
     website && getLatestState(website.id);
   }, []);
@@ -75,7 +80,13 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
             <Stack direction="column" alignItems="flex-end">
               <Stack direction="row" alignItems="center">
                 <Tooltip title="Check" arrow>
-                  <IconButton aria-label="check">
+                  <IconButton
+                    aria-label="check"
+                    onClick={e => {
+                      e.stopPropagation();
+                      checkStatus(website.id);
+                    }}
+                  >
                     <SensorsOutlinedIcon />
                   </IconButton>
                 </Tooltip>

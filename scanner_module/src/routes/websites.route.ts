@@ -18,6 +18,7 @@ class WebsitesRoute implements Route {
     this.router.get(`${this.path}`, authMiddleware, this.websitesController.getWebsites);
     this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.websitesController.getWebsiteById);
     this.router.get(`${this.path}/q=:query`, authMiddleware, this.websitesController.searchWebsite);
+    this.router.get(`${this.path}/:id(\\d+)/check`, authMiddleware, this.websitesController.checkWebsite);
     this.router.put(`${this.path}/:id(\\d+)`, validationMiddleware(CreateWebsiteDto, 'body', true), this.websitesController.updateWebsite);
     this.router.post(`${this.path}/create`, [validationMiddleware(CreateWebsiteDto, 'body'), authMiddleware], this.websitesController.createWebsite);
     this.router.delete(`${this.path}/:id(\\d+)`, authMiddleware, this.websitesController.deleteWebsite);

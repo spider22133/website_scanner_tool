@@ -17,9 +17,6 @@ export const getStatesByWebsiteId = createAsyncThunk<
 >('states/getStatesByWebsiteId', async (id, { rejectWithValue, dispatch }) => {
   try {
     const res = await StatesDataService.getStatesByWebsiteId(id);
-
-    if (Object.keys(res.data.data).length == 0) dispatch(setMessage('empty'));
-
     const normalized = normalize<
       any,
       {
@@ -44,12 +41,21 @@ export const statesAdapter = createEntityAdapter<IState>({
 
 const stateSlice = createSlice({
   name: 'states',
-  initialState: statesAdapter.getInitialState(),
+  initialState: statesAdapter.getInitialState({
+    loading: false,
+  }),
   reducers: {},
   extraReducers: builder => {
+    builder.addCase(getStatesByWebsiteId.pending, (state, {}) => {
+      state.loading = true;
+    });
     builder.addCase(getStatesByWebsiteId.fulfilled, (state, { payload }) => {
-      if (Object.keys(payload).length == 0) return;
+      state.loading = false;
+      if (Object.keys(payload).length === 0) return statesAdapter.removeAll(state);
       statesAdapter.setAll(state, payload.states);
+    });
+    builder.addCase(getStatesByWebsiteId.rejected, (state, {}) => {
+      state.loading = false;
     });
   },
 });
