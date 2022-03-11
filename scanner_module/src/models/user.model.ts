@@ -79,3 +79,17 @@ export default function (sequelize: Sequelize): typeof UserModel {
 
   return UserModel;
 }
+
+async function initUser() {
+  try {
+    await UserModel.create({
+      id: 1,
+      firstName: 'Eugen',
+      lastName: 'Schlosser',
+      email: 'e.schlosser.de@gmail.com',
+      password: '',
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}

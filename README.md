@@ -25,13 +25,13 @@ $ npm start
 + NavBar active page 
 -+ Redux implementation.
 + Response time chart
-- Admin, Moderator and User roles. 
-	User:
-		- can see websites.
-	Moderator: User can only read and update websites.
-		- can edit websites.
-	Admin: Only Admin can create users and delete websites.
-		- all
++ Admin, Moderator and User roles. 
+    User:
+        + can see websites.
+    Moderator: User can only read and update websites.
+        + can edit websites.
+    Admin: Only Admin can create users and delete websites.
+        + all
 
 # Original npm Global Package "typescript-express-starter"
 https://www.npmjs.com/package/typescript-express-starter

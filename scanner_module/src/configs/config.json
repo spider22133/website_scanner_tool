@@ -1,21 +1,22 @@
 {
   "development": {
     "username": "root",
-    "password": null,
+    "password": "password",
     "database": "scan_module_db",
-    "host": "localhost",
+    "host": "127.0.0.1",
+    "port": "3306",
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": "password",
     "database": "database_test",
     "host": "localhost",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": null,
+    "password": "password",
     "database": "database_production",
     "host": "localhost",
     "dialect": "mysql"

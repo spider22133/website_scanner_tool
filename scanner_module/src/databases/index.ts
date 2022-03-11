@@ -8,9 +8,10 @@ import WebsiteStateModel from '@/models/website_state.model';
 import WebsiteErrorModel from '@/models/website_error.model';
 import { logger } from '@utils/logger';
 
-const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');
+const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig');
 const sequelize = new Sequelize(database, user, password, {
   host: host,
+  port: port,
   dialect: 'mysql',
   timezone: '+01:00',
   define: {
@@ -33,10 +34,10 @@ const sequelize = new Sequelize(database, user, password, {
 sequelize.authenticate();
 
 const DB = {
+  Roles: RoleModel(sequelize),
   WebsiteStates: WebsiteStateModel(sequelize),
   WebsiteErrors: WebsiteErrorModel(sequelize),
   Websites: WebsiteModel(sequelize),
-  Roles: RoleModel(sequelize),
   Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library

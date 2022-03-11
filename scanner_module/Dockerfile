@@ -1,18 +1,20 @@
 # Common build stage
 FROM node:14.14.0-alpine3.12 as common-build-stage
 
-COPY . ./app
+WORKDIR /usr/src/app/scanner_module
 
-WORKDIR /app
+COPY package.json ./
+COPY package-lock.json ./
+COPY ./ ./
 
 RUN npm install
 
-EXPOSE 3000
+EXPOSE 3001
 
 # Dvelopment build stage
 FROM common-build-stage as development-build-stage
 
-RUN chmod +x /app/docker-entrypoint.sh
+RUN chmod +x /usr/src/app/scanner_module/docker-entrypoint.sh
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 

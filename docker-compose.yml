@@ -11,22 +11,33 @@ services:
     restart: 'unless-stopped'
     networks:
       - backend
+  client:
+    build:
+      context: ./config_module
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    container_name: client
+    stdin_open: true
+    volumes:
+      - ./config_module:/usr/src/app/config_module
+      - /usr/src/app/config_module/node_modules
   server:
     build:
-      context: ./
+      context: ./scanner_module
       target: development-build-stage
       dockerfile: Dockerfile
     container_name: server
     ports:
-      - '3000:3000'
+      - '3001:3001'
     environment:
       MYSQL_USER: root
       MYSQL_PASSWORD: password
       MYSQL_HOST: mysql
-      MYSQL_DATABASE: sequelize
+      MYSQL_DATABASE: scan_module_db
     volumes:
-      - ./:/app
-      - /app/node_modules
+      - ./scanner_module:/usr/src/app/scanner_module
+      - /usr/src/app/scanner_module/node_modules
     restart: 'unless-stopped'
     networks:
       - backend
@@ -40,7 +51,7 @@ services:
     environment:
       MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: sequelize
+      MYSQL_DATABASE: scan_module_db
     ports:
       - '3306:3306'
     networks:
