@@ -3,8 +3,6 @@ FROM node:14.14.0-alpine3.12 as common-build-stage
 
 WORKDIR /usr/src/app/scanner_module
 
-COPY package.json ./
-COPY package-lock.json ./
 COPY ./ ./
 
 RUN npm install
