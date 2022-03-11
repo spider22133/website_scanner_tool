@@ -10,6 +10,7 @@ import {
 } from 'sequelize';
 import { User } from '@/interfaces/user.interface';
 import { RoleModel } from './role.model';
+import { log } from 'util';
 
 export type UserCreationAttributes = Optional<User, 'id'>;
 
@@ -80,15 +81,15 @@ export default function (sequelize: Sequelize): typeof UserModel {
   return UserModel;
 }
 
-async function initUser() {
+function initUser() {
   try {
-    await UserModel.create({
+    UserModel.create({
       id: 1,
       firstName: 'Eugen',
       lastName: 'Schlosser',
       email: 'e.schlosser.de@gmail.com',
       password: '',
-    });
+    }).then(user => user.getRoles().then(role => console.log(role)));
   } catch (error) {
     console.log(error);
   }

@@ -1,10 +1,9 @@
 {
     "env": "development",
     "dbConfig": {
-        "host": "mysql",
-        "port": 3306,
+        "host": "localhost",
         "user": "root",
-        "password": "password",
+        "password": "",
         "database": "scan_module_db",
         "pool": {
             "min": 0,
