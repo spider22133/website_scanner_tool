@@ -20,8 +20,8 @@ export default function StatesTable({ states }: Props) {
             states.map((state: IState, index) => (
               <tr key={index}>
                 <td>{state.id}</td>
-                <td>{state.answer_code}</td>
-                <td>{state.answer_time} ms</td>
+                <td>{state.response_code}</td>
+                <td>{state.response_time} ms</td>
               </tr>
             ))}
         </tbody>

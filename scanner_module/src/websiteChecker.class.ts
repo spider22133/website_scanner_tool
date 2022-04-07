@@ -27,14 +27,16 @@ class WebsiteChecker {
       const findAllWebsitesData: WebsiteModel[] = await this.websiteService.findAllWebsites();
       for (const website of findAllWebsitesData) {
         const controlSteps: WebsiteControlStep[] = await website.getSteps();
-        await this.checkWebsite(controlSteps);
+        console.log('sdfgsdg', controlSteps);
+        await this.checkWebsite(website);
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  public async checkWebsite(controlSteps: WebsiteControlStep[]): Promise<void> {
+  public async checkWebsite(website: WebsiteModel): Promise<void> {
+    const controlSteps: WebsiteControlStep[] = await website.getSteps();
     for (const step of controlSteps) {
       try {
         const start = new Date().getTime();

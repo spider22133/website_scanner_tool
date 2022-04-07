@@ -4,6 +4,7 @@ import WebsiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
 import WebsiteChecker from '@/websiteChecker.class';
 import WebsiteStatesService from '@services/website_states.service';
+import {WebsiteModel} from "@models/website.model";
 
 class WebsitesController {
   public websiteService = new WebsiteService();
@@ -49,7 +50,7 @@ class WebsitesController {
   public checkWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteId = Number(req.params.id);
-      const findOne: Website = await this.websiteService.findWebsiteById(websiteId);
+      const findOne: WebsiteModel = await this.websiteService.findWebsiteById(websiteId);
       await this.websiteChecker.checkWebsite(findOne);
       const latestState = await this.websiteStatesService.findLatestStateByStepId(websiteId);
       res.status(200).json({ data: latestState, message: 'checked' });

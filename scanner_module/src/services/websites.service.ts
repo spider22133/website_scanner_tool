@@ -13,10 +13,10 @@ class WebsiteService {
     return await this.websites.findAll();
   }
 
-  public async findWebsiteById(websiteId: number): Promise<Website> {
+  public async findWebsiteById(websiteId: number): Promise<WebsiteModel> {
     if (isEmpty(websiteId)) throw new HttpException(400, 'Id is wrong');
 
-    const findWebsite: Website = await this.websites.findByPk(websiteId);
+    const findWebsite: WebsiteModel = await this.websites.findByPk(websiteId);
 
     if (!findWebsite) throw new HttpException(409, "Website doesn't exist");
 

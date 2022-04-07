@@ -9,19 +9,19 @@ const getAllErrors = () => {
 };
 
 const getStatesByWebsiteId = (id: string) => {
-  return http.get(`/website-states/website/${id}`);
+  return http.get(`/website-states/step/${id}`);
 };
 
 const getErrorStatesByWebsiteId = (id: string) => {
-  return http.get(`/website-states/website/${id}/errors`);
+  return http.get(`/website-states/step/${id}/errors`);
 };
 
 const getLatestStateByWebsiteId = (id: string) => {
-  return http.get(`/website-states/website/${id}/latest`);
+  return http.get(`/website-states/step/${id}/latest`);
 };
 
 const getAggregatedDataByWebsiteId = (id: string) => {
-  return http.get(`/website-states/website/${id}/aggregate`);
+  return http.get(`/website-states/step/${id}/aggregate`);
 };
 
 const StatesDataService = {

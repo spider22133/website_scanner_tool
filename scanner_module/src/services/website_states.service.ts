@@ -37,9 +37,9 @@ class WebsiteStatesService {
     const [{ avg, min, max }]: any = await this.website_states.findAll({
       where: { step_id },
       attributes: [
-        [sequelize.fn('avg', sequelize.col('answer_time')), 'avg'],
-        [sequelize.fn('min', sequelize.col('answer_time')), 'min'],
-        [sequelize.fn('max', sequelize.col('answer_time')), 'max'],
+        [sequelize.fn('avg', sequelize.col('response_time')), 'avg'],
+        [sequelize.fn('min', sequelize.col('response_time')), 'min'],
+        [sequelize.fn('max', sequelize.col('response_time')), 'max'],
       ],
       raw: true,
     });

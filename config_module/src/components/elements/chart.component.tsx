@@ -75,10 +75,10 @@ export default function Chart({ states, aggrStates }: Props) {
     const createdTimes: string[] = [];
 
     states.forEach(e => {
-      if (e.answer_time) {
+      if (e.response_time) {
         const date = new Date(e.createdAt);
         const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`;
-        answerTimes.push(e.answer_time);
+        answerTimes.push(e.response_time);
         createdTimes.push(time);
       }
     });

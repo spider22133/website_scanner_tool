@@ -6,8 +6,6 @@ import PaginationContainer from './elements/pagination-container.component';
 import StatesDataService from '../services/states.service';
 import StatesTable from './websites/states-table.component';
 import ErrorTable from './websites/error-table.component';
-import ErrorsDataService from '../services/errors.service';
-import IWebsiteError from '../interfaces/error.interface';
 import fetchData from '../helpers/fetch-data.helper';
 import Chart from './elements/chart.component';
 import AddWebsite from './websites/add-website.component';
@@ -37,7 +35,7 @@ const DashboardComponent: React.FC = () => {
 
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
-  const [errors, setWebsiteErrors] = useState<IWebsiteError[]>([]);
+  const [errors, setWebsiteErrors] = useState<IState[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -79,7 +77,7 @@ const DashboardComponent: React.FC = () => {
   };
 
   const getErrorsByWebsiteId = (id: string) => {
-    fetchData(ErrorsDataService.getErrorsByWebsiteId(id), setWebsiteErrors);
+    fetchData(StatesDataService.getErrorStatesByWebsiteId('1'), setWebsiteErrors);
   };
 
   const onPageChange = (page = 1) => {
