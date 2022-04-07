@@ -1,6 +1,6 @@
 import WebsiteService from '@services/websites.service';
 import WebsiteStatesService from '@services/website_states.service';
-import WebsiteErrorService from '@services/website_error.service';
+import WebsiteErrorService from '@services/website_control_steps.service';
 import { Website } from '@/interfaces/website.interface';
 import fetch from 'node-fetch';
 import mailer from '@utils/mailer';

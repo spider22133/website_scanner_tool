@@ -1,33 +1,32 @@
 import { NextFunction, Request, Response } from 'express';
 import { WebsiteState } from '@/interfaces/website_state.interface';
 import WebsiteStatesService from '@services/website_states.service';
-import WebsiteChecker from '@/websiteChecker.class';
 
 class WebsiteStatesController {
   public websiteStatesService = new WebsiteStatesService();
 
-  public getWebsiteStates = async (req: Request, res: Response, next: NextFunction) => {
+  public getStepStates = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findAllWebsiteStates();
+      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findAllStepStates();
       res.status(200).json({ data: findAllStatesData, message: 'findAll' });
     } catch (error) {
       next(error);
     }
   };
 
-  public getWebsiteErrorStates = async (req: Request, res: Response, next: NextFunction) => {
+  public getStepErrorStates = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findAllWebsiteErrorStates();
+      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findAllStepErrorStates();
       res.status(200).json({ data: findAllStatesData, message: 'findAll' });
     } catch (error) {
       next(error);
     }
   };
 
-  public getLatestStateByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+  public getLatestStateByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteId = Number(req.params.id);
-      const latestStateByWebsiteId: WebsiteState = await this.websiteStatesService.findLatestStateByWebsiteId(websiteId);
+      const stepId = Number(req.params.id);
+      const latestStateByWebsiteId: WebsiteState = await this.websiteStatesService.findLatestStateByStepId(stepId);
 
       res.status(200).json({ data: latestStateByWebsiteId, message: 'findLatestStateByWebsiteId' });
     } catch (error) {
@@ -35,10 +34,10 @@ class WebsiteStatesController {
     }
   };
 
-  public getWebsiteStatesByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+  public getStepStatesByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteId = Number(req.params.id);
-      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findStatesByWebsiteId(websiteId);
+      const stepId = Number(req.params.id);
+      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findStatesByStepId(stepId);
 
       res.status(200).json({ data: findAllStatesData, message: 'findStatesByWebsiteId' });
     } catch (error) {
@@ -46,10 +45,10 @@ class WebsiteStatesController {
     }
   };
 
-  public getWebsiteErrorStatesByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+  public getStepErrorStatesByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteId = Number(req.params.id);
-      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findErrorStatesByWebsiteId(websiteId);
+      const stepId = Number(req.params.id);
+      const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findErrorStatesByStepId(stepId);
 
       res.status(200).json({ data: findAllStatesData, message: 'findStatesByWebsiteId' });
     } catch (error) {
@@ -57,10 +56,10 @@ class WebsiteStatesController {
     }
   };
 
-  public getAggregatedDataByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+  public getAggregatedDataByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteId = Number(req.params.id);
-      const getAggregatedData: any = await this.websiteStatesService.aggregatedByWebsiteId(websiteId);
+      const stepId = Number(req.params.id);
+      const getAggregatedData: any = await this.websiteStatesService.aggregatedByStepId(stepId);
 
       res.status(200).json({ data: getAggregatedData, message: 'findStatesByWebsiteId' });
     } catch (error) {

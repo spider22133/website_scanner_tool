@@ -51,7 +51,7 @@ class WebsitesController {
       const websiteId = Number(req.params.id);
       const findOne: Website = await this.websiteService.findWebsiteById(websiteId);
       await this.websiteChecker.checkWebsite(findOne);
-      const latestState = await this.websiteStatesService.findLatestStateByWebsiteId(websiteId);
+      const latestState = await this.websiteStatesService.findLatestStateByStepId(websiteId);
       res.status(200).json({ data: latestState, message: 'checked' });
     } catch (error) {
       next(error);
