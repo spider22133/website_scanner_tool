@@ -9,7 +9,7 @@ import { Op } from 'sequelize';
 class WebsiteService {
   public websites = DB.Websites;
 
-  public async findAllWebsites(): Promise<Website[]> {
+  public async findAllWebsites(): Promise<WebsiteModel[]> {
     return await this.websites.findAll();
   }
 
@@ -38,7 +38,10 @@ class WebsiteService {
     const findWebsite: Website = await this.websites.findOne({ where: { url: websiteData.url } });
     if (findWebsite) throw new HttpException(409, `Url ${websiteData.url} already exists`);
 
-    return await this.websites.create(websiteData);
+    const website = await this.websites.create(websiteData);
+    await website.createStep({ path: website.url, title: 'MAIN' });
+
+    return website;
   }
 
   public async deleteWebsite(websiteId: number): Promise<Website> {

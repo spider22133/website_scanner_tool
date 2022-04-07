@@ -15,7 +15,8 @@ class WebsiteControlStepsRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/website/:id(\\d+)`, authMiddleware, this.websiteControlStepsController.getWebsiteControlStepsByWebsiteId);
+    this.router.get(`${this.path}/`, authMiddleware, this.websiteControlStepsController.getWebsiteControlSteps);
+    this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.websiteControlStepsController.getWebsiteControlStepsByWebsiteId);
     this.router.put(
       `${this.path}/:id(\\d+)`,
       validationMiddleware(CreateWebsiteControlStepDto, 'body', true),

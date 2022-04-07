@@ -1,18 +1,23 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import {Sequelize, DataTypes, Model, Optional, HasManyGetAssociationsMixin, Association, HasManyCreateAssociationMixin} from 'sequelize';
 import { Website } from '@/interfaces/website.interface';
 import { WebsiteControlStepModel } from './website_control_step.model';
 
-export type WebsiteCreationAttributes = Optional<Website, 'id' | 'is_active' | 'name' | 'url'>;
+export type WebsiteCreationAttributes = Optional<Website, 'id' | 'name' | 'url'>;
 
 export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> {
   public id: number;
   public name: string;
   public url: string;
   public is_hidden: boolean;
-  public is_active: boolean;
-
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public getSteps!: HasManyGetAssociationsMixin<WebsiteControlStepModel>;
+  public createStep!: HasManyCreateAssociationMixin<WebsiteControlStepModel>;
+
+  public static associations: {
+    projects: Association<WebsiteModel, WebsiteControlStepModel>;
+  };
 }
 
 export default function (sequelize: Sequelize): typeof WebsiteModel {
@@ -34,11 +39,6 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
         defaultValue: false,
         type: DataTypes.BOOLEAN,
       },
-      is_active: {
-        allowNull: false,
-        defaultValue: false,
-        type: DataTypes.BOOLEAN,
-      },
     },
     {
       tableName: 'websites',
@@ -49,13 +49,13 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
   WebsiteModel.hasMany(WebsiteControlStepModel, {
     sourceKey: 'id',
     foreignKey: 'website_id',
-    as: 'website_control_step',
+    as: 'steps',
     onDelete: 'CASCADE',
   });
 
   WebsiteControlStepModel.belongsTo(WebsiteModel, {
     foreignKey: 'website_id',
-    as: 'website',
+    as: 'websites',
   });
 
   return WebsiteModel;
