@@ -1,7 +1,6 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { Website } from '@/interfaces/website.interface';
-import { WebsiteStateModel } from '@/models/website_state.model';
-import { WebsiteErrorModel } from './website_error.model';
+import { WebsiteControlStepModel } from './website_control_step.model';
 
 export type WebsiteCreationAttributes = Optional<Website, 'id' | 'is_active' | 'name' | 'url'>;
 
@@ -47,26 +46,14 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
     },
   );
 
-  WebsiteModel.hasMany(WebsiteStateModel, {
+  WebsiteModel.hasMany(WebsiteControlStepModel, {
     sourceKey: 'id',
     foreignKey: 'website_id',
-    as: 'website_state',
+    as: 'website_control_step',
     onDelete: 'CASCADE',
   });
 
-  WebsiteStateModel.belongsTo(WebsiteModel, {
-    foreignKey: 'website_id',
-    as: 'website',
-  });
-
-  WebsiteModel.hasMany(WebsiteErrorModel, {
-    sourceKey: 'id',
-    foreignKey: 'website_id',
-    as: 'website_error',
-    onDelete: 'CASCADE',
-  });
-
-  WebsiteErrorModel.belongsTo(WebsiteModel, {
+  WebsiteControlStepModel.belongsTo(WebsiteModel, {
     foreignKey: 'website_id',
     as: 'website',
   });

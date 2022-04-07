@@ -1,5 +1,5 @@
 import DB from '@databases';
-import { WebsiteError } from '@/interfaces/website_error.interface';
+import { WebsiteError } from '@interfaces/website_control_step.interface';
 
 class WebsiteErrorService {
   public website_errors = DB.WebsiteErrors;

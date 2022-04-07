@@ -5,8 +5,7 @@ import UserModel from '@/models/user.model';
 import RoleModel from '@models/role.model';
 import WebsiteModel from '@/models/website.model';
 import WebsiteStateModel from '@/models/website_state.model';
-import WebsiteErrorModel from '@/models/website_error.model';
-import { logger } from '@utils/logger';
+import WebsiteControlStepModel from '@models/website_control_step.model';
 
 const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig');
 const sequelize = new Sequelize(database, user, password, {
@@ -36,7 +35,7 @@ sequelize.authenticate();
 const DB = {
   Roles: RoleModel(sequelize),
   WebsiteStates: WebsiteStateModel(sequelize),
-  WebsiteErrors: WebsiteErrorModel(sequelize),
+  WebsiteControlSteps: WebsiteControlStepModel(sequelize),
   Websites: WebsiteModel(sequelize),
   Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)

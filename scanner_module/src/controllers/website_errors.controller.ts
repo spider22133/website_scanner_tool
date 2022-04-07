@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { WebsiteError } from '@/interfaces/website_error.interface';
+import { WebsiteError } from '@interfaces/website_control_step.interface';
 import websiteErrorsService from '@services/website_error.service';
 
 class WebsiteErrorsController {

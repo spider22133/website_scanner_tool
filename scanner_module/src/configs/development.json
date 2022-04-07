@@ -1,15 +1,14 @@
 {
-    "env": "development",
-    "dbConfig": {
-        "host": "mysql",
-        "port": 3306,
-        "user": "root",
-        "password": "password",
-        "database": "scan_module_db",
-        "pool": {
-            "min": 0,
-            "max": 5
-        }
-    },
-    "secretKey": "ABCDEF$123"
+  "env": "development",
+  "dbConfig": {
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": "scan_module_db",
+    "pool": {
+      "min": 0,
+      "max": 5
+    }
+  },
+  "secretKey": "ABCDEF$123"
 }

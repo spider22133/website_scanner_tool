@@ -1,8 +1,8 @@
 export interface WebsiteState {
   id?: number;
-  website_id: number;
-  answer_code: number;
-  answer_time?: number;
-  answer_text?: string;
+  step_id: number;
+  response_code: number;
+  response_time?: number;
+  response_text?: string;
   is_error?: boolean;
 }

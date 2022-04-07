@@ -5,10 +5,10 @@ export type WebsiteStateCreationAttributes = Optional<WebsiteState, 'id'>;
 
 export class WebsiteStateModel extends Model<WebsiteState, WebsiteStateCreationAttributes> implements WebsiteState {
   public id: number;
-  public website_id: number;
-  public answer_code: number;
-  public answer_time: number;
-  public answer_text: string;
+  public step_id: number;
+  public response_code: number;
+  public response_time: number;
+  public response_text: string;
   public is_error: boolean;
 
   public readonly createdAt!: Date;
@@ -23,16 +23,16 @@ export default function (sequelize: Sequelize): typeof WebsiteStateModel {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      website_id: {
+      step_id: {
         type: DataTypes.INTEGER,
       },
-      answer_code: {
+      response_code: {
         type: DataTypes.INTEGER,
       },
-      answer_time: {
+      response_time: {
         type: DataTypes.INTEGER,
       },
-      answer_text: {
+      response_text: {
         type: DataTypes.TEXT,
       },
       is_error: {
@@ -40,7 +40,7 @@ export default function (sequelize: Sequelize): typeof WebsiteStateModel {
       },
     },
     {
-      tableName: 'website_states',
+      tableName: 'website_control_step_states',
       sequelize,
     },
   );
