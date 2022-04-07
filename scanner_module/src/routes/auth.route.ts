@@ -23,6 +23,7 @@ class AuthRoute implements Route {
     this.router.post(`${this.path}logout`, authMiddleware, this.authController.logOut);
 
     this.router.get(`${this.path}oauth/redirect`, (req, res) => {
+      console.log(req.query.code);
       axios({
         method: 'POST',
         url: `${this.FIRM_URL}?client_id=${this.CLIENT_ID}&client_secret=${this.CLIENT_SECRET}&code=${req.query.code}`,
@@ -30,7 +31,8 @@ class AuthRoute implements Route {
           Accept: 'application/json',
         },
       }).then(response => {
-        res.redirect(`http://localhost:3000?access_token=${response.data.access_token}`);
+        console.log(response.data.access_token);
+        res.redirect(`http://localhost:3000/dashboard?access_token=${response.data.access_token}`);
       });
     });
   }
