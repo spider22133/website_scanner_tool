@@ -1,4 +1,4 @@
-import {Sequelize, DataTypes, Model, Optional, HasManyGetAssociationsMixin, Association, HasManyCreateAssociationMixin} from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional, HasManyGetAssociationsMixin, Association, HasManyCreateAssociationMixin } from 'sequelize';
 import { Website } from '@/interfaces/website.interface';
 import { WebsiteControlStepModel } from './website_control_step.model';
 
@@ -9,6 +9,8 @@ export class WebsiteModel extends Model<Website, WebsiteCreationAttributes> {
   public name: string;
   public url: string;
   public is_hidden: boolean;
+  public is_active: boolean;
+
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -35,6 +37,11 @@ export default function (sequelize: Sequelize): typeof WebsiteModel {
         type: DataTypes.STRING(255),
       },
       is_hidden: {
+        allowNull: false,
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
+      },
+      is_active: {
         allowNull: false,
         defaultValue: false,
         type: DataTypes.BOOLEAN,

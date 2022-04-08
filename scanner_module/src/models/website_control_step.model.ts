@@ -1,6 +1,7 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
+import {Sequelize, DataTypes, Model, Optional, BelongsToSetAssociationMixin} from 'sequelize';
 import { WebsiteControlStep } from '@/interfaces/website_control_step.interface';
 import { WebsiteStateModel } from '@/models/website_state.model';
+import {WebsiteModel} from '@models/website.model';
 
 export type WebsiteControlStepCreationAttributes = Optional<WebsiteControlStep, 'id'>;
 
@@ -11,6 +12,8 @@ export class WebsiteControlStepModel extends Model<WebsiteControlStep, WebsiteCo
   public path: string;
   public api_call_data: string;
   public estimated_code: number;
+
+  public setWebsite!: BelongsToSetAssociationMixin<WebsiteModel, number>;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

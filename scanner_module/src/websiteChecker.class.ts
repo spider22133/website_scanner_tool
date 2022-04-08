@@ -7,6 +7,7 @@ import { Socket } from 'socket.io';
 import { WebsiteModel } from '@models/website.model';
 import { WebsiteControlStep } from '@interfaces/website_control_step.interface';
 import WebsiteControlStepService from '@services/website_control_steps.service';
+import { WebsiteControlStepModel } from '@models/website_control_step.model';
 
 const HTTP_CODE_404 = 404;
 const HTTP_CODE_200 = 200;
@@ -26,8 +27,6 @@ class WebsiteChecker {
     try {
       const findAllWebsitesData: WebsiteModel[] = await this.websiteService.findAllWebsites();
       for (const website of findAllWebsitesData) {
-        const controlSteps: WebsiteControlStep[] = await website.getSteps();
-        console.log('sdfgsdg', controlSteps);
         await this.checkWebsite(website);
       }
     } catch (error) {
@@ -36,29 +35,47 @@ class WebsiteChecker {
   }
 
   public async checkWebsite(website: WebsiteModel): Promise<void> {
-    const controlSteps: WebsiteControlStep[] = await website.getSteps();
+    const controlSteps: WebsiteControlStepModel[] = await website.getSteps();
     for (const step of controlSteps) {
       try {
         const start = new Date().getTime();
-
         switch (step.title) {
           case 'MAIN':
-            const { status } = await WebsiteChecker.checkWebsiteStatus(step.path);
-            if (status == HTTP_CODE_200) {
-              const end = new Date().getTime() - start;
-              return await this.sendStatus(step, end, status);
-            }
+            const { status, msg } = await WebsiteChecker.checkWebsiteStatus(step.path);
+            await this.updateStatus(status, start, step, msg);
             break;
           case 'API_CALL':
             console.log('API_CALL');
             break;
           case 'LOGIN_CALL':
-            console.log('API_CALL');
+            const { login_status, login_msg } = await WebsiteChecker.checkLoginCall(step);
+            await this.updateStatus(login_status, start, step, login_msg);
             break;
         }
       } catch (error) {
+        console.log(error);
         await this.sendError(step, error.code, error.message);
       }
+    }
+    // Check if their any unsuccessfully requests
+    const controlStepsUpdated: WebsiteControlStepModel[] = await website.getSteps();
+    const hasErrors = controlStepsUpdated.find(item => item.estimated_code === HTTP_CODE_404);
+
+    if (hasErrors) {
+      await this.websiteService.updateWebsite(website.id, { ...website, is_active: false });
+      this._socket.emit('updateWebsites', 'changed');
+    } else {
+      await this.websiteService.updateWebsite(website.id, { ...website, is_active: true });
+      this._socket.emit('updateWebsites', 'changed');
+    }
+  }
+
+  private async updateStatus(status: number, start: number, step: WebsiteControlStepModel, msg: string) {
+    if (status == HTTP_CODE_200) {
+      const end = new Date().getTime() - start;
+      await this.sendStatus(step, end, status);
+    } else {
+      await this.sendError(step, status, msg);
     }
   }
 
@@ -66,20 +83,14 @@ class WebsiteChecker {
     return await WebsiteChecker.checkWebsiteStatus(url);
   }
 
-  private async sendStatus(step: WebsiteControlStep, end: number, status: number) {
-    const updated = await this.websiteControlStepService.updateWebsiteControlStep(step.id, { ...step, estimated_code: HTTP_CODE_200 });
+  private async sendStatus(step: WebsiteControlStepModel, end: number, status: number) {
+    await this.websiteControlStepService.updateWebsiteControlStep(step.id, { ...step, estimated_code: HTTP_CODE_200 });
     await this.websiteStatesService.createStepState({ step_id: step.id, response_time: end, response_code: status });
-
-    // Client should update websites state
-    if (updated.estimated_code === HTTP_CODE_200 && step.estimated_code === HTTP_CODE_404) this._socket.emit('updateWebsites', 'changed');
   }
 
   private async sendError(step: WebsiteControlStep, status: number, msg = '') {
     await this.websiteControlStepService.updateWebsiteControlStep(step.id, { ...step, estimated_code: HTTP_CODE_404 });
     await this.websiteStatesService.createStepErrorState({ step_id: step.id, response_code: status, response_text: msg, is_error: true });
-
-    // Client should update websites state
-    this._socket.emit('updateWebsites', 'changed');
 
     //Send mail
     //mailer(website, status, msg).catch(console.error);
@@ -87,6 +98,21 @@ class WebsiteChecker {
 
   private static checkWebsiteStatus(url: string): Promise<{ status: number; msg: string }> {
     return fetch(url).then(res => ({ status: res.status, msg: res.statusText }));
+  }
+
+  private static checkLoginCall(step: WebsiteControlStep): Promise<{ login_status: number; login_msg: string }> {
+    const dataApi = JSON.parse(step.api_call_data);
+    const data = {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: dataApi,
+    };
+
+    return fetch(step.path, data).then(res => ({ login_status: res.status, login_msg: res.statusText }));
   }
 }
 
