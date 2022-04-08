@@ -46,7 +46,7 @@ function initRoles() {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log('ROLES', error);
     }
   });
 }

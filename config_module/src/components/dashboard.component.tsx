@@ -4,6 +4,7 @@ import IWebsite from '../interfaces/website.interface';
 import IState from '../interfaces/website-state.interface';
 import PaginationContainer from './elements/pagination-container.component';
 import StatesDataService from '../services/states.service';
+import WebsiteService from '../services/website.service';
 import StatesTable from './websites/states-table.component';
 import ErrorTable from './websites/error-table.component';
 import fetchData from '../helpers/fetch-data.helper';
@@ -31,8 +32,8 @@ const DashboardComponent: React.FC = () => {
   const itemsPerPage = 15;
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
-  const states = useSelector(selectAllStates);
 
+  const [states, setStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
   const [errors, setWebsiteErrors] = useState<IState[]>([]);
@@ -57,6 +58,7 @@ const DashboardComponent: React.FC = () => {
     dispatch(retrieveWebsites());
     dispatch(getStatesByWebsiteId('1'));
     getAggrStates('1');
+    getWebsiteMainStepStates('1');
   }, [dispatch]);
 
   useEffect(() => {
@@ -68,12 +70,17 @@ const DashboardComponent: React.FC = () => {
     setCurrentPage(1);
     getErrorsByWebsiteId(website.id);
     getAggrStates(website.id);
+    getWebsiteMainStepStates(website.id);
 
     dispatch(getStatesByWebsiteId(website.id));
   };
 
   const getAggrStates = (id: string) => {
     fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates);
+  };
+
+  const getWebsiteMainStepStates = (id: string) => {
+    fetchData(WebsiteService.getWebsiteMainStepStates(id), setStates);
   };
 
   const getErrorsByWebsiteId = (id: string) => {

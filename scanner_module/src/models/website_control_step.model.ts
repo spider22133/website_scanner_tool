@@ -1,14 +1,15 @@
-import {Sequelize, DataTypes, Model, Optional, BelongsToSetAssociationMixin} from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional, BelongsToSetAssociationMixin } from 'sequelize';
 import { WebsiteControlStep } from '@/interfaces/website_control_step.interface';
 import { WebsiteStateModel } from '@/models/website_state.model';
-import {WebsiteModel} from '@models/website.model';
+import { WebsiteModel } from '@models/website.model';
 
 export type WebsiteControlStepCreationAttributes = Optional<WebsiteControlStep, 'id'>;
 
 export class WebsiteControlStepModel extends Model<WebsiteControlStep, WebsiteControlStepCreationAttributes> implements WebsiteControlStep {
   public id: number;
   public website_id: number;
-  public title: string;
+  public type: string;
+  public description: string;
   public path: string;
   public api_call_data: string;
   public estimated_code: number;
@@ -30,7 +31,10 @@ export default function (sequelize: Sequelize): typeof WebsiteControlStepModel {
       website_id: {
         type: DataTypes.INTEGER,
       },
-      title: {
+      type: {
+        type: DataTypes.TEXT,
+      },
+      description: {
         type: DataTypes.TEXT,
       },
       path: {

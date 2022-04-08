@@ -39,7 +39,7 @@ class WebsiteService {
     if (findWebsite) throw new HttpException(409, `Url ${websiteData.url} already exists`);
 
     const website = await this.websites.create(websiteData);
-    await website.createStep({ path: website.url, title: 'MAIN' });
+    await website.createStep({ path: website.url, type: 'MAIN', description: 'First step to check website URL address' });
 
     return website;
   }

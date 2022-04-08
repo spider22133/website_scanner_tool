@@ -25,7 +25,7 @@ const app = new App([
   new IndexRoute(),
   new UsersRoute(),
   new AuthRoute(),
-  new WebsitesRoute(),
+  new WebsitesRoute(websiteChecker),
   new TimerRoute(timer),
   new StatesRoute(),
   new WebsiteErrorsRoute(),

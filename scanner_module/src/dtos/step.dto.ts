@@ -2,7 +2,10 @@ import { IsString, IsBoolean } from 'class-validator';
 
 export default class CreateWebsiteControlStepDto {
   @IsString()
-  public title: string;
+  public type: string;
+
+  @IsString()
+  public description: string;
 
   @IsString()
   public path: string;

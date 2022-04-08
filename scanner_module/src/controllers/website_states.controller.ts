@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { WebsiteState } from '@/interfaces/website_state.interface';
 import WebsiteStatesService from '@services/website_states.service';
+import WebsiteControlStepsService from '@services/website_control_steps.service';
 
 class WebsiteStatesController {
   public websiteStatesService = new WebsiteStatesService();
-
+  public websiteControlStepsService = new WebsiteControlStepsService();
   public getStepStates = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findAllStepStates();
@@ -25,8 +26,10 @@ class WebsiteStatesController {
 
   public getLatestStateByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const stepId = Number(req.params.id);
-      const latestStateByWebsiteId: WebsiteState = await this.websiteStatesService.findLatestStateByStepId(stepId);
+      const websiteId = Number(req.params.id);
+      const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId);
+      const mainStep = steps.find(step => step.type === 'MAIN');
+      const latestStateByWebsiteId: WebsiteState = await this.websiteStatesService.findLatestStateByStepId(mainStep.id);
 
       res.status(200).json({ data: latestStateByWebsiteId, message: 'findLatestStateByWebsiteId' });
     } catch (error) {

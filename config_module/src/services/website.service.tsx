@@ -12,6 +12,10 @@ const getWebsiteById = (id: string) => {
   return http.get(`/websites/${id}`);
 };
 
+const getWebsiteMainStepStates = (id: string) => {
+  return http.get(`/websites/${id}/main_states`);
+};
+
 const update = (data: IWebsite) => {
   const { id, name, url, is_hidden } = data;
   return http.put(`/websites/${id}`, { name, url, is_hidden });
@@ -41,6 +45,7 @@ const WebsiteDataService = {
   deleteWebsite,
   searchInWebsites,
   checkStatus,
+  getWebsiteMainStepStates,
 };
 
 export default WebsiteDataService;

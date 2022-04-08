@@ -4,12 +4,18 @@ import WebsiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
 import WebsiteChecker from '@/websiteChecker.class';
 import WebsiteStatesService from '@services/website_states.service';
-import {WebsiteModel} from "@models/website.model";
+import { WebsiteModel } from '@models/website.model';
+import WebsiteControlStepsService from '@services/website_control_steps.service';
 
 class WebsitesController {
   public websiteService = new WebsiteService();
-  public websiteChecker = new WebsiteChecker();
+  public websiteChecker;
   public websiteStatesService = new WebsiteStatesService();
+  public websiteControlStepsService = new WebsiteControlStepsService();
+
+  constructor(websiteChecker: WebsiteChecker) {
+    this.websiteChecker = websiteChecker;
+  }
 
   public getWebsites = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -27,6 +33,19 @@ class WebsitesController {
       const findOne: Website = await this.websiteService.findWebsiteById(websiteId);
 
       res.status(200).json({ data: findOne, message: 'findOne' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getWebsiteMainStepStates = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = Number(req.params.id);
+      const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId);
+      const mainStep = steps.find(step => step.type === 'MAIN');
+      const states = await this.websiteStatesService.findStatesByStepId(mainStep.id);
+
+      res.status(200).json({ data: states, message: 'findOne' });
     } catch (error) {
       next(error);
     }
@@ -51,8 +70,13 @@ class WebsitesController {
     try {
       const websiteId = Number(req.params.id);
       const findOne: WebsiteModel = await this.websiteService.findWebsiteById(websiteId);
+
       await this.websiteChecker.checkWebsite(findOne);
-      const latestState = await this.websiteStatesService.findLatestStateByStepId(websiteId);
+
+      const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId);
+      const mainStep = steps.find(step => step.type === 'MAIN');
+      const latestState = await this.websiteStatesService.findLatestStateByStepId(mainStep.id);
+
       res.status(200).json({ data: latestState, message: 'checked' });
     } catch (error) {
       next(error);

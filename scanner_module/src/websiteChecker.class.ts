@@ -17,7 +17,7 @@ class WebsiteChecker {
   public websiteControlStepService = new WebsiteControlStepService();
   public websiteStatesService = new WebsiteStatesService();
   public websiteErrorService = new WebsiteErrorService();
-  private _socket: Socket;
+  public _socket: Socket;
 
   public connectSocket = (socket: Socket) => {
     this._socket = socket;
@@ -34,12 +34,13 @@ class WebsiteChecker {
     }
   }
 
-  public async checkWebsite(website: WebsiteModel): Promise<void> {
+  public async checkWebsite(website: WebsiteModel) {
     const controlSteps: WebsiteControlStepModel[] = await website.getSteps();
+
     for (const step of controlSteps) {
       try {
         const start = new Date().getTime();
-        switch (step.title) {
+        switch (step.type) {
           case 'MAIN':
             const { status, msg } = await WebsiteChecker.checkWebsiteStatus(step.path);
             await this.updateStatus(status, start, step, msg);
@@ -53,7 +54,6 @@ class WebsiteChecker {
             break;
         }
       } catch (error) {
-        console.log(error);
         await this.sendError(step, error.code, error.message);
       }
     }
@@ -63,11 +63,11 @@ class WebsiteChecker {
 
     if (hasErrors) {
       await this.websiteService.updateWebsite(website.id, { ...website, is_active: false });
-      this._socket.emit('updateWebsites', 'changed');
     } else {
       await this.websiteService.updateWebsite(website.id, { ...website, is_active: true });
-      this._socket.emit('updateWebsites', 'changed');
     }
+
+    this._socket.emit('updateWebsites', 'changed');
   }
 
   private async updateStatus(status: number, start: number, step: WebsiteControlStepModel, msg: string) {
@@ -109,7 +109,7 @@ class WebsiteChecker {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: dataApi,
+      body: JSON.stringify(dataApi),
     };
 
     return fetch(step.path, data).then(res => ({ login_status: res.status, login_msg: res.statusText }));
