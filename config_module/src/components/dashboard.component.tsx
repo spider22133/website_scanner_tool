@@ -139,15 +139,9 @@ const DashboardComponent: React.FC = () => {
             </Box>
           </Grid>
           <Grid item xs={12} lg={7}>
-            <Grid item xs={12}>
-              <ApiStepsComponent steps={steps} type="MAIN" title="Standard Page Requests" />
-            </Grid>
-            <Grid item xs={12}>
-              <ApiStepsComponent steps={steps} type="LOGIN_CALL" title="Login Requests" />
-            </Grid>
-            <Grid item xs={12}>
-              <ApiStepsComponent steps={steps} type="API_CALL" title="API Requests" />
-            </Grid>
+            <ApiStepsComponent steps={steps} type="MAIN" title="Standard Page Requests" />
+            <ApiStepsComponent steps={steps} type="LOGIN_CALL" title="Login Requests" />
+            <ApiStepsComponent steps={steps} type="API_CALL" title="API Requests" />
             {errors.length > 0 ? (
               <div className="border border-danger border-2 rounded-2 p-4 mb-3">
                 <h2 className="">Error list</h2>
