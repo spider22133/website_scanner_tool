@@ -17,6 +17,7 @@ class WebsiteStatesRoute implements Route {
     this.router.get(`${this.path}/errors`, authMiddleware, this.websiteStatesController.getStepErrorStates);
     this.router.get(`${this.path}/step/:id(\\d+)`, authMiddleware, this.websiteStatesController.getStepStatesByStepId);
     this.router.get(`${this.path}/step/:id(\\d+)/errors`, authMiddleware, this.websiteStatesController.getStepErrorStatesByStepId);
+    this.router.get(`${this.path}/website/:id(\\d+)/latest`, authMiddleware, this.websiteStatesController.getLatestStateByWebsiteId);
     this.router.get(`${this.path}/step/:id(\\d+)/latest`, authMiddleware, this.websiteStatesController.getLatestStateByStepId);
     this.router.get(`${this.path}/step/:id(\\d+)/aggregate`, authMiddleware, this.websiteStatesController.getAggregatedDataByStepId);
   }

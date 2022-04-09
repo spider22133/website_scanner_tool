@@ -16,11 +16,14 @@ import { retrieveWebsites } from '../slices/websites.slice';
 import { RootState, useAppDispatch } from '../store';
 import { useSelector } from 'react-redux';
 import { getStatesByWebsiteId, selectAllStates } from '../slices/states.slice';
-import { Box, Container, Paper, Grid, Button, Alert } from '@mui/material';
+import { Box, Container, Paper, Grid, Button, Alert, CardContent, CardActions, Card, Typography, Stack, Divider } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import WebsitesList from './websites/websites-list';
 import SearchFilterBar from './elements/search-filter-bar.component';
 import socketIOClient from 'socket.io-client';
+import { getStepsByWebsiteId } from '../slices/websites_control_steps.slice';
+import ApiStepComponent from './websites/api-step.component';
+import ApiStepsComponent from './websites/api-steps.component';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -32,6 +35,7 @@ const DashboardComponent: React.FC = () => {
   const itemsPerPage = 15;
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+  const { steps, loading } = useSelector((state: RootState) => state.steps);
 
   const [states, setStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
@@ -57,6 +61,7 @@ const DashboardComponent: React.FC = () => {
   useEffect(() => {
     dispatch(retrieveWebsites());
     dispatch(getStatesByWebsiteId('1'));
+    dispatch(getStepsByWebsiteId('1'));
     getAggrStates('1');
     getWebsiteMainStepStates('1');
   }, [dispatch]);
@@ -72,6 +77,7 @@ const DashboardComponent: React.FC = () => {
     getAggrStates(website.id);
     getWebsiteMainStepStates(website.id);
 
+    dispatch(getStepsByWebsiteId(website.id));
     dispatch(getStatesByWebsiteId(website.id));
   };
 
@@ -133,6 +139,15 @@ const DashboardComponent: React.FC = () => {
             </Box>
           </Grid>
           <Grid item xs={12} lg={7}>
+            <Grid item xs={12}>
+              <ApiStepsComponent steps={steps} type="MAIN" title="Standard Page Requests" />
+            </Grid>
+            <Grid item xs={12}>
+              <ApiStepsComponent steps={steps} type="LOGIN_CALL" title="Login Requests" />
+            </Grid>
+            <Grid item xs={12}>
+              <ApiStepsComponent steps={steps} type="API_CALL" title="API Requests" />
+            </Grid>
             {errors.length > 0 ? (
               <div className="border border-danger border-2 rounded-2 p-4 mb-3">
                 <h2 className="">Error list</h2>

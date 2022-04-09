@@ -1,8 +1,11 @@
 export default interface IWebsiteControlStep {
   id: string;
   website_id: string;
-  title: string;
+  type?: string;
+  description: string;
   path: string;
   api_call_data: string;
-  estimated_code: number;
+  estimated_code?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }

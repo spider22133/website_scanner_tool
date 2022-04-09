@@ -56,15 +56,15 @@ export const updateWebsiteControlStep = createAsyncThunk<
   }
 });
 
-export const retrieveWebsiteControlSteps = createAsyncThunk<
+export const getStepsByWebsiteId = createAsyncThunk<
   IWebsiteControlStep[],
-  void,
+  string,
   {
     rejectValue: httpErrors;
   }
->('website_control_step/retrieve', async (_, { rejectWithValue, dispatch }) => {
+>('website_control_step/retrieve', async (id, { rejectWithValue, dispatch }) => {
   try {
-    const res = await WebsiteControlStepsDataService.getAll();
+    const res = await WebsiteControlStepsDataService.getStepsById(id);
     return res.data.data;
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err;
@@ -114,14 +114,14 @@ const websiteControlStateSlice = createSlice({
     });
 
     // Retrieve websites
-    builder.addCase(retrieveWebsiteControlSteps.pending, (state, {}) => {
+    builder.addCase(getStepsByWebsiteId.pending, (state, {}) => {
       state.loading = true;
     });
-    builder.addCase(retrieveWebsiteControlSteps.fulfilled, (state, { payload }) => {
+    builder.addCase(getStepsByWebsiteId.fulfilled, (state, { payload }) => {
       state.loading = false;
       state.steps = payload;
     });
-    builder.addCase(retrieveWebsiteControlSteps.rejected, state => {
+    builder.addCase(getStepsByWebsiteId.rejected, state => {
       state.loading = false;
     });
 

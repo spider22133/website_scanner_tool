@@ -26,6 +26,17 @@ class WebsiteStatesController {
 
   public getLatestStateByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const stepId = Number(req.params.id);
+      const latestStateByStepId: WebsiteState = await this.websiteStatesService.findLatestStateByStepId(stepId);
+
+      res.status(200).json({ data: latestStateByStepId, message: 'findLatestStateByWebsiteId' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getLatestStateByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
       const websiteId = Number(req.params.id);
       const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId);
       const mainStep = steps.find(step => step.type === 'MAIN');

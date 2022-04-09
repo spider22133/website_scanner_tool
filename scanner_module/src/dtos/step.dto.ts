@@ -1,8 +1,11 @@
-import { IsString, IsBoolean } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 
 export default class CreateWebsiteControlStepDto {
   @IsString()
-  public type: string;
+  public id: string;
+
+  @IsString()
+  public website_id: string;
 
   @IsString()
   public description: string;
@@ -10,9 +13,6 @@ export default class CreateWebsiteControlStepDto {
   @IsString()
   public path: string;
 
-  @IsBoolean()
+  @IsString()
   public api_call_data: string;
-
-  @IsBoolean()
-  public estimated_code: number;
 }

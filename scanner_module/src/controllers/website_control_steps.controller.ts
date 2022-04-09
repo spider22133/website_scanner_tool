@@ -39,6 +39,7 @@ class WebsiteControlStepsController {
 
   public updateWebsiteControlStep = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(req.body);
       const stepId = Number(req.params.id);
       const stepData: CreateWebsiteControlStepDto = req.body;
 

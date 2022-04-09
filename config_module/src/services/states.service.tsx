@@ -17,6 +17,10 @@ const getErrorStatesByWebsiteId = (id: string) => {
 };
 
 const getLatestStateByWebsiteId = (id: string) => {
+  return http.get(`/website-states/website/${id}/latest`);
+};
+
+const getLatestStateByStepId = (id: string) => {
   return http.get(`/website-states/step/${id}/latest`);
 };
 
@@ -26,6 +30,7 @@ const getAggregatedDataByWebsiteId = (id: string) => {
 
 const StatesDataService = {
   getAggregatedDataByWebsiteId,
+  getLatestStateByStepId,
   getLatestStateByWebsiteId,
   getStatesByWebsiteId,
   getErrorStatesByWebsiteId,
