@@ -39,7 +39,7 @@ export default function Chart({ states, aggrStates }: Props) {
       curve: 'smooth',
     },
     title: {
-      text: 'Answer Time Overview',
+      text: 'Home Page Response Time Overview',
       align: 'left',
       style: {
         fontSize: '18px',
