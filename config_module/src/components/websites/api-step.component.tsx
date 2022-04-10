@@ -70,7 +70,7 @@ const ApiStepComponent: React.FC<Props> = ({ step }) => {
   }, []);
 
   return (
-    <Card sx={{ width: '50%', height: 'fit-content' }}>
+    <Card sx={{ height: 'fit-content' }}>
       <CardHeader
         sx={{ '& .MuiCardHeader-subheader': { fontSize: '0.875rem', pr: 1 } }}
         subheader={step.description}

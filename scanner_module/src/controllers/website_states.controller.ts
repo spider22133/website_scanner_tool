@@ -72,8 +72,10 @@ class WebsiteStatesController {
 
   public getAggregatedDataByStepId = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const stepId = Number(req.params.id);
-      const getAggregatedData: any = await this.websiteStatesService.aggregatedByStepId(stepId);
+      const websiteId = Number(req.params.id);
+      const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId);
+      const mainStep = steps.find(step => step.type === 'MAIN');
+      const getAggregatedData: any = await this.websiteStatesService.aggregatedByStepId(mainStep.id);
 
       res.status(200).json({ data: getAggregatedData, message: 'findStatesByWebsiteId' });
     } catch (error) {

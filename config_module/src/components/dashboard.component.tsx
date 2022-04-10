@@ -6,7 +6,6 @@ import PaginationContainer from './elements/pagination-container.component';
 import StatesDataService from '../services/states.service';
 import WebsiteService from '../services/website.service';
 import StatesTable from './websites/states-table.component';
-import ErrorTable from './websites/error-table.component';
 import fetchData from '../helpers/fetch-data.helper';
 import Chart from './elements/chart.component';
 import AddWebsite from './websites/add-website.component';
@@ -15,14 +14,13 @@ import { motion } from 'framer-motion';
 import { retrieveWebsites } from '../slices/websites.slice';
 import { RootState, useAppDispatch } from '../store';
 import { useSelector } from 'react-redux';
-import { getStatesByWebsiteId, selectAllStates } from '../slices/states.slice';
-import { Box, Container, Paper, Grid, Button, Alert, CardContent, CardActions, Card, Typography, Stack, Divider } from '@mui/material';
+import { getStatesByWebsiteId } from '../slices/states.slice';
+import { Box, Container, Paper, Grid, Button, Alert, CircularProgress } from '@mui/material';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import WebsitesList from './websites/websites-list';
 import SearchFilterBar from './elements/search-filter-bar.component';
 import socketIOClient from 'socket.io-client';
 import { getStepsByWebsiteId } from '../slices/websites_control_steps.slice';
-import ApiStepComponent from './websites/api-step.component';
 import ApiStepsComponent from './websites/api-steps.component';
 
 const variants = {
@@ -40,7 +38,6 @@ const DashboardComponent: React.FC = () => {
   const [states, setStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
   const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
-  const [errors, setWebsiteErrors] = useState<IState[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -73,7 +70,6 @@ const DashboardComponent: React.FC = () => {
   const setActiveWebsite = (website: IWebsite, index: number) => {
     setCurrentIndex(index);
     setCurrentPage(1);
-    getErrorsByWebsiteId(website.id);
     getAggrStates(website.id);
     getWebsiteMainStepStates(website.id);
 
@@ -87,10 +83,6 @@ const DashboardComponent: React.FC = () => {
 
   const getWebsiteMainStepStates = (id: string) => {
     fetchData(WebsiteService.getWebsiteMainStepStates(id), setStates);
-  };
-
-  const getErrorsByWebsiteId = (id: string) => {
-    fetchData(StatesDataService.getErrorStatesByWebsiteId('1'), setWebsiteErrors);
   };
 
   const onPageChange = (page = 1) => {
@@ -139,38 +131,36 @@ const DashboardComponent: React.FC = () => {
             </Box>
           </Grid>
           <Grid item xs={12} lg={7}>
-            <ApiStepsComponent steps={steps} type="MAIN" title="Standard Page Requests" />
-            <ApiStepsComponent steps={steps} type="LOGIN_CALL" title="Login Requests" />
-            <ApiStepsComponent steps={steps} type="API_CALL" title="API Requests" />
-            {errors.length > 0 ? (
-              <div className="border border-danger border-2 rounded-2 p-4 mb-3">
-                <h2 className="">Error list</h2>
-                <ErrorTable errors={errors} />
-              </div>
+            {loading ? (
+              <Box justifyContent="center" alignItems="center" sx={{ display: 'flex', width: '100%', height: '100px' }}>
+                <CircularProgress />
+              </Box>
             ) : (
-              ''
-            )}
-            <Paper sx={{ p: 4, mb: 2 }}>
-              {states.length > 0 ? <Chart states={states} aggrStates={aggrStates} /> : <Alert severity="warning">No data!</Alert>}
-            </Paper>
-            {states.length > 0 && (
-              <Paper sx={{ p: 4, mb: 2 }}>
-                <h2>Check list</h2>
-                <StatesTable states={displayedStates} />
-                <div className="pagination">
-                  {states.length > 0 ? (
-                    <PaginationContainer
-                      totalItems={states.length}
-                      itemsPerPage={itemsPerPage}
-                      currentPage={currentPage}
-                      pageChange={onPageChange}
-                      setCurrentPage={setCurrentPage}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </div>
-              </Paper>
+              <>
+                <ApiStepsComponent steps={steps} />
+                <Paper sx={{ p: 4, mb: 2 }}>
+                  {states.length > 0 ? <Chart states={states} aggrStates={aggrStates} /> : <Alert severity="warning">No data!</Alert>}
+                </Paper>
+                {states.length > 0 && (
+                  <Paper sx={{ p: 4, mb: 2 }}>
+                    <h2>Check list</h2>
+                    <StatesTable states={displayedStates} />
+                    <div className="pagination">
+                      {states.length > 0 ? (
+                        <PaginationContainer
+                          totalItems={states.length}
+                          itemsPerPage={itemsPerPage}
+                          currentPage={currentPage}
+                          pageChange={onPageChange}
+                          setCurrentPage={setCurrentPage}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  </Paper>
+                )}
+              </>
             )}
           </Grid>
         </Grid>
