@@ -64,9 +64,7 @@ export default function LogIn() {
                     Reset Password
                   </a>
                 </div> */}
-                <button type="submit" className="btn btn-primary w-100 my-3 shadow" disabled={loading}>
-                  {loading ? 'Loading...' : 'Login'}
-                </button>
+                <a href="http://websitescanner.3m5.de/login">{loading ? 'Loading...' : 'Login'}</a>
                 <p className="text-center m-0">
                   No account yet, <a href="/signup">Please Signup</a>
                 </p>

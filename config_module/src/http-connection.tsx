@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export default axios.create({
-  baseURL: 'http://localhost:3001/',
+  baseURL: 'http://websitescanner.3m5.de/',
   headers: {
     'Content-type': 'application/json',
   },

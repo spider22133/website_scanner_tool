@@ -20,9 +20,11 @@ export const login = createAsyncThunk<
 >('auth/login', async ({ data: { email, password }, id }, { rejectWithValue, dispatch }) => {
   try {
     const res = await AuthService.login({ email, password });
+    console.log('sadfsdf', res);
     setUserSession(res.data);
     return res.data;
   } catch (err: any) {
+    console.log('sadfsdf', err);
     const error: AxiosError<httpErrors> = err;
     if (!error.response) {
       throw err;

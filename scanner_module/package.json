@@ -13,7 +13,10 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
+    "@nestjs/passport": "^8.2.1",
     "@types/nodemailer": "^6.4.4",
+    "@types/passport": "^1.0.7",
+    "@types/passport-oauth2": "^1.4.11",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
@@ -33,6 +36,8 @@
     "mysql2": "^2.3.2",
     "node-fetch": "^2.6.5",
     "nodemailer": "^6.7.2",
+    "passport": "^0.5.2",
+    "passport-oauth2": "^1.6.1",
     "sequelize": "^6.15.0",
     "socket.io": "^4.4.1",
     "swagger-jsdoc": "^6.1.0",
