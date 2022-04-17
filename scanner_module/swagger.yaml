@@ -1,35 +1,33 @@
 swagger: '2.0'
 tags:
-- name: users
-  description: users API
 - name: websites
   description: websites API
 
 paths:
-# [GET] users
-  /users:
+# [GET] websites
+  /websites:
     get:
       tags:
-      - users
-      summary: Find All Users
+      - websites
+      summary: Find All Websites
       responses:
         200:
           description: 'OK'
         500:
           description: 'Server Error'
 
-# [POST] users
+# [POST] websites
     post:
       tags:
-      - users
-      summary: Add User
+      - websites
+      summary: Add Website
       parameters:
       - name: body
         in: body
-        description: user Data
+        description: website Data
         required: true
         schema:
-          $ref: '#/definitions/users'
+          $ref: '#/definitions/websites'
       responses:
         201:
           description: 'Created'
@@ -40,16 +38,16 @@ paths:
         500:
           description: 'Server Error'
 
-# [GET] users/id
-  /users/{id}:
+# [GET] websites/id
+  /websites/{id}:
     get:
       tags:
-      - users
-      summary: Find User By Id
+      - websites
+      summary: Find Website By Id
       parameters:
       - name: id
         in: path
-        description: User Id
+        description: Website Id
         required: true
         type: integer
       responses:
@@ -60,23 +58,23 @@ paths:
         500:
           description: 'Server Error'
 
-# [PUT] users/id
+# [PUT] websites/id
     put:
       tags:
-      - users
-      summary: Update User By Id
+      - websites
+      summary: Update Website By Id
       parameters:
       - name: id
         in: path
-        description: user Id
+        description: website Id
         required: true
         type: integer
       - name: body
         in: body
-        description: user Data
+        description: website Data
         required: true
         schema:
-          $ref: '#/definitions/users'
+          $ref: '#/definitions/websites'
       responses:
         200:
           description: 'OK'
@@ -87,15 +85,15 @@ paths:
         500:
           description: 'Server Error'
 
-# [DELETE] users/id
+# [DELETE] websites/id
     delete:
       tags:
-      - users
-      summary: Delete User By Id
+      - websites
+      summary: Delete Website By Id
       parameters:
       - name: id
         in: path
-        description: user Id
+        description: website Id
         required: true
         type: integer
       responses:
@@ -108,21 +106,6 @@ paths:
 
 # definitions
 definitions:
-  users:
-    type: object
-    required:
-        - email
-        - password
-    properties:
-      id:
-        type: integer
-        description: user Id
-      email:
-        type: string
-        description: user Email
-      password:
-        type: string
-        description: user Password
   websites:
     type: object
     required:
@@ -138,7 +121,7 @@ definitions:
       url:
         type: string
         description: website Url
-      is_active: 
+      is_active:
         type: boolean
 schemes:
  - https

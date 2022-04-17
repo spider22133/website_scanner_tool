@@ -9,7 +9,7 @@ import WebsiteChecker from '@/websiteChecker.class';
 class WebsitesRoute implements Route {
   public path = '/websites';
   public router = Router();
-  public websitesController;
+  public websitesController: WebsitesController;
 
   constructor(websiteChecker: WebsiteChecker) {
     this.websitesController = new WebsitesController(websiteChecker);
