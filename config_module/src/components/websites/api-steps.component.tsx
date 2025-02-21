@@ -22,21 +22,21 @@ const ApiStepsComponent: React.FC<Props> = ({ steps }) => {
       <TabContext value={value}>
         <Box>
           <TabList onChange={(e, newValue) => setValue(newValue)} variant="scrollable">
-            {typeTitle.map(({ type, title }) => (
-              <Tab label={title} value={type} sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+            {typeTitle.map(({ type, title }, index) => (
+              <Tab key={index} label={title} value={type} sx={{ textTransform: 'none', fontWeight: 'bold' }} />
             ))}
           </TabList>
         </Box>
-        {typeTitle.map(({ type, title }) => (
-          <TabPanel value={type} sx={{ px: 0, pt: 3, pb: 0 }}>
+        {typeTitle.map(({ type, title }, index) => (
+          <TabPanel key={index} value={type} sx={{ px: 0, pt: 3, pb: 0 }}>
             <Grid item container spacing={2} xs={12} sx={{ mb: 2.5 }}>
               {steps.filter(step => step.type === type).length !== 0 ? (
                 <>
                   {steps
                     .filter(step => step.type === type)
                     .map((step, index) => (
-                      <Grid item xs={12} md={5}>
-                        <ApiStepComponent key={index} step={step} />{' '}
+                      <Grid item xs={12} md={6} key={index + step.id}>
+                        <ApiStepComponent step={step} />{' '}
                       </Grid>
                     ))}
                 </>

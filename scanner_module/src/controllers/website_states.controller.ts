@@ -6,6 +6,7 @@ import WebsiteControlStepsService from '@services/website_control_steps.service'
 class WebsiteStatesController {
   public websiteStatesService = new WebsiteStatesService();
   public websiteControlStepsService = new WebsiteControlStepsService();
+
   public getStepStates = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const findAllStatesData: WebsiteState[] = await this.websiteStatesService.findAllStepStates();

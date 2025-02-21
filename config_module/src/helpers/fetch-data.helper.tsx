@@ -8,7 +8,7 @@ export default async function fetchData(promise: Promise<AxiosResponse<any>>, se
     })
     .catch((error: AxiosError) => {
       if (error.response) {
-        console.log(error.response.data.message, error.response.status);
+        console.log(error.message, error.response.status);
       }
     });
 }

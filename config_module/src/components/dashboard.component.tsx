@@ -34,6 +34,7 @@ const DashboardComponent: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
   const { steps, loading } = useSelector((state: RootState) => state.steps);
+  const { websites } = useSelector((state: RootState) => state.websites);
 
   const [states, setStates] = useState<IState[]>([]);
   const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
@@ -46,6 +47,8 @@ const DashboardComponent: React.FC = () => {
   });
 
   useEffect(() => {
+    dispatch(retrieveWebsites());
+
     const socket = socketIOClient(ENDPOINT);
     socket.on('updateWebsites', (data: any) => {
       if (data === 'changed') dispatch(retrieveWebsites());
@@ -56,12 +59,15 @@ const DashboardComponent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(retrieveWebsites());
-    dispatch(getStatesByWebsiteId('1'));
-    dispatch(getStepsByWebsiteId('1'));
-    getAggrStates('1');
-    getWebsiteMainStepStates('1');
-  }, [dispatch]);
+    const firstWebsiteId = websites[0]?.id;
+
+    if (firstWebsiteId) {
+      dispatch(getStatesByWebsiteId(firstWebsiteId));
+      dispatch(getStepsByWebsiteId(firstWebsiteId));
+      getAggrStates(firstWebsiteId);
+      getWebsiteMainStepStates(firstWebsiteId);
+    }
+  }, [dispatch, websites]);
 
   useEffect(() => {
     onPageChange();

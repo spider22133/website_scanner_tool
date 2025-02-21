@@ -27,7 +27,6 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useAppDispatch } from '../../store';
 import { updateWebsiteControlStep } from '../../slices/websites_control_steps.slice';
-import { log } from 'util';
 
 type Props = {
   step: IWebsiteControlStep;
@@ -114,25 +113,23 @@ const ApiStepComponent: React.FC<Props> = ({ step }) => {
               {step.path}
             </Link>
           </Box>
-          {step.type !== 'MAIN' && (
-            <Box mt={2}>
-              <Typography variant="body2">Api data:</Typography>
-              <ReactJson
-                src={JSON.parse(step.api_call_data)}
-                collapsed={true}
-                iconStyle="circle"
-                onEdit={({ updated_src }) =>
-                  dispatch(updateWebsiteControlStep({ id, website_id, path, description, api_call_data: JSON.stringify(updated_src) }))
-                }
-                onAdd={({ updated_src }) =>
-                  dispatch(updateWebsiteControlStep({ id, website_id, path, description, api_call_data: JSON.stringify(updated_src) }))
-                }
-                onDelete={({ updated_src }) =>
-                  dispatch(updateWebsiteControlStep({ id, website_id, path, description, api_call_data: JSON.stringify(updated_src) }))
-                }
-              />
-            </Box>
-          )}
+          <Box mt={2}>
+            <Typography variant="body2">Api data:</Typography>
+            <ReactJson
+              src={JSON.parse(step.api_call_data)}
+              collapsed={true}
+              iconStyle="circle"
+              onEdit={({ updated_src }) =>
+                dispatch(updateWebsiteControlStep({ id, website_id, path, description, api_call_data: JSON.stringify(updated_src) }))
+              }
+              onAdd={({ updated_src }) =>
+                dispatch(updateWebsiteControlStep({ id, website_id, path, description, api_call_data: JSON.stringify(updated_src) }))
+              }
+              onDelete={({ updated_src }) =>
+                dispatch(updateWebsiteControlStep({ id, website_id, path, description, api_call_data: JSON.stringify(updated_src) }))
+              }
+            />
+          </Box>
         </CardContent>
       </Collapse>
       <CardActions disableSpacing>

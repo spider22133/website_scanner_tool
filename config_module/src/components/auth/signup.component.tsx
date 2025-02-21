@@ -25,7 +25,7 @@ export default function SignUp() {
       })
       .catch((error: AxiosError) => {
         setLoading(false);
-        setError(error.response?.data.message);
+        setError(error.message);
       });
   };
 
