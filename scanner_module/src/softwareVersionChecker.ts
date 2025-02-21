@@ -13,7 +13,7 @@ import * as cheerio from 'cheerio'
 const HTTP_CODE_404 = 404
 const HTTP_CODE_200 = 200
 
-class WebsiteChecker {
+class SoftwareVersionChecker {
   public websiteService = new WebsiteService()
   public websiteControlStepService = new WebsiteControlStepService()
   public websiteStatesService = new WebsiteStatesService()
@@ -43,14 +43,14 @@ class WebsiteChecker {
         const start = new Date().getTime()
         switch (step.type) {
           case 'MAIN':
-            const { status, msg } = await WebsiteChecker.checkWebsiteStatus(step.path)
+            const { status, msg } = await SoftwareVersionChecker.checkWebsiteStatus(step.path)
             await this.updateStatus(status, start, step, msg)
             break
           case 'API_CALL':
             console.log('API_CALL')
             break
           case 'LOGIN_CALL':
-            const { login_status, login_msg } = await WebsiteChecker.checkLoginCall(step)
+            const { login_status, login_msg } = await SoftwareVersionChecker.checkLoginCall(step)
             await this.updateStatus(login_status, start, step, login_msg)
             break
         }
@@ -81,7 +81,7 @@ class WebsiteChecker {
   }
 
   public async checkUrl(url: string) {
-    return await WebsiteChecker.checkWebsiteStatus(url)
+    return await SoftwareVersionChecker.checkWebsiteStatus(url)
   }
 
   private async sendStatus(step: WebsiteControlStepModel, end: number, status: number) {
@@ -138,4 +138,4 @@ class WebsiteChecker {
   }
 }
 
-export default WebsiteChecker
+export default SoftwareVersionChecker

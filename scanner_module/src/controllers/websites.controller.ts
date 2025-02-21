@@ -2,19 +2,19 @@ import { NextFunction, Request, Response } from 'express';
 import { Website } from '@/interfaces/website.interface';
 import WebsiteService from '@services/websites.service';
 import CreateWebsiteDto from '@dtos/website.dto';
-import WebsiteChecker from '@/websiteChecker.class';
+import SoftwareVersionChecker from '@/softwareVersionChecker';
 import WebsiteStatesService from '@services/website_states.service';
 import { WebsiteModel } from '@models/website.model';
 import WebsiteControlStepsService from '@services/website_control_steps.service';
 
 class WebsitesController {
   public websiteService = new WebsiteService();
-  public websiteChecker;
+  public softwareVersionChecker;
   public websiteStatesService = new WebsiteStatesService();
   public websiteControlStepsService = new WebsiteControlStepsService();
 
-  constructor(websiteChecker: WebsiteChecker) {
-    this.websiteChecker = websiteChecker;
+  constructor(softwareVersionChecker: SoftwareVersionChecker) {
+    this.softwareVersionChecker = softwareVersionChecker;
   }
 
   public getWebsites = async (req: Request, res: Response, next: NextFunction) => {
@@ -55,7 +55,7 @@ class WebsitesController {
     try {
       const websiteId = Number(req.params.id);
       const websiteData: CreateWebsiteDto = req.body;
-      const { status, msg } = await this.websiteChecker.checkUrl(websiteData.url);
+      const { status, msg } = await this.softwareVersionChecker.checkUrl(websiteData.url);
 
       if (status !== 200) next(msg);
 
@@ -71,7 +71,7 @@ class WebsitesController {
       const websiteId = Number(req.params.id);
       const findOne: WebsiteModel = await this.websiteService.findWebsiteById(websiteId);
 
-      await this.websiteChecker.checkWebsite(findOne);
+      await this.softwareVersionChecker.checkWebsite(findOne);
 
       const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId);
       const mainStep = steps.find(step => step.type === 'MAIN');
@@ -86,7 +86,7 @@ class WebsitesController {
   public createWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteData: CreateWebsiteDto = req.body;
-      const { status, msg } = await this.websiteChecker.checkUrl(websiteData.url);
+      const { status, msg } = await this.softwareVersionChecker.checkUrl(websiteData.url);
 
       if (status !== 200) next(msg);
 

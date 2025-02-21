@@ -4,15 +4,15 @@ import Route from '@/interfaces/route.interface';
 import CreateWebsiteDto from '@dtos/website.dto';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@/middlewares/auth.middleware';
-import WebsiteChecker from '@/websiteChecker.class';
+import SoftwareVersionChecker from '@/softwareVersionChecker';
 
 class WebsitesRoute implements Route {
   public path = '/websites';
   public router = Router();
   public websitesController: WebsitesController;
 
-  constructor(websiteChecker: WebsiteChecker) {
-    this.websitesController = new WebsitesController(websiteChecker);
+  constructor(softwareVersionChecker: SoftwareVersionChecker) {
+    this.websitesController = new WebsitesController(softwareVersionChecker);
     this.initializeRoutes();
   }
 

@@ -1,8 +1,5 @@
-process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
-
 import 'dotenv/config';
 import App from '@/app';
-import WebsiteChecker from '@/websiteChecker.class';
 import AuthRoute from '@routes/auth.route';
 import IndexRoute from '@routes/index.route';
 import TimerRoute from '@routes/timer.route';
@@ -12,11 +9,14 @@ import WebsiteStepsRoute from '@routes/control_steps.route';
 import WebsitesRoute from '@routes/websites.route';
 import validateEnv from '@utils/validateEnv';
 import TimerController from '@controllers/timer.controller';
+import SoftwareVersionChecker from '@/softwareVersionChecker'
+
+process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
 
 validateEnv();
 
-const websiteChecker = new WebsiteChecker();
-const timer = new TimerController(websiteChecker);
+const softwareVersionChecker = new SoftwareVersionChecker();
+const timer = new TimerController(softwareVersionChecker);
 
 timer.interval = 3600000;
 timer.run();
@@ -25,7 +25,7 @@ const app = new App([
   new IndexRoute(),
   new UsersRoute(),
   new AuthRoute(),
-  new WebsitesRoute(websiteChecker),
+  new WebsitesRoute(softwareVersionChecker),
   new TimerRoute(timer),
   new StatesRoute(),
   new WebsiteStepsRoute(),
@@ -33,7 +33,7 @@ const app = new App([
 
 app.io.on('connection', socket => {
   console.log('New client connected');
-  websiteChecker.connectSocket(socket);
+  softwareVersionChecker.connectSocket(socket);
 });
 
 app.listen();

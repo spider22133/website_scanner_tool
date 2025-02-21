@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import WebsiteChecker from '@/websiteChecker.class';
+import SoftwareVersionChecker from '@/softwareVersionChecker';
 
 class TimerController {
   private _interval = 3600000;
   public timer: NodeJS.Timer;
-  public worker: WebsiteChecker;
+  public worker: SoftwareVersionChecker;
 
-  constructor(worker: WebsiteChecker) {
+  constructor(worker: SoftwareVersionChecker) {
     this.worker = worker;
   }
 
