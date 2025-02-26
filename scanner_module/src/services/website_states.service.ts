@@ -1,36 +1,36 @@
-import DB from '@databases';
-import { WebsiteState } from '@/interfaces/website_state.interface';
-import sequelize from 'sequelize';
+import DB from '@databases'
+import { WebsiteState } from '@/interfaces/website_state.interface'
+import sequelize from 'sequelize'
 
 class WebsiteStatesService {
-  public website_states = DB.WebsiteStates;
+  public website_states = DB.WebsiteStates
 
   public async findAllStepStates(): Promise<WebsiteState[]> {
-    return await this.website_states.findAll();
+    return await this.website_states.findAll()
   }
 
   public async findAllStepErrorStates(): Promise<WebsiteState[]> {
-    return await this.website_states.findAll({ where: { is_error: true } });
+    return await this.website_states.findAll({ where: { is_error: true } })
   }
 
   public async findStatesByStepId(stepId: number): Promise<WebsiteState[]> {
-    return await this.website_states.findAll({ where: { step_id: stepId } });
+    return await this.website_states.findAll({ where: { step_id: stepId } })
   }
 
   public async findErrorStatesByStepId(stepId: number): Promise<WebsiteState[]> {
-    return await this.website_states.findAll({ where: { step_id: stepId, is_error: true } });
+    return await this.website_states.findAll({ where: { step_id: stepId, is_error: true } })
   }
 
   public async findLatestStateByStepId(stepId: number): Promise<WebsiteState> {
-    return await this.website_states.findOne({ limit: 1, where: { step_id: stepId }, order: [['createdAt', 'DESC']] });
+    return await this.website_states.findOne({ limit: 1, where: { step_id: stepId }, order: [['createdAt', 'DESC']] })
   }
 
   public async createStepState(data: WebsiteState): Promise<WebsiteState> {
-    return await this.website_states.create(data);
+    return await this.website_states.create(data)
   }
 
   public async createStepErrorState(data: WebsiteState): Promise<WebsiteState> {
-    return await this.website_states.create(data);
+    return await this.website_states.create(data)
   }
 
   public async aggregatedByStepId(step_id: number): Promise<{ avg: number; min: number; max: number }> {
@@ -42,9 +42,9 @@ class WebsiteStatesService {
         [sequelize.fn('max', sequelize.col('response_time')), 'max'],
       ],
       raw: true,
-    });
-    return { avg, min, max };
+    })
+    return { avg, min, max }
   }
 }
 
-export default WebsiteStatesService;
+export default WebsiteStatesService

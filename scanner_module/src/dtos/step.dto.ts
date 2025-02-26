@@ -1,21 +1,21 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator'
 
 export default class CreateWebsiteControlStepDto {
   @IsNumber()
-  public id: number;
+  public id: number
 
   @IsNumber()
-  public website_id: number;
+  public website_id: number
 
   @IsString()
-  public description: string;
+  public description: string
 
   @IsString()
-  public path: string;
+  public path: string
 
   @IsString()
-  public api_call_data: string;
+  public api_call_data: string
 
   @IsNumber()
-  public estimated_code: number;
+  public estimated_code: number
 }

@@ -1,14 +1,14 @@
-import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
-import { Role } from '@interfaces/role.interface';
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize'
+import { Role } from '@interfaces/role.interface'
 
-export type RoleCreationAttributes = Optional<Role, 'id' | 'name'>;
+export type RoleCreationAttributes = Optional<Role, 'id' | 'name'>
 
 export class RoleModel extends Model<Role, RoleCreationAttributes> implements Role {
-  public id: number;
-  public name: string;
+  public id: number
+  public name: string
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
 }
 
 export default function (sequelize: Sequelize): typeof RoleModel {
@@ -28,25 +28,25 @@ export default function (sequelize: Sequelize): typeof RoleModel {
       tableName: 'roles',
       sequelize,
     },
-  );
+  )
 
-  initRoles();
+  initRoles()
 
-  return RoleModel;
+  return RoleModel
 }
 
 function initRoles() {
-  const ROLES = ['user', 'moderator', 'admin'];
+  const ROLES = ['user', 'moderator', 'admin']
   ROLES.forEach(async (role, index) => {
     try {
       if (!(await RoleModel.findByPk(index + 1))) {
         await RoleModel.create({
           id: index + 1,
           name: role,
-        });
+        })
       }
     } catch (error) {
-      console.log('ROLES', error);
+      console.log('ROLES', error)
     }
-  });
+  })
 }
