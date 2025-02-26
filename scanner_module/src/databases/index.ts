@@ -1,13 +1,12 @@
-import config from 'config';
-import { Sequelize } from 'sequelize';
-import { dbConfig } from '@interfaces/db.interface';
-import UserModel from '@/models/user.model';
-import RoleModel from '@models/role.model';
-import WebsiteModel from '@/models/website.model';
-import WebsiteStateModel from '@/models/website_state.model';
-import WebsiteControlStepModel from '@models/website_control_step.model';
+import config from 'config'
+import { Sequelize } from 'sequelize'
+import { dbConfig } from '@interfaces/db.interface'
+import UserModel from '@/models/user.model'
+import RoleModel from '@models/role.model'
+import SoftwareModel from '@/models/software.model'
+import SoftwareVersionModel from '@models/software_version.model'
 
-const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig');
+const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig')
 const sequelize = new Sequelize(database, user, password, {
   host: host,
   port: port,
@@ -28,18 +27,17 @@ const sequelize = new Sequelize(database, user, password, {
     // logger.info(time + 'ms' + ' ' + query);
   },
   benchmark: true,
-});
+})
 
-sequelize.authenticate();
+sequelize.authenticate()
 
 const DB = {
   Roles: RoleModel(sequelize),
-  WebsiteStates: WebsiteStateModel(sequelize),
-  WebsiteControlSteps: WebsiteControlStepModel(sequelize),
-  Websites: WebsiteModel(sequelize),
+  SoftwareVersions: SoftwareVersionModel(sequelize),
+  Software: SoftwareModel(sequelize),
   Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
-};
+}
 
-export default DB;
+export default DB

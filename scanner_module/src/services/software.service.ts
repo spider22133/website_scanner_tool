@@ -1,0 +1,71 @@
+import DB from '@databases'
+import { Software } from '@/interfaces/software.interface'
+import CreateSoftwareDto from '@dtos/software.dto'
+import { isEmpty } from '@/utils/util'
+import HttpException from '@/exceptions/HttpException'
+import { SoftwareModel } from '@/models/software.model'
+import { Op } from 'sequelize'
+
+class SoftwareService {
+  public software = DB.Software
+
+  public async findAllSoftwares(): Promise<SoftwareModel[]> {
+    return await this.software.findAll()
+  }
+
+  public async findSoftwareById(softwareId: number): Promise<SoftwareModel> {
+    if (isEmpty(softwareId)) throw new HttpException(400, 'Id is wrong')
+
+    const findSoftware: SoftwareModel = await this.software.findByPk(softwareId)
+
+    if (!findSoftware) throw new HttpException(409, "Software doesn't exist")
+
+    return findSoftware
+  }
+
+  public async updateSoftware(id: number, data: CreateSoftwareDto): Promise<Software> {
+    const findSoftware: Software = await this.software.findByPk(id)
+    if (!findSoftware) throw new HttpException(409, 'There is no software with such id')
+
+    await this.software.update(data, { where: { id: id } })
+
+    return await this.software.findByPk(id)
+  }
+
+  public async createSoftware(softwareData: CreateSoftwareDto): Promise<Software> {
+    if (isEmpty(softwareData)) throw new HttpException(400, 'Software data is empty')
+
+    const findSoftware: Software = await this.software.findOne({ where: { url: softwareData.url } })
+    if (findSoftware) throw new HttpException(409, `Url ${softwareData.url} already exists`)
+
+    const software = await this.software.create(softwareData)
+    await software.createStep({
+      path: software.url,
+      type: 'MAIN',
+      description: 'First step to check software URL address',
+    })
+
+    return software
+  }
+
+  public async deleteSoftware(softwareId: number): Promise<Software> {
+    if (isEmpty(softwareId)) throw new HttpException(400, "This isn't softwareId")
+
+    const findSoftware: SoftwareModel = await this.software.findByPk(softwareId)
+    if (!findSoftware) throw new HttpException(409, "You're not software")
+
+    await this.software.destroy({ where: { id: softwareId } })
+
+    return findSoftware
+  }
+
+  public async searchQuery(data: string): Promise<Software[]> {
+    return await this.software.findAll({
+      where: {
+        [Op.or]: [{ name: { [Op.like]: `%${data}%` } }, { url: { [Op.like]: `%${data}%` } }],
+      },
+    })
+  }
+}
+
+export default SoftwareService

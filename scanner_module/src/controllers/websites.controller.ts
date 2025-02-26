@@ -6,10 +6,12 @@ import SoftwareVersionChecker from '@/softwareVersionChecker'
 import WebsiteStatesService from '@services/website_states.service'
 import { WebsiteModel } from '@models/website.model'
 import WebsiteControlStepsService from '@services/website_control_steps.service'
+import { WingetSoftwareEntry } from '@/types/common'
+import CreateSoftwareDto from '@dtos/sofware.dto'
 
-class WebsitesController {
+class SoftwareController {
+  public softwareVersionChecker: SoftwareVersionChecker
   public websiteService = new WebsiteService()
-  public softwareVersionChecker
   public websiteStatesService = new WebsiteStatesService()
   public websiteControlStepsService = new WebsiteControlStepsService()
 
@@ -71,7 +73,7 @@ class WebsitesController {
       const websiteId = Number(req.params.id)
       const findOne: WebsiteModel = await this.websiteService.findWebsiteById(websiteId)
 
-      await this.softwareVersionChecker.checkVersion(findOne)
+      await this.softwareVersionChecker.checkVersion(findOne.id.toString())
 
       const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId)
       const mainStep = steps.find(step => step.type === 'MAIN')
@@ -91,6 +93,17 @@ class WebsitesController {
       if (status !== 200) next(msg)
 
       const createWebsiteData = await this.websiteService.createWebsite({ ...websiteData, is_active: true })
+      res.status(201).json({ data: createWebsiteData, message: 'created' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public createWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const softwareData: CreateSoftwareDto = req.body
+
+      const createSoftwareData = await this.websiteService.createWebsite({ ...websiteData, is_active: true })
       res.status(201).json({ data: createWebsiteData, message: 'created' })
     } catch (error) {
       next(error)
@@ -118,6 +131,17 @@ class WebsitesController {
       next(error)
     }
   }
+
+  public searchWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const searchString = String(req.params.query)
+      const searchWebsiteData: WingetSoftwareEntry[] = await this.softwareVersionChecker.prepareSearchedSoftwareList(searchString)
+
+      res.status(200).json({ data: searchWebsiteData })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
-export default WebsitesController
+export default SoftwareController

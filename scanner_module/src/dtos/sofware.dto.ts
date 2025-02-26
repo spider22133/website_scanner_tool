@@ -1,11 +1,17 @@
 import { IsString, IsBoolean } from 'class-validator'
 
-export default class CreateWebsiteDto {
+export default class CreateSoftwareDto {
   @IsString()
   public name: string
 
   @IsString()
-  public url: string
+  public id: string
+
+  @IsString()
+  public version: string
+
+  @IsString()
+  public source: string
 
   @IsBoolean()
   public is_hidden: boolean

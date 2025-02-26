@@ -1,51 +1,62 @@
-import http from '../http-connection';
-import IWebsite from '../interfaces/website.interface';
+import http from '../http-connection'
+import IWebsite, { WinGetSoftwareEntry } from '../interfaces/website.interface'
+
 type createProps = {
-  name: string;
-  url: string;
-};
+  name: string
+  url: string
+}
+
 const getAll = () => {
-  return http.get('/websites');
-};
+  return http.get('/software')
+}
 
 const getWebsiteById = (id: string) => {
-  return http.get(`/websites/${id}`);
-};
+  return http.get(`/software/${id}`)
+}
 
 const getWebsiteMainStepStates = (id: string) => {
-  return http.get(`/websites/${id}/main_states`);
-};
+  return http.get(`/software/${id}/main_states`)
+}
 
 const update = (data: IWebsite) => {
-  const { id, name, url, is_hidden } = data;
-  return http.put(`/websites/${id}`, { name, url, is_hidden });
-};
+  const { id, name, url, is_hidden } = data
+  return http.put(`/software/${id}`, { name, url, is_hidden })
+}
 
 const checkStatus = (id: string) => {
-  return http.get(`/websites/${id}/check`);
-};
+  return http.get(`/software/${id}/check`)
+}
 
 const create = (data: createProps) => {
-  return http.post('/websites/create', data);
-};
+  return http.post('/software/create', data)
+}
+
+const createSoftware = (data: WinGetSoftwareEntry) => {
+  return http.post('/software/create', data)
+}
 
 const deleteWebsite = (id: string) => {
-  return http.delete(`/websites/${id}`);
-};
+  return http.delete(`/software/${id}`)
+}
 
-const searchInWebsites = (query: string) => {
-  return query ? http.get(`/websites/q=${query}`) : getAll();
-};
+const searchInsoftware = (query: string) => {
+  return query ? http.get(`/software/q=${query}`) : getAll()
+}
+
+const searchWithWinGet = (query: string) => {
+  return http.get(`/software/q=${query}`)
+}
 
 const WebsiteDataService = {
   getAll,
   getWebsiteById,
   update,
   create,
+  createSoftware,
   deleteWebsite,
-  searchInWebsites,
+  searchWithWinGet,
   checkStatus,
   getWebsiteMainStepStates,
-};
+}
 
-export default WebsiteDataService;
+export default WebsiteDataService

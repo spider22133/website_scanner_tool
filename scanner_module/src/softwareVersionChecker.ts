@@ -1,16 +1,20 @@
 import WebsiteService from '@services/websites.service'
 import WebsiteStatesService from '@services/website_states.service'
 import WebsiteErrorService from '@services/website_control_steps.service'
-import fetch from 'node-fetch'
-import mailer from '@utils/mailer'
 import { Socket } from 'socket.io'
 import { WebsiteModel } from '@models/website.model'
-import { WebsiteControlStep } from '@interfaces/website_control_step.interface'
+import { WebsiteControlStep } from '@interfaces/software_version.interface'
 import WebsiteControlStepService from '@services/website_control_steps.service'
-import { WebsiteControlStepModel } from '@models/website_control_step.model'
+import { WebsiteControlStepModel } from '@models/software_version.model'
+import { WingetSoftwareEntry } from '@/types/common'
+import { exec, ExecOptions, PromiseWithChild } from 'child_process'
+import { promisify } from 'util'
+import { ObjectEncodingOptions } from 'fs'
+import { logger } from '@utils/logger'
+
+import mailer from '@utils/mailer'
 import * as cheerio from 'cheerio'
-import { SoftwareProfile } from '@/types/common'
-import { exec } from 'child_process'
+import fetch from 'node-fetch'
 
 const HTTP_CODE_404 = 404
 const HTTP_CODE_200 = 200
@@ -45,8 +49,7 @@ class SoftwareVersionChecker {
         const start = new Date().getTime()
         switch (step.type) {
           case 'MAIN':
-            const profile = JSON.parse(step.api_call_data) as SoftwareProfile
-            await SoftwareVersionChecker.checkSoftwareVersion(profile)
+            await SoftwareVersionChecker.checkSoftwareVersion(step.api_call_data)
             // await this.updateStatus(status, start, step, msg)
             break
           case 'API_CALL':
@@ -79,8 +82,8 @@ class SoftwareVersionChecker {
     }
   }
 
-  public async checkVersion(profile: SoftwareProfile) {
-    return await SoftwareVersionChecker.checkSoftwareVersion(profile)
+  public async checkVersion(id: string) {
+    return await SoftwareVersionChecker.checkSoftwareVersion(id)
   }
 
   private async sendStatus(step: WebsiteControlStepModel, end: number, status: number) {
@@ -101,9 +104,62 @@ class SoftwareVersionChecker {
     //mailer(website, status, msg).catch(console.error);
   }
 
-  private static async checkSoftwareVersion(profile: SoftwareProfile): Promise<{ status: number; msg: string }> {
-    const { url, pattern, mainSelector } = profile
+  private static parseSoftwareTable(input: string): WingetSoftwareEntry[] {
+    const lines = input.split('\n').slice(2) // Skip header lines
 
+    let entries: WingetSoftwareEntry[] = []
+
+    for (const line of lines) {
+      // Split by whitespace, but preserve content after the version (e.g., "Tag: docker")
+      const parts = line.trim().split(/\s+/)
+      if (parts.length < 3) continue // Skip malformed lines
+
+      const nameParts = []
+      let i = 0
+      // Name can have multiple words, so collect until we hit the ID (which has dots or specific format)
+      while (i < parts.length && !parts[i].includes('.') && parts[i] !== 'Unknown') {
+        nameParts.push(parts[i])
+        i++
+      }
+      const name = nameParts.join(' ')
+      const id = parts[i] || ''
+      const version = parts[i + 1] || 'Unknown'
+      const source = parts[parts.length - 1] || ''
+      let match = parts.slice(i + 2, parts.length - 1).join(' ') || undefined
+
+      // Clean up match field (remove if empty or just whitespace)
+      if (match && match.trim() === '') match = undefined
+
+      entries.push({
+        name,
+        id,
+        version,
+        source,
+      })
+    }
+    entries = entries.filter(entrie => entrie.source !== 'msstore')
+    console.log('entries found', entries)
+    return entries
+  }
+
+  public async prepareSearchedSoftwareList(query: string): Promise<WingetSoftwareEntry[]> {
+    try {
+      const execAsync = promisify(exec)
+      console.log('query', query)
+      console.log('query', `winget search --name "${query.trim()}"`)
+      const { stdout, stderr } = await execAsync(`winget search --name "${query.trim()}"`)
+      if (stderr) {
+        logger.error(`winget stderr: ${stderr}`)
+      }
+
+      return SoftwareVersionChecker.parseSoftwareTable(stdout)
+    } catch (error) {
+      logger.error(`Failed to search software: ${(error as Error).message}`)
+      logger.error(error) // Propagate error to caller
+    }
+  }
+
+  private static async checkSoftwareVersion(id: string): Promise<{ status: number; msg: string }> {
     // try {
     //  const response = await fetch(url)
     //  const body = await response.text()
@@ -117,21 +173,6 @@ class SoftwareVersionChecker {
     //  console.log(error)
     //}
 
-    exec('winget show Docker.DockerDesktop', (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error: ${error.message}`)
-        return
-      }
-      if (stderr) {
-        console.error(`Stderr: ${stderr}`)
-        return
-      }
-      console.log(stdout) // Parse this output to find updates
-      const versionMatch = stdout.match(new RegExp('Version:\\s*([\\w.-]+)'))
-      const version = versionMatch ? versionMatch[1] : undefined
-
-      console.info('Extracted Version:', version)
-    })
     return new Promise(() => ({ status: 200, msg: '' }))
   }
 }

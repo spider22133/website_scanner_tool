@@ -1,31 +1,31 @@
-import { useForm, SubmitHandler } from 'react-hook-form';
-import IWebsite from '../../interfaces/website.interface';
-import { sleep } from '../../helpers/animation.helper';
-import * as Yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { RootState, useAppDispatch } from '../../store';
-import { createWebsite } from '../../slices/websites.slice';
-import { useSelector } from 'react-redux';
-import { clearMessage } from '../../slices/message.slice';
-import { APIErrorNotification } from '../elements/error-notification.component';
-import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Paper, Stack } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import LoadingButton from '@mui/lab/LoadingButton';
-import React from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form'
+import IWebsite from '../../interfaces/website.interface'
+import { sleep } from '../../helpers/animation.helper'
+import * as Yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { RootState, useAppDispatch } from '../../store'
+import { createWebsite } from '../../slices/websites.slice'
+import { useSelector } from 'react-redux'
+import { clearMessage } from '../../slices/message.slice'
+import { APIErrorNotification } from '../elements/error-notification.component'
+import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Paper, Stack } from '@mui/material'
+import SendIcon from '@mui/icons-material/Send'
+import LoadingButton from '@mui/lab/LoadingButton'
+import React from 'react'
 
 type Props = {
-  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
-  showAddForm: boolean;
-};
+  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>
+  showAddForm: boolean
+}
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(4),
   url: Yup.string().required('Username is required').url('Url is invalid'),
-});
+})
 
 export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
-  const { loading } = useSelector((state: RootState) => state.websites);
-  const messages = useSelector((state: RootState) => state.messages);
+  const { loading } = useSelector((state: RootState) => state.websites)
+  const messages = useSelector((state: RootState) => state.messages)
 
   const {
     register,
@@ -34,20 +34,20 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-  });
+  })
 
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   const onSubmit: SubmitHandler<IWebsite> = async data => {
     dispatch(createWebsite({ data, id: 'add' })).then(async response => {
       if (createWebsite.fulfilled.match(response)) {
-        dispatch(clearMessage('add'));
-        await sleep(1000);
-        setShowAddForm(false);
-        reset();
+        dispatch(clearMessage('add'))
+        await sleep(1000)
+        setShowAddForm(false)
+        reset()
       }
-    });
-  };
+    })
+  }
   return (
     <>
       {showAddForm ? (
@@ -80,5 +80,5 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
         ''
       )}
     </>
-  );
+  )
 }
