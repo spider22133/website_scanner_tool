@@ -55,7 +55,7 @@ class WebsitesController {
     try {
       const websiteId = Number(req.params.id)
       const websiteData: CreateWebsiteDto = req.body
-      const { status, msg } = await this.softwareVersionChecker.checkUrl(websiteData.url)
+      const { status, msg } = await this.softwareVersionChecker.checkVersion(websiteData.url)
 
       if (status !== 200) next(msg)
 
@@ -71,7 +71,7 @@ class WebsitesController {
       const websiteId = Number(req.params.id)
       const findOne: WebsiteModel = await this.websiteService.findWebsiteById(websiteId)
 
-      await this.softwareVersionChecker.checkWebsite(findOne)
+      await this.softwareVersionChecker.checkVersion(findOne)
 
       const steps = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId)
       const mainStep = steps.find(step => step.type === 'MAIN')
@@ -86,7 +86,7 @@ class WebsitesController {
   public createWebsite = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteData: CreateWebsiteDto = req.body
-      const { status, msg } = await this.softwareVersionChecker.checkUrl(websiteData.url)
+      const { status, msg } = await this.softwareVersionChecker.checkVersion(websiteData.url)
 
       if (status !== 200) next(msg)
 

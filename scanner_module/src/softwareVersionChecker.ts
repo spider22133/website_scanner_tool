@@ -9,6 +9,8 @@ import { WebsiteControlStep } from '@interfaces/website_control_step.interface'
 import WebsiteControlStepService from '@services/website_control_steps.service'
 import { WebsiteControlStepModel } from '@models/website_control_step.model'
 import * as cheerio from 'cheerio'
+import { SoftwareProfile } from '@/types/common'
+import { exec } from 'child_process'
 
 const HTTP_CODE_404 = 404
 const HTTP_CODE_200 = 200
@@ -24,18 +26,18 @@ class SoftwareVersionChecker {
     this._socket = socket
   }
 
-  public async checkWebsites(): Promise<void> {
+  public async checkAllSoftware(): Promise<void> {
     try {
       const findAllWebsitesData: WebsiteModel[] = await this.websiteService.findAllWebsites()
       for (const website of findAllWebsitesData) {
-        await this.checkWebsite(website)
+        await this.checkSoftware(website)
       }
     } catch (error) {
       console.log(error)
     }
   }
 
-  public async checkWebsite(website: WebsiteModel) {
+  public async checkSoftware(website: WebsiteModel) {
     const controlSteps: WebsiteControlStepModel[] = await website.getSteps()
 
     for (const step of controlSteps) {
@@ -43,15 +45,12 @@ class SoftwareVersionChecker {
         const start = new Date().getTime()
         switch (step.type) {
           case 'MAIN':
-            const { status, msg } = await SoftwareVersionChecker.checkWebsiteStatus(step.path)
-            await this.updateStatus(status, start, step, msg)
+            const profile = JSON.parse(step.api_call_data) as SoftwareProfile
+            await SoftwareVersionChecker.checkSoftwareVersion(profile)
+            // await this.updateStatus(status, start, step, msg)
             break
           case 'API_CALL':
             console.log('API_CALL')
-            break
-          case 'LOGIN_CALL':
-            const { login_status, login_msg } = await SoftwareVersionChecker.checkLoginCall(step)
-            await this.updateStatus(login_status, start, step, login_msg)
             break
         }
       } catch (error) {
@@ -80,8 +79,8 @@ class SoftwareVersionChecker {
     }
   }
 
-  public async checkUrl(url: string) {
-    return await SoftwareVersionChecker.checkWebsiteStatus(url)
+  public async checkVersion(profile: SoftwareProfile) {
+    return await SoftwareVersionChecker.checkSoftwareVersion(profile)
   }
 
   private async sendStatus(step: WebsiteControlStepModel, end: number, status: number) {
@@ -102,39 +101,38 @@ class SoftwareVersionChecker {
     //mailer(website, status, msg).catch(console.error);
   }
 
-  private static async checkWebsiteStatus(url: string): Promise<{ status: number; msg: string }> {
-    try {
-      const response = await fetch(url)
-      const body = await response.text()
+  private static async checkSoftwareVersion(profile: SoftwareProfile): Promise<{ status: number; msg: string }> {
+    const { url, pattern, mainSelector } = profile
 
-      const $ = cheerio.load(body)
+    // try {
+    //  const response = await fetch(url)
+    //  const body = await response.text()
+    //  const $ = cheerio.load(body)
 
-      const id = $('[id^=current-version]')
+    //  const versionMatch = $(mainSelector).text().match(new RegExp(pattern))
+    //  const version = versionMatch ? versionMatch[0] : undefined
 
-      const versionMatch = id.text().match(/(\d+\.\d+\.\d+)/) // Extracts version number
-      const version = versionMatch ? versionMatch[0] : 'Unknown'
+    //  console.info('Extracted Version:', version)
+    //} catch (error) {
+    //  console.log(error)
+    //}
+
+    exec('winget show Docker.DockerDesktop', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error.message}`)
+        return
+      }
+      if (stderr) {
+        console.error(`Stderr: ${stderr}`)
+        return
+      }
+      console.log(stdout) // Parse this output to find updates
+      const versionMatch = stdout.match(new RegExp('Version:\\s*([\\w.-]+)'))
+      const version = versionMatch ? versionMatch[1] : undefined
 
       console.info('Extracted Version:', version)
-    } catch (error) {
-      console.log(error)
-    }
-
+    })
     return new Promise(() => ({ status: 200, msg: '' }))
-  }
-
-  private static checkLoginCall(step: WebsiteControlStep): Promise<{ login_status: number; login_msg: string }> {
-    const dataApi = JSON.parse(step.api_call_data)
-    const data = {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(dataApi),
-    }
-
-    return fetch(step.path, data).then(res => ({ login_status: res.status, login_msg: res.statusText }))
   }
 }
 

@@ -27,7 +27,7 @@ export default function Header() {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/dashboard'}>
-                Dashboard
+                Version Control Dashboard
               </NavLink>
             </li>
           </ul>

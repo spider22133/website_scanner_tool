@@ -72,7 +72,7 @@ export default function WebsitesListItem({ website, index, currentIndex, setActi
               {website.name}{' '}
               {website.is_active ? <span className="badge bg-success ms-2">Online</span> : <span className="badge bg-danger ms-2">Offline</span>}
             </div>
-            <Link href={website.url} underline="none" variant="body2">
+            <Link href={website.url} underline="none" variant="body2" target="_blank">
               {website.url}
             </Link>
           </div>

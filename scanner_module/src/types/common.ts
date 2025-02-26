@@ -1,6 +1,5 @@
-interface SoftwareProfile {
-  scraping: {
-    pattern: string;
-    mainSelector: string;
-  }
+export interface SoftwareProfile {
+  url: string
+  pattern: string
+  mainSelector: string
 }

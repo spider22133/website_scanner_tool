@@ -21,7 +21,7 @@ import WebsitesList from './websites/websites-list';
 import SearchFilterBar from './elements/search-filter-bar.component';
 import socketIOClient from 'socket.io-client';
 import { getStepsByWebsiteId } from '../slices/websites_control_steps.slice';
-import ApiStepsComponent from './websites/api-steps.component';
+import TabsComponent from './websites/tabs.component';
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -143,7 +143,7 @@ const DashboardComponent: React.FC = () => {
               </Box>
             ) : (
               <>
-                <ApiStepsComponent steps={steps} />
+                <TabsComponent steps={steps} />
                 <Paper sx={{ p: 4, mb: 2 }}>
                   {states.length > 0 ? <Chart states={states} aggrStates={aggrStates} /> : <Alert severity="warning">No data!</Alert>}
                 </Paper>

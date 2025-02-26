@@ -1,45 +1,45 @@
-import { NextFunction, Request, Response } from 'express';
-import SoftwareVersionChecker from '@/softwareVersionChecker';
+import { NextFunction, Request, Response } from 'express'
+import SoftwareVersionChecker from '@/softwareVersionChecker'
 
 class TimerController {
-  private _interval = 3600000;
-  public timer: NodeJS.Timer;
-  public worker: SoftwareVersionChecker;
+  private _interval = 3600000
+  public timer: NodeJS.Timer
+  public worker: SoftwareVersionChecker
 
   constructor(worker: SoftwareVersionChecker) {
-    this.worker = worker;
+    this.worker = worker
   }
 
   get interval(): number {
-    return this._interval;
+    return this._interval
   }
 
   set interval(value: number) {
-    this._interval = value;
+    this._interval = value
   }
 
   public updateInterval = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const newInterval = Number(req.params.interval);
+      const newInterval = Number(req.params.interval)
 
-      clearInterval(this.timer);
-      this._interval = newInterval;
+      clearInterval(this.timer)
+      this._interval = newInterval
 
       this.timer = setInterval(() => {
-        return this.worker.checkWebsites();
-      }, this._interval);
+        return this.worker.checkAllSoftware()
+      }, this._interval)
 
-      res.status(200).json({ data: newInterval, message: 'updated' });
+      res.status(200).json({ data: newInterval, message: 'updated' })
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 
   public run() {
     this.timer = setInterval(() => {
-      return this.worker.checkWebsites();
-    }, this._interval);
+      return this.worker.checkAllSoftware()
+    }, this._interval)
   }
 }
 
-export default TimerController;
+export default TimerController

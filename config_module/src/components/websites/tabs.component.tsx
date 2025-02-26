@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Divider, Grid, IconButton, Stack, Tab } from '@mui/material';
+import { Box, Grid, IconButton, Tab } from '@mui/material';
 import IWebsiteControlStep from '../../interfaces/website_control_step.interface';
 import ApiStepComponent from './api-step.component';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -10,12 +10,12 @@ type Props = {
 };
 
 const typeTitle = [
-  { type: 'MAIN', title: 'Standard Page Requests' },
-  { type: 'LOGIN_CALL', title: 'Login Requests' },
+  { type: 'MAIN', title: 'Software Profile' },
+  { type: 'CREATE_BDS', title: 'Create BDS' },
   { type: 'API_CALL', title: 'API Requests' },
 ];
 
-const ApiStepsComponent: React.FC<Props> = ({ steps }) => {
+const TabsComponent: React.FC<Props> = ({ steps }) => {
   const [value, setValue] = React.useState('MAIN');
   return (
     <>
@@ -35,7 +35,7 @@ const ApiStepsComponent: React.FC<Props> = ({ steps }) => {
                   {steps
                     .filter(step => step.type === type)
                     .map((step, index) => (
-                      <Grid item xs={12} md={6} key={index + step.id}>
+                      <Grid item xs={12} key={index + step.id}>
                         <ApiStepComponent step={step} />{' '}
                       </Grid>
                     ))}
@@ -47,13 +47,6 @@ const ApiStepsComponent: React.FC<Props> = ({ steps }) => {
                   </Box>
                 </Grid>
               )}
-              <Grid item xs={12} md={1}>
-                <Box alignItems="center" justifyContent="center" sx={{ display: 'flex', height: '100%' }}>
-                  <IconButton color="primary" size="large">
-                    <AddCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Box>
-              </Grid>
             </Grid>
           </TabPanel>
         ))}
@@ -62,4 +55,4 @@ const ApiStepsComponent: React.FC<Props> = ({ steps }) => {
   );
 };
 
-export default ApiStepsComponent;
+export default TabsComponent;

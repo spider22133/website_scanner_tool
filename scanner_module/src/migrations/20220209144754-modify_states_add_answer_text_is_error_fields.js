@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -25,8 +25,8 @@ module.exports = {
           },
           { transaction: t },
         ),
-      ]);
-    });
+      ])
+    })
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -34,7 +34,7 @@ module.exports = {
       return Promise.all([
         queryInterface.removeColumn('website_states', 'answer_text', { transaction: t }),
         queryInterface.removeColumn('website_states', 'is_error', { transaction: t }),
-      ]);
-    });
+      ])
+    })
   },
-};
+}
