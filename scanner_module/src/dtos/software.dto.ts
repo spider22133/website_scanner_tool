@@ -13,6 +13,9 @@ export default class CreateSoftwareDto {
   @IsString()
   public winget_id: string
 
+  @IsString()
+  public details: string
+
   @IsBoolean()
   public is_hidden: boolean
 

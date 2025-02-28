@@ -4,7 +4,7 @@ import Route from '@/interfaces/route.interface'
 import CreateWebsiteDto from '@dtos/website.dto'
 import validationMiddleware from '@middlewares/validation.middleware'
 import authMiddleware from '@/middlewares/auth.middleware'
-import SoftwareVersionChecker from '@/softwareVersionChecker'
+import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import CreateSoftwareDto from '@dtos/software.dto'
 
 class SoftwareRoute implements Route {
@@ -30,7 +30,7 @@ class SoftwareRoute implements Route {
       [validationMiddleware(CreateSoftwareDto, 'body'), authMiddleware],
       this.softwareController.createWinGetSoftware,
     )
-    this.router.delete(`${this.path}/:id(\\d+)`, authMiddleware, this.softwareController.deleteSoftware)
+    this.router.delete(`${this.path}/:id`, authMiddleware, this.softwareController.deleteSoftware)
   }
 }
 

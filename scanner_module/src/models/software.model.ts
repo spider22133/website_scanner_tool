@@ -2,7 +2,7 @@ import { Sequelize, DataTypes, Model, Optional, HasManyGetAssociationsMixin, Ass
 import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
 
-export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source' | 'description' | 'author'>
+export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source'>
 
 export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public id: number
@@ -10,8 +10,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public winget_id: string
   public version: string
   public source: string
-  public description: string
-  public author: string
+  public details: string
   public is_hidden: boolean
   public is_current: boolean
 
@@ -46,10 +45,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       source: {
         type: DataTypes.STRING,
       },
-      description: {
-        type: DataTypes.STRING,
-      },
-      author: {
+      details: {
         type: DataTypes.STRING,
       },
       is_hidden: {

@@ -36,7 +36,6 @@ class SoftwareService {
     if (isEmpty(softwareData)) throw new HttpException(400, 'Software data is empty')
 
     const findSoftware: Software = await this.software.findOne({ where: { winget_id: softwareData.winget_id } })
-    console.log('findSoftware', findSoftware)
     if (findSoftware) throw new HttpException(409, `Winget ID ${softwareData.winget_id} already exists`)
 
     const software = await this.software.create(softwareData)

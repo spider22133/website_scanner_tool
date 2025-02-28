@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import SoftwareVersionChecker from '@/softwareVersionChecker'
+import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 
 class TimerController {
   private _interval = 3600000

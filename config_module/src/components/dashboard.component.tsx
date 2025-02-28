@@ -62,10 +62,10 @@ const DashboardComponent: React.FC = () => {
     const firstWebsiteId = software[0]?.winget_id
 
     if (firstWebsiteId) {
-      dispatch(getStatesByWebsiteId(firstWebsiteId))
-      dispatch(getStepsByWebsiteId(firstWebsiteId))
-      getAggrStates(firstWebsiteId)
-      getWebsiteMainStepStates(firstWebsiteId)
+      //dispatch(getStatesByWebsiteId(firstWebsiteId))
+      //dispatch(getStepsByWebsiteId(firstWebsiteId))
+      // getAggrStates(firstWebsiteId)
+      // getWebsiteMainStepStates(firstWebsiteId)
     }
   }, [dispatch, software])
 
@@ -76,11 +76,11 @@ const DashboardComponent: React.FC = () => {
   const setActiveWebsite = (website: WinGetSoftwareEntry, index: number) => {
     setCurrentIndex(index)
     setCurrentPage(1)
-    getAggrStates(website.winget_id)
-    getWebsiteMainStepStates(website.winget_id)
+    // getAggrStates(website.winget_id)
+    // getWebsiteMainStepStates(website.winget_id)
 
-    dispatch(getStepsByWebsiteId(website.winget_id))
-    dispatch(getStatesByWebsiteId(website.winget_id))
+    // dispatch(getStepsByWebsiteId(website.winget_id))
+    // dispatch(getStatesByWebsiteId(website.winget_id))
   }
 
   const getAggrStates = (id: string) => {

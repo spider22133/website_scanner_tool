@@ -8,7 +8,7 @@ import WebsiteStepsRoute from '@routes/control_steps.route'
 import SoftwareRoute from '@routes/software.route'
 import validateEnv from '@utils/validateEnv'
 import TimerController from '@controllers/timer.controller'
-import SoftwareVersionChecker from '@/softwareVersionChecker'
+import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 
 process.env['NODE_CONFIG_DIR'] = __dirname + '/config'
 

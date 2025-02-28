@@ -52,7 +52,7 @@ class App {
 
   private static async connectToDatabase() {
     DB.sequelize.sync({ force: false })
-    initRoles()
+    await initRoles()
   }
 
   private initializeMiddlewares() {

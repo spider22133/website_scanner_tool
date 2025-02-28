@@ -1,14 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
-import { Website } from '@/interfaces/website.interface'
 import SoftwareService from '@services/software.service'
-import CreateWebsiteDto from '@dtos/website.dto'
-import SoftwareVersionChecker from '@/softwareVersionChecker'
-import WebsiteStatesService from '@services/website_states.service'
-import { SoftwareModel } from '@models/software.model'
+import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import SoftwareVersionService from '@services/software_versions.service'
-import { WingetSoftwareEntry } from '@/types/common'
+import { WinGetSoftwareEntry } from '@/types/common'
 import CreateSoftwareDto from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
+import { WingetUtils } from '@/classes/WingetUtils'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
@@ -96,8 +93,13 @@ class SoftwareController {
   public createWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const softwareData: CreateSoftwareDto = req.body
+      const packageDetails = await WingetUtils.showSoftware(softwareData.winget_id)
+      const createSoftwareData = await this.softwareService.createSoftware({
+        ...softwareData,
+        details: JSON.stringify(packageDetails),
+        is_current: true,
+      })
 
-      const createSoftwareData = await this.softwareService.createSoftware({ ...softwareData, is_current: true })
       res.status(201).json({ data: createSoftwareData, message: 'created' })
     } catch (error) {
       next(error)
@@ -107,7 +109,6 @@ class SoftwareController {
   public deleteSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const wingetId = req.params.id
-      console.log('wingetId', wingetId)
       const deleteSoftwareData: Software = await this.softwareService.deleteSoftware(wingetId)
 
       res.status(200).json({ data: deleteSoftwareData, message: 'deleted' })
@@ -130,7 +131,7 @@ class SoftwareController {
   public searchWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const searchString = String(req.params.query)
-      const searchSoftwareData: WingetSoftwareEntry[] = await this.softwareVersionChecker.prepareSearchedSoftwareList(searchString)
+      const searchSoftwareData: WinGetSoftwareEntry[] = await WingetUtils.searchSoftware(searchString)
 
       res.status(200).json({ data: searchSoftwareData })
     } catch (error) {
