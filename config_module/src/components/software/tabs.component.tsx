@@ -1,22 +1,22 @@
-import React from 'react';
-import { Box, Grid, IconButton, Tab } from '@mui/material';
-import IWebsiteControlStep from '../../interfaces/website_control_step.interface';
-import ApiStepComponent from './api-step.component';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import React from 'react'
+import { Box, Grid, IconButton, Tab } from '@mui/material'
+import IWebsiteControlStep from '../../interfaces/website_control_step.interface'
+import ApiStepComponent from './api-step.component'
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 type Props = {
-  steps: IWebsiteControlStep[];
-};
+  steps: IWebsiteControlStep[]
+}
 
 const typeTitle = [
   { type: 'MAIN', title: 'Software Profile' },
   { type: 'CREATE_BDS', title: 'Create BDS' },
   { type: 'API_CALL', title: 'API Requests' },
-];
+]
 
 const TabsComponent: React.FC<Props> = ({ steps }) => {
-  const [value, setValue] = React.useState('MAIN');
+  const [value, setValue] = React.useState('MAIN')
   return (
     <>
       <TabContext value={value}>
@@ -52,7 +52,7 @@ const TabsComponent: React.FC<Props> = ({ steps }) => {
         ))}
       </TabContext>
     </>
-  );
-};
+  )
+}
 
-export default TabsComponent;
+export default TabsComponent

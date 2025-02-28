@@ -11,7 +11,7 @@ export class RoleModel extends Model<Role, RoleCreationAttributes> implements Ro
   public readonly updatedAt!: Date
 }
 
-export default function (sequelize: Sequelize): typeof RoleModel {
+export default (sequelize: Sequelize) => {
   RoleModel.init(
     {
       id: {
@@ -30,12 +30,10 @@ export default function (sequelize: Sequelize): typeof RoleModel {
     },
   )
 
-  initRoles()
-
   return RoleModel
 }
 
-function initRoles() {
+export async function initRoles() {
   const ROLES = ['user', 'moderator', 'admin']
   ROLES.forEach(async (role, index) => {
     try {

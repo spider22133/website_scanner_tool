@@ -5,7 +5,7 @@ import { SoftwareVersionModel } from './software_version.model'
 export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source' | 'description' | 'author'>
 
 export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
-  public id: string
+  public id: number
   public name: string
   public winget_id: string
   public version: string
@@ -32,7 +32,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       id: {
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
       },
       name: {
         type: DataTypes.STRING,
@@ -72,7 +72,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
   SoftwareModel.hasMany(SoftwareVersionModel, {
     sourceKey: 'id',
     foreignKey: 'software_id',
-    as: 'steps',
+    as: 'versions',
     onDelete: 'CASCADE',
   })
 

@@ -3,7 +3,7 @@ import WebsiteControlStepsController from '@controllers/website_control_steps.co
 import Route from '@/interfaces/route.interface'
 import authMiddleware from '@/middlewares/auth.middleware'
 import validationMiddleware from '@middlewares/validation.middleware'
-import CreateWebsiteControlStepDto from '@dtos/step.dto'
+import CreateWebsiteControlStepDto from '@dtos/version.dto'
 
 class WebsiteControlStepsRoute implements Route {
   public path = '/website-control-steps'

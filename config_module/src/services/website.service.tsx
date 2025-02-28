@@ -18,9 +18,9 @@ const getWebsiteMainStepStates = (id: string) => {
   return http.get(`/software/${id}/main_states`)
 }
 
-const update = (data: IWebsite) => {
-  const { id, name, url, is_hidden } = data
-  return http.put(`/software/${id}`, { name, url, is_hidden })
+const update = (data: WinGetSoftwareEntry) => {
+  const { winget_id, name, is_hidden } = data
+  return http.put(`/software/${winget_id}`, { name, is_hidden })
 }
 
 const checkStatus = (id: string) => {

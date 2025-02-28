@@ -4,14 +4,13 @@ import AuthRoute from '@routes/auth.route'
 import IndexRoute from '@routes/index.route'
 import TimerRoute from '@routes/timer.route'
 import UsersRoute from '@routes/users.route'
-import StatesRoute from '@routes/states.route'
 import WebsiteStepsRoute from '@routes/control_steps.route'
-import WebsitesRoute from '@routes/websites.route'
+import SoftwareRoute from '@routes/software.route'
 import validateEnv from '@utils/validateEnv'
 import TimerController from '@controllers/timer.controller'
 import SoftwareVersionChecker from '@/softwareVersionChecker'
 
-process.env['NODE_CONFIG_DIR'] = __dirname + '/configs'
+process.env['NODE_CONFIG_DIR'] = __dirname + '/config'
 
 validateEnv()
 
@@ -25,9 +24,8 @@ const app = new App([
   new IndexRoute(),
   new UsersRoute(),
   new AuthRoute(),
-  new WebsitesRoute(softwareVersionChecker),
+  new SoftwareRoute(softwareVersionChecker),
   new TimerRoute(timer),
-  new StatesRoute(),
   new WebsiteStepsRoute(),
 ])
 

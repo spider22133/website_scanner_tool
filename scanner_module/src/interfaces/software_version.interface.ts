@@ -1,5 +1,5 @@
 export interface SoftwareVersion {
-  id: string
-  software_id: string
+  id: number
+  software_id: number
   version: string
 }

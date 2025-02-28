@@ -5,8 +5,8 @@ import { SoftwareModel } from '@models/software.model'
 export type SoftwareVersionCreationAttributes = Optional<SoftwareVersion, 'id'>
 
 export class SoftwareVersionModel extends Model<SoftwareVersion, SoftwareVersionCreationAttributes> implements SoftwareVersion {
-  public id: string
-  public software_id: string
+  public id: number
+  public software_id: number
   public version: string
 
   public setSoftware!: BelongsToSetAssociationMixin<SoftwareModel, number>
@@ -21,10 +21,10 @@ export default function (sequelize: Sequelize): typeof SoftwareVersionModel {
       id: {
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
       },
       software_id: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
       },
       version: {
         type: DataTypes.STRING,

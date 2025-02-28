@@ -1,8 +1,8 @@
-import IState from '../../interfaces/website-state.interface';
+import IState from '../../interfaces/website-state.interface'
 
 type Props = {
-  states: IState[];
-};
+  states: IState[]
+}
 
 export default function StatesTable({ states }: Props) {
   return (
@@ -27,5 +27,5 @@ export default function StatesTable({ states }: Props) {
         </tbody>
       </table>
     </>
-  );
+  )
 }

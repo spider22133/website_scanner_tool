@@ -1,10 +1,10 @@
 import { useForm, SubmitHandler } from 'react-hook-form'
-import IWebsite from '../../interfaces/website.interface'
+import IWebsite, { WinGetSoftwareEntry } from '../../interfaces/website.interface'
 import { sleep } from '../../helpers/animation.helper'
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { RootState, useAppDispatch } from '../../store'
-import { createWebsite } from '../../slices/websites.slice'
+import { createSoftware } from '../../slices/websites.slice'
 import { useSelector } from 'react-redux'
 import { clearMessage } from '../../slices/message.slice'
 import { APIErrorNotification } from '../elements/error-notification.component'
@@ -24,7 +24,7 @@ const validationSchema = Yup.object().shape({
 })
 
 export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
-  const { loading } = useSelector((state: RootState) => state.websites)
+  const { loading } = useSelector((state: RootState) => state.software)
   const messages = useSelector((state: RootState) => state.messages)
 
   const {
@@ -38,9 +38,9 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
 
   const dispatch = useAppDispatch()
 
-  const onSubmit: SubmitHandler<IWebsite> = async data => {
-    dispatch(createWebsite({ data, id: 'add' })).then(async response => {
-      if (createWebsite.fulfilled.match(response)) {
+  const onSubmit: SubmitHandler<WinGetSoftwareEntry> = async data => {
+    dispatch(createSoftware(data)).then(async response => {
+      if (createSoftware.fulfilled.match(response)) {
         dispatch(clearMessage('add'))
         await sleep(1000)
         setShowAddForm(false)

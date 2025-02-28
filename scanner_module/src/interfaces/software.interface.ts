@@ -1,5 +1,5 @@
 export interface Software {
-  id: string
+  id: number
   name: string
   winget_id: string
   version: string

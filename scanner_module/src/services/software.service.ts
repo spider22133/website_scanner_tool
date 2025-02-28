@@ -1,6 +1,6 @@
 import DB from '@databases'
 import { Software } from '@/interfaces/software.interface'
-import CreateSoftwareDto from '@dtos/software.dto'
+import CreateSoftwareDto from '@/dtos/software.dto'
 import { isEmpty } from '@/utils/util'
 import HttpException from '@/exceptions/HttpException'
 import { SoftwareModel } from '@/models/software.model'
@@ -35,26 +35,25 @@ class SoftwareService {
   public async createSoftware(softwareData: CreateSoftwareDto): Promise<Software> {
     if (isEmpty(softwareData)) throw new HttpException(400, 'Software data is empty')
 
-    const findSoftware: Software = await this.software.findOne({ where: { url: softwareData.url } })
-    if (findSoftware) throw new HttpException(409, `Url ${softwareData.url} already exists`)
+    const findSoftware: Software = await this.software.findOne({ where: { winget_id: softwareData.winget_id } })
+    console.log('findSoftware', findSoftware)
+    if (findSoftware) throw new HttpException(409, `Winget ID ${softwareData.winget_id} already exists`)
 
     const software = await this.software.create(softwareData)
-    await software.createStep({
-      path: software.url,
-      type: 'MAIN',
-      description: 'First step to check software URL address',
+    await software.createVersion({
+      version: software.version,
     })
 
     return software
   }
 
-  public async deleteSoftware(softwareId: number): Promise<Software> {
-    if (isEmpty(softwareId)) throw new HttpException(400, "This isn't softwareId")
+  public async deleteSoftware(wingetId: string): Promise<Software> {
+    if (isEmpty(wingetId)) throw new HttpException(400, "This isn't softwareId")
 
-    const findSoftware: SoftwareModel = await this.software.findByPk(softwareId)
+    const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: wingetId } })
     if (!findSoftware) throw new HttpException(409, "You're not software")
 
-    await this.software.destroy({ where: { id: softwareId } })
+    await this.software.destroy({ where: { winget_id: wingetId } })
 
     return findSoftware
   }

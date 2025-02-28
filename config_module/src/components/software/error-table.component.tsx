@@ -1,9 +1,9 @@
-import { addZero } from '../../helpers/chart.helper';
-import IState from '../../interfaces/website-state.interface';
+import { addZero } from '../../helpers/chart.helper'
+import IState from '../../interfaces/website-state.interface'
 
 type Props = {
-  errors: IState[];
-};
+  errors: IState[]
+}
 
 export default function ErrorTable({ errors }: Props) {
   return (
@@ -20,8 +20,8 @@ export default function ErrorTable({ errors }: Props) {
         <tbody>
           {errors &&
             errors.map((error: IState, index) => {
-              const date = new Date(error.createdAt);
-              const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`;
+              const date = new Date(error.createdAt)
+              const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`
               return (
                 <tr key={index}>
                   <td>{error.id}</td>
@@ -29,10 +29,10 @@ export default function ErrorTable({ errors }: Props) {
                   <td>{error.response_text}</td>
                   <td>{time}</td>
                 </tr>
-              );
+              )
             })}
         </tbody>
       </table>
     </>
-  );
+  )
 }

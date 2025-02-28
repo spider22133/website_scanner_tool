@@ -1,108 +1,108 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import IWebsite from '../interfaces/website.interface';
-import IState from '../interfaces/website-state.interface';
-import PaginationContainer from './elements/pagination-container.component';
-import StatesDataService from '../services/states.service';
-import WebsiteService from '../services/website.service';
-import StatesTable from './websites/states-table.component';
-import fetchData from '../helpers/fetch-data.helper';
-import Chart from './elements/chart.component';
-import AddWebsite from './websites/add-website.component';
-import { motion } from 'framer-motion';
+import React from 'react'
+import { useEffect, useState } from 'react'
+import { WinGetSoftwareEntry } from '../interfaces/website.interface'
+import IState from '../interfaces/website-state.interface'
+import PaginationContainer from './elements/pagination-container.component'
+import StatesDataService from '../services/states.service'
+import WebsiteService from '../services/website.service'
+import StatesTable from './software/states-table.component'
+import fetchData from '../helpers/fetch-data.helper'
+import Chart from './elements/chart.component'
+import AddWebsite from './software/add-website.component'
+import { motion } from 'framer-motion'
 
-import { retrieveWebsites } from '../slices/websites.slice';
-import { RootState, useAppDispatch } from '../store';
-import { useSelector } from 'react-redux';
-import { getStatesByWebsiteId } from '../slices/states.slice';
-import { Box, Container, Paper, Grid, Button, Alert, CircularProgress } from '@mui/material';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import WebsitesList from './websites/websites-list';
-import SearchFilterBar from './elements/search-filter-bar.component';
-import socketIOClient from 'socket.io-client';
-import { getStepsByWebsiteId } from '../slices/websites_control_steps.slice';
-import TabsComponent from './websites/tabs.component';
+import { retrieveWebsites } from '../slices/websites.slice'
+import { RootState, useAppDispatch } from '../store'
+import { useSelector } from 'react-redux'
+import { getStatesByWebsiteId } from '../slices/states.slice'
+import { Box, Container, Paper, Grid, Button, Alert, CircularProgress } from '@mui/material'
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
+import WebsitesList from './software/websites-list'
+import SearchFilterBar from './elements/search-filter-bar.component'
+import socketIOClient from 'socket.io-client'
+import { getStepsByWebsiteId } from '../slices/websites_control_steps.slice'
+import TabsComponent from './software/tabs.component'
 
 const variants = {
   open: { height: '100%', opacity: 1 },
   closed: { height: '0px', opacity: 0 },
-};
+}
 
 const DashboardComponent: React.FC = () => {
-  const ENDPOINT = 'http://localhost:3001/';
-  const itemsPerPage = 15;
-  const dispatch = useAppDispatch();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { steps, loading } = useSelector((state: RootState) => state.steps);
-  const { websites } = useSelector((state: RootState) => state.websites);
+  const ENDPOINT = 'http://localhost:3001/'
+  const itemsPerPage = 15
+  const dispatch = useAppDispatch()
+  const { user } = useSelector((state: RootState) => state.auth)
+  const { steps, loading } = useSelector((state: RootState) => state.steps)
+  const { software } = useSelector((state: RootState) => state.software)
 
-  const [states, setStates] = useState<IState[]>([]);
-  const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
-  const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [states, setStates] = useState<IState[]>([])
+  const [displayedStates, setDisplayedStates] = useState<IState[]>([])
+  const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>()
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showAddForm, setShowAddForm] = useState(false)
   const [value, setValue] = useState({
     toggleVisible: false,
-  });
+  })
 
   useEffect(() => {
-    dispatch(retrieveWebsites());
+    dispatch(retrieveWebsites())
 
-    const socket = socketIOClient(ENDPOINT);
+    const socket = socketIOClient(ENDPOINT)
     socket.on('updateWebsites', (data: any) => {
-      if (data === 'changed') dispatch(retrieveWebsites());
-    });
+      if (data === 'changed') dispatch(retrieveWebsites())
+    })
     return () => {
-      socket.disconnect();
-    };
-  }, []);
+      socket.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
-    const firstWebsiteId = websites[0]?.id;
+    const firstWebsiteId = software[0]?.winget_id
 
     if (firstWebsiteId) {
-      dispatch(getStatesByWebsiteId(firstWebsiteId));
-      dispatch(getStepsByWebsiteId(firstWebsiteId));
-      getAggrStates(firstWebsiteId);
-      getWebsiteMainStepStates(firstWebsiteId);
+      dispatch(getStatesByWebsiteId(firstWebsiteId))
+      dispatch(getStepsByWebsiteId(firstWebsiteId))
+      getAggrStates(firstWebsiteId)
+      getWebsiteMainStepStates(firstWebsiteId)
     }
-  }, [dispatch, websites]);
+  }, [dispatch, software])
 
   useEffect(() => {
-    onPageChange();
-  }, [states]);
+    onPageChange()
+  }, [states])
 
-  const setActiveWebsite = (website: IWebsite, index: number) => {
-    setCurrentIndex(index);
-    setCurrentPage(1);
-    getAggrStates(website.id);
-    getWebsiteMainStepStates(website.id);
+  const setActiveWebsite = (website: WinGetSoftwareEntry, index: number) => {
+    setCurrentIndex(index)
+    setCurrentPage(1)
+    getAggrStates(website.winget_id)
+    getWebsiteMainStepStates(website.winget_id)
 
-    dispatch(getStepsByWebsiteId(website.id));
-    dispatch(getStatesByWebsiteId(website.id));
-  };
+    dispatch(getStepsByWebsiteId(website.winget_id))
+    dispatch(getStatesByWebsiteId(website.winget_id))
+  }
 
   const getAggrStates = (id: string) => {
-    fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates);
-  };
+    fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates)
+  }
 
   const getWebsiteMainStepStates = (id: string) => {
-    fetchData(WebsiteService.getWebsiteMainStepStates(id), setStates);
-  };
+    fetchData(WebsiteService.getWebsiteMainStepStates(id), setStates)
+  }
 
   const onPageChange = (page = 1) => {
-    const startItem = (page - 1) * itemsPerPage;
-    const endItem = page * itemsPerPage;
-    setDisplayedStates(states.slice(startItem, endItem));
-  };
+    const startItem = (page - 1) * itemsPerPage
+    const endItem = page * itemsPerPage
+    setDisplayedStates(states.slice(startItem, endItem))
+  }
 
   const handleClickToggle = () => {
-    setValue({ toggleVisible: !value.toggleVisible });
-  };
+    setValue({ toggleVisible: !value.toggleVisible })
+  }
 
   return (
-    <Box sx={{ bgcolor: 'grey.A100' }}>
+    <Box sx={{ bgcolor: 'grey.A100', height: '100vh' }}>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} lg={5}>
@@ -172,7 +172,7 @@ const DashboardComponent: React.FC = () => {
         </Grid>
       </Container>
     </Box>
-  );
-};
+  )
+}
 
-export default DashboardComponent;
+export default DashboardComponent

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { WebsiteState } from '@/interfaces/website_state.interface'
 import WebsiteStatesService from '@services/website_states.service'
-import WebsiteControlStepsService from '@services/website_control_steps.service'
+import WebsiteControlStepsService from '@services/software_versions.service'
 
 class WebsiteStatesController {
   public websiteStatesService = new WebsiteStatesService()

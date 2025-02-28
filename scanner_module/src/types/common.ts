@@ -6,7 +6,7 @@ export interface SoftwareEntry {
 
 export interface WingetSoftwareEntry {
   name: string
-  id: string
+  winget_id: string
   version: string
   source: string
 }

@@ -5,17 +5,17 @@ export default class CreateSoftwareDto {
   public name: string
 
   @IsString()
-  public id: string
-
-  @IsString()
   public version: string
 
   @IsString()
   public source: string
 
+  @IsString()
+  public winget_id: string
+
   @IsBoolean()
   public is_hidden: boolean
 
   @IsBoolean()
-  public is_active: boolean
+  public is_current: boolean
 }

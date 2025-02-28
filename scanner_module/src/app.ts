@@ -1,4 +1,6 @@
-process.env['NODE_CONFIG_DIR'] = __dirname + '/configs'
+import { initRoles } from '@models/role.model'
+
+process.env['NODE_CONFIG_DIR'] = __dirname + '/config'
 
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
@@ -48,8 +50,9 @@ class App {
     return this.httpServer
   }
 
-  private static connectToDatabase() {
+  private static async connectToDatabase() {
     DB.sequelize.sync({ force: false })
+    initRoles()
   }
 
   private initializeMiddlewares() {

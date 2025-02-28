@@ -1,34 +1,34 @@
-import React, { useEffect } from 'react';
-import IWebsite from '../../interfaces/website.interface';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import React, { useEffect } from 'react'
+import IWebsite, { WinGetSoftwareEntry } from '../../interfaces/website.interface'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
 
-import { RootState, useAppDispatch } from '../../store';
-import { useSelector } from 'react-redux';
-import { clearMessage } from '../../slices/message.slice';
-import { updateWebsite } from '../../slices/websites.slice';
-import { sleep } from '../../helpers/animation.helper';
-import { APIErrorNotification } from '../elements/error-notification.component';
-import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Stack } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
-import SendIcon from '@mui/icons-material/Send';
+import { RootState, useAppDispatch } from '../../store'
+import { useSelector } from 'react-redux'
+import { clearMessage } from '../../slices/message.slice'
+import { updateWebsite } from '../../slices/websites.slice'
+import { sleep } from '../../helpers/animation.helper'
+import { APIErrorNotification } from '../elements/error-notification.component'
+import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Stack } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton'
+import SendIcon from '@mui/icons-material/Send'
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(4),
   url: Yup.string().required('Username is required').url('Url is invalid'),
-});
+})
 
 type Props = {
-  website: IWebsite;
-  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>;
-  showAddForm: boolean;
-};
+  software: WinGetSoftwareEntry
+  setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>
+  showAddForm: boolean
+}
 
-export default function EditWebsite({ website, setShowAddForm, showAddForm }: Props) {
-  const { loading } = useSelector((state: RootState) => state.websites);
-  const messages = useSelector((state: RootState) => state.messages);
-  const dispatch = useAppDispatch();
+export default function EditWebsite({ software, setShowAddForm, showAddForm }: Props) {
+  const { loading } = useSelector((state: RootState) => state.software)
+  const messages = useSelector((state: RootState) => state.messages)
+  const dispatch = useAppDispatch()
 
   const {
     register,
@@ -37,23 +37,30 @@ export default function EditWebsite({ website, setShowAddForm, showAddForm }: Pr
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-  });
+  })
 
   useEffect(() => {
-    reset(website);
-  }, [website]);
+    reset(software)
+  }, [software])
 
   const onSubmit: SubmitHandler<IWebsite> = data => {
-    const { name, url } = data;
-    dispatch(updateWebsite({ id: website.id, name: name || website.name, url: url || website.url })).then(async response => {
+    const { name } = data
+    dispatch(
+      updateWebsite({
+        winget_id: software.winget_id,
+        name: name || software.name,
+        version: '',
+        source: '',
+      }),
+    ).then(async response => {
       if (updateWebsite.fulfilled.match(response)) {
-        dispatch(clearMessage(website.id));
-        await sleep(1000);
-        setShowAddForm(false);
-        reset();
+        dispatch(clearMessage(software.winget_id))
+        await sleep(1000)
+        setShowAddForm(false)
+        reset()
       }
-    });
-  };
+    })
+  }
   return (
     <>
       {showAddForm ? (
@@ -78,11 +85,11 @@ export default function EditWebsite({ website, setShowAddForm, showAddForm }: Pr
               Reset
             </Button>
           </Stack>
-          <APIErrorNotification messages={messages} websiteId={website.id} />
+          <APIErrorNotification messages={messages} websiteId={software.winget_id} />
         </form>
       ) : (
         ' '
       )}
     </>
-  );
+  )
 }

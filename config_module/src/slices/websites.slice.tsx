@@ -1,40 +1,40 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import IWebsite, { WinGetSoftwareEntry } from '../interfaces/website.interface'
+import { WinGetSoftwareEntry } from '../interfaces/website.interface'
 import WebsiteDataService from '../services/website.service'
 import { AxiosError } from 'axios'
 import { setMessage } from './message.slice'
 import httpErrors from '../interfaces/api.error.interface'
 
 const initialState = {
-  softwareList: [] as WinGetSoftwareEntry[],
-  websites: [] as IWebsite[],
+  softwareSearchList: [] as WinGetSoftwareEntry[],
+  software: [] as WinGetSoftwareEntry[],
   loading: false as boolean,
 }
 
 type setErrorType = {
-  data: IWebsite
+  data: WinGetSoftwareEntry
   id: string
 }
 
-export const createWebsite = createAsyncThunk<
-  IWebsite,
-  setErrorType,
-  {
-    rejectValue: httpErrors
-  }
->('websites/create', async ({ data, id }, { rejectWithValue, dispatch }) => {
-  try {
-    const res = await WebsiteDataService.create({ name: data.name, url: data.url })
-    return res.data.data
-  } catch (err: any) {
-    const error: AxiosError<httpErrors> = err
-    if (!error.response) {
-      throw err
-    }
-    dispatch(setMessage({ id, message: error.response.data.message }))
-    return rejectWithValue(error.response.data)
-  }
-})
+// export const createWebsite = createAsyncThunk<
+//   WinGetSoftwareEntry,
+//   setErrorType,
+//   {
+//     rejectValue: httpErrors
+//   }
+// >('websites/create', async ({ data, id }, { rejectWithValue, dispatch }) => {
+//   try {
+//     const res = await WebsiteDataService.create({ name: data.name, url: data.url })
+//     return res.data.data
+//   } catch (err: any) {
+//     const error: AxiosError<httpErrors> = err
+//     if (!error.response) {
+//       throw err
+//     }
+//     dispatch(setMessage({ id, message: error.response.data.message }))
+//     return rejectWithValue(error.response.data)
+//   }
+// })
 
 export const createSoftware = createAsyncThunk<
   WinGetSoftwareEntry,
@@ -45,8 +45,7 @@ export const createSoftware = createAsyncThunk<
 >('software/create', async (data, { rejectWithValue, dispatch }) => {
   try {
     const res = await WebsiteDataService.createSoftware(data)
-    console.log('res', res)
-    return res.data
+    return res.data.data
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err
     if (!error.response) {
@@ -58,14 +57,13 @@ export const createSoftware = createAsyncThunk<
 })
 
 export const updateWebsite = createAsyncThunk<
-  IWebsite,
-  IWebsite,
+  WinGetSoftwareEntry,
+  WinGetSoftwareEntry,
   {
     rejectValue: httpErrors
   }
->('websites/update', async (data, { rejectWithValue, dispatch }) => {
+>('software/update', async (data, { rejectWithValue, dispatch }) => {
   try {
-    console.log(data)
     const response = await WebsiteDataService.update(data)
     return response.data.data
   } catch (err: any) {
@@ -74,18 +72,18 @@ export const updateWebsite = createAsyncThunk<
       throw err
     }
 
-    dispatch(setMessage({ id: data.id, message: error.response.data.message }))
+    dispatch(setMessage({ id: data.winget_id, message: error.response.data.message }))
     return rejectWithValue(error.response.data)
   }
 })
 
 export const retrieveWebsites = createAsyncThunk<
-  IWebsite[],
+  WinGetSoftwareEntry[],
   void,
   {
     rejectValue: httpErrors
   }
->('websites/retrieve', async (_, { rejectWithValue, dispatch }) => {
+>('software/retrieve', async (_, { rejectWithValue, dispatch }) => {
   try {
     const res = await WebsiteDataService.getAll()
     return res.data.data
@@ -165,16 +163,16 @@ const websiteSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     // Create website
-    builder.addCase(createWebsite.pending, (state, {}) => {
-      state.loading = true
-    })
-    builder.addCase(createWebsite.fulfilled, (state, { payload }) => {
-      state.loading = false
-      state.websites.push(payload)
-    })
-    builder.addCase(createWebsite.rejected, state => {
-      state.loading = false
-    })
+    // builder.addCase(createWebsite.pending, (state, {}) => {
+    //   state.loading = true
+    // })
+    // builder.addCase(createWebsite.fulfilled, (state, { payload }) => {
+    //   state.loading = false
+    //   state.software.push(payload)
+    // })
+    // builder.addCase(createWebsite.rejected, state => {
+    //   state.loading = false
+    // })
 
     // Retrieve websites
     builder.addCase(retrieveWebsites.pending, (state, {}) => {
@@ -182,7 +180,7 @@ const websiteSlice = createSlice({
     })
     builder.addCase(retrieveWebsites.fulfilled, (state, { payload }) => {
       state.loading = false
-      state.websites = payload
+      state.software = payload
     })
     builder.addCase(retrieveWebsites.rejected, state => {
       state.loading = false
@@ -193,11 +191,11 @@ const websiteSlice = createSlice({
       state.loading = true
     })
     builder.addCase(updateWebsite.fulfilled, (state, { payload }) => {
-      const index = state.websites.findIndex(item => item.id === payload.id)
+      const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
 
       state.loading = false
-      state.websites[index] = {
-        ...state.websites[index],
+      state.software[index] = {
+        ...state.software[index],
         ...payload,
       }
     })
@@ -223,7 +221,7 @@ const websiteSlice = createSlice({
     })
     builder.addCase(queryWinGetSoftware.fulfilled, (state, { payload }) => {
       state.loading = false
-      state.softwareList = payload
+      state.softwareSearchList = payload
     })
     builder.addCase(queryWinGetSoftware.rejected, state => {
       state.loading = false
@@ -234,7 +232,7 @@ const websiteSlice = createSlice({
     })
     builder.addCase(createSoftware.fulfilled, (state, { payload }) => {
       state.loading = false
-      state.softwareList.push(payload)
+      state.software.push(payload)
     })
     builder.addCase(createSoftware.rejected, state => {
       state.loading = false
@@ -242,7 +240,7 @@ const websiteSlice = createSlice({
 
     // Delete website
     builder.addCase(deleteWebsite.fulfilled, (state, { payload }) => {
-      state.websites = state.websites.filter(item => item.id !== payload.id)
+      state.software = state.software.filter(item => item.winget_id !== payload.id)
     })
   },
 })

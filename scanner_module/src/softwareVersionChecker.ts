@@ -1,29 +1,19 @@
-import WebsiteService from '@services/websites.service'
-import WebsiteStatesService from '@services/website_states.service'
-import WebsiteErrorService from '@services/website_control_steps.service'
+import SoftwareService from '@services/software.service'
 import { Socket } from 'socket.io'
-import { WebsiteModel } from '@models/website.model'
-import { WebsiteControlStep } from '@interfaces/software_version.interface'
-import WebsiteControlStepService from '@services/website_control_steps.service'
-import { WebsiteControlStepModel } from '@models/software_version.model'
+import { SoftwareModel } from '@models/software.model'
+import SoftwareVersionService from '@services/software_versions.service'
 import { WingetSoftwareEntry } from '@/types/common'
-import { exec, ExecOptions, PromiseWithChild } from 'child_process'
+import { exec } from 'child_process'
 import { promisify } from 'util'
-import { ObjectEncodingOptions } from 'fs'
 import { logger } from '@utils/logger'
 
 import mailer from '@utils/mailer'
 import * as cheerio from 'cheerio'
 import fetch from 'node-fetch'
 
-const HTTP_CODE_404 = 404
-const HTTP_CODE_200 = 200
-
 class SoftwareVersionChecker {
-  public websiteService = new WebsiteService()
-  public websiteControlStepService = new WebsiteControlStepService()
-  public websiteStatesService = new WebsiteStatesService()
-  public websiteErrorService = new WebsiteErrorService()
+  public softwareService = new SoftwareService()
+  public softwareVersionService = new SoftwareVersionService()
   public _socket: Socket
 
   public connectSocket = (socket: Socket) => {
@@ -32,76 +22,17 @@ class SoftwareVersionChecker {
 
   public async checkAllSoftware(): Promise<void> {
     try {
-      const findAllWebsitesData: WebsiteModel[] = await this.websiteService.findAllWebsites()
-      for (const website of findAllWebsitesData) {
-        await this.checkSoftware(website)
+      const findAllSoftwaresData: SoftwareModel[] = await this.softwareService.findAllSoftwares()
+      for (const software of findAllSoftwaresData) {
+        // await this.checkSoftware(software)
       }
     } catch (error) {
       console.log(error)
     }
   }
 
-  public async checkSoftware(website: WebsiteModel) {
-    const controlSteps: WebsiteControlStepModel[] = await website.getSteps()
-
-    for (const step of controlSteps) {
-      try {
-        const start = new Date().getTime()
-        switch (step.type) {
-          case 'MAIN':
-            await SoftwareVersionChecker.checkSoftwareVersion(step.api_call_data)
-            // await this.updateStatus(status, start, step, msg)
-            break
-          case 'API_CALL':
-            console.log('API_CALL')
-            break
-        }
-      } catch (error) {
-        await this.sendError(step, error.code, error.message)
-      }
-    }
-    // Check if their any unsuccessfully requests
-    const controlStepsUpdated: WebsiteControlStepModel[] = await website.getSteps()
-    const hasErrors = controlStepsUpdated.find(item => item.estimated_code === HTTP_CODE_404)
-
-    if (hasErrors) {
-      await this.websiteService.updateWebsite(website.id, { ...website, is_active: false })
-    } else {
-      await this.websiteService.updateWebsite(website.id, { ...website, is_active: true })
-    }
-
-    this._socket.emit('updateWebsites', 'changed')
-  }
-
-  private async updateStatus(status: number, start: number, step: WebsiteControlStepModel, msg: string) {
-    if (status == HTTP_CODE_200) {
-      const end = new Date().getTime() - start
-      await this.sendStatus(step, end, status)
-    } else {
-      await this.sendError(step, status, msg)
-    }
-  }
-
   public async checkVersion(id: string) {
     return await SoftwareVersionChecker.checkSoftwareVersion(id)
-  }
-
-  private async sendStatus(step: WebsiteControlStepModel, end: number, status: number) {
-    await this.websiteControlStepService.updateWebsiteControlStep(step.id, { ...step, estimated_code: HTTP_CODE_200 })
-    await this.websiteStatesService.createStepState({ step_id: step.id, response_time: end, response_code: status })
-  }
-
-  private async sendError(step: WebsiteControlStep, status: number, msg = '') {
-    await this.websiteControlStepService.updateWebsiteControlStep(step.id, { ...step, estimated_code: HTTP_CODE_404 })
-    await this.websiteStatesService.createStepErrorState({
-      step_id: step.id,
-      response_code: status,
-      response_text: msg,
-      is_error: true,
-    })
-
-    //Send mail
-    //mailer(website, status, msg).catch(console.error);
   }
 
   private static parseSoftwareTable(input: string): WingetSoftwareEntry[] {
@@ -122,7 +53,7 @@ class SoftwareVersionChecker {
         i++
       }
       const name = nameParts.join(' ')
-      const id = parts[i] || ''
+      const winget_id = parts[i] || ''
       const version = parts[i + 1] || 'Unknown'
       const source = parts[parts.length - 1] || ''
       let match = parts.slice(i + 2, parts.length - 1).join(' ') || undefined
@@ -132,7 +63,7 @@ class SoftwareVersionChecker {
 
       entries.push({
         name,
-        id,
+        winget_id,
         version,
         source,
       })

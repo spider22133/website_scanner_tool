@@ -17,7 +17,7 @@ type Props = {
 
 const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
   const dispatch = useAppDispatch()
-  const softwareList = useSelector((state: RootState) => state.websites.softwareList || []) // Fallback to empty array
+  const softwareList = useSelector((state: RootState) => state.software.softwareSearchList || []) // Fallback to empty array
   const [inputValue, setInputValue] = useState('')
   const [selectedSoftware, setSelectedSoftware] = useState<WinGetSoftwareEntry | null>(null)
   const [open, setOpen] = useState(false)
@@ -57,7 +57,7 @@ const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
     if (selectedSoftware) {
       dispatch(createSoftware(selectedSoftware))
       setSelectedSoftware(null)
-      setInputValue('') // Clear input after adding, adjust if you want to keep it
+      setInputValue('')
       setOpen(false)
     }
   }
@@ -76,37 +76,20 @@ const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
           if (inputValue.length >= 3 && softwareList.length > 0) setOpen(true)
         }}
         onClose={() => setOpen(false)}
-        renderInput={params => (
-          <TextField
-            {...params}
-            variant="outlined"
-            label="Search"
-            InputProps={{
-              ...params.InputProps,
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            fullWidth
-          />
-        )}
+        renderInput={params => <TextField {...params} variant="outlined" label="Search" InputProps={{ ...params.InputProps }} fullWidth />}
         renderOption={(props, option) => {
-          console.log('Rendering option:', option)
           return (
-            <li {...props} key={option.id}>
+            <li {...props} key={option.winget_id}>
               <Box>
                 <Typography variant="body1">{option.name}</Typography>
                 <Typography variant="caption" color="textSecondary">
-                  {option.id} - v{option.version}
+                  {option.winget_id} - v{option.version}
                 </Typography>
               </Box>
             </li>
           )
         }}
         sx={{ flexGrow: 1 }}
-        disablePortal
       />
       <Box alignItems="center" justifyContent="center" sx={{ display: 'flex', height: '100%' }}>
         <IconButton disabled={!selectedSoftware} onClick={handleAddToList} color="primary" size="large" title="Add to List">

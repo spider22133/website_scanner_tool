@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { WebsiteControlStep } from '@interfaces/software_version.interface'
-import WebsiteControlStepsService from '@services/website_control_steps.service'
-import CreateWebsiteControlStepDto from '@dtos/step.dto'
+import WebsiteControlStepsService from '@services/software_versions.service'
+import CreateWebsiteControlStepDto from '@dtos/version.dto'
 
 class WebsiteControlStepsController {
   public websiteControlStepsService = new WebsiteControlStepsService()

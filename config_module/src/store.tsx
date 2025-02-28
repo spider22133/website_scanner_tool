@@ -7,7 +7,7 @@ import statesReducer from './slices/states.slice'
 import authReducer from './slices/auth.slice'
 
 const reducer = {
-  websites: websiteReducer,
+  software: websiteReducer,
   steps: websiteControlStepReducer,
   states: statesReducer,
   messages: messageReducer,
