@@ -100,7 +100,7 @@ const DashboardComponent: React.FC = () => {
   }
 
   return (
-    <Box sx={{ bgcolor: 'grey.A100', height: '100vh' }}>
+    <Box sx={{ bgcolor: 'grey.A100', minHeight: '100vh', pb: 6 }}>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} lg={5}>
