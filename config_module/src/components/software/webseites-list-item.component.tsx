@@ -1,8 +1,8 @@
-import { WinGetSoftwareEntry } from '../../interfaces/website.interface'
+import { WinGetSoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
-import { deleteWebsite, updateWebsite } from '../../slices/websites.slice'
+import { deleteWebsite, updateWebsite } from '../../slices/software.slice'
 import EditWebsite from './edit-website.component'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
 import { Chip, IconButton, Link, ListItem, Stack, Tooltip, useTheme } from '@mui/material'
@@ -66,8 +66,8 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
             <div className="fw-bold">
               {software.name} <span className={`badge ${software.is_current ? 'bg-success' : 'bg-danger'} ms-2`}>{software.version}</span>
             </div>
-            <Link href={software.source} underline="none" variant="body2" target="_blank">
-              {software.source}
+            <Link href={software.details?.homepage} underline="none" variant="body2" target="_blank">
+              {software.details?.homepage}
             </Link>
           </div>
           <div className="">

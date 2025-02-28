@@ -1,17 +1,17 @@
+import React from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import IWebsite, { WinGetSoftwareEntry } from '../../interfaces/website.interface'
+import { WinGetSoftwareEntry } from '../../../../types/common'
 import { sleep } from '../../helpers/animation.helper'
-import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { RootState, useAppDispatch } from '../../store'
-import { createSoftware } from '../../slices/websites.slice'
+import { createSoftware } from '../../slices/software.slice'
 import { useSelector } from 'react-redux'
 import { clearMessage } from '../../slices/message.slice'
 import { APIErrorNotification } from '../elements/error-notification.component'
 import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Paper, Stack } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 import LoadingButton from '@mui/lab/LoadingButton'
-import React from 'react'
+import * as Yup from 'yup'
 
 type Props = {
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>

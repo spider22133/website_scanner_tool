@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { WinGetSoftwareEntry } from '../interfaces/website.interface'
+import { WingetPackageDetails, WinGetSoftwareEntry } from '../../../types/common'
 import WebsiteDataService from '../services/website.service'
 import { AxiosError } from 'axios'
 import { setMessage } from './message.slice'
@@ -179,8 +179,11 @@ const websiteSlice = createSlice({
       state.loading = true
     })
     builder.addCase(retrieveWebsites.fulfilled, (state, { payload }) => {
+      state.software = payload.map(item => ({
+        ...item,
+        details: JSON.parse(item.details as string) as WingetPackageDetails,
+      }))
       state.loading = false
-      state.software = payload
     })
     builder.addCase(retrieveWebsites.rejected, state => {
       state.loading = false
@@ -220,8 +223,8 @@ const websiteSlice = createSlice({
       state.loading = true
     })
     builder.addCase(queryWinGetSoftware.fulfilled, (state, { payload }) => {
+      state.softwareSearchList = payload.filter((item, index, self) => index === self.findIndex(t => t.winget_id === item.winget_id))
       state.loading = false
-      state.softwareSearchList = payload
     })
     builder.addCase(queryWinGetSoftware.rejected, state => {
       state.loading = false
@@ -231,8 +234,11 @@ const websiteSlice = createSlice({
       state.loading = true
     })
     builder.addCase(createSoftware.fulfilled, (state, { payload }) => {
+      state.software.push({
+        ...payload,
+        details: JSON.parse(payload.details as string) as WingetPackageDetails,
+      })
       state.loading = false
-      state.software.push(payload)
     })
     builder.addCase(createSoftware.rejected, state => {
       state.loading = false

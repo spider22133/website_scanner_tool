@@ -33,4 +33,7 @@ export interface WinGetSoftwareEntry {
   version: string
   source: string
   details?: WingetPackageDetails
+  is_hidden?: boolean
+  is_current?: boolean
+  updatedAt?: string
 }

@@ -1,5 +1,5 @@
 import http from '../http-connection'
-import IWebsite, { WinGetSoftwareEntry } from '../interfaces/website.interface'
+import { WinGetSoftwareEntry } from '../../../types/common'
 
 type createProps = {
   name: string

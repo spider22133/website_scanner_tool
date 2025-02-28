@@ -1,6 +1,5 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { WinGetSoftwareEntry } from '../interfaces/website.interface'
 import IState from '../interfaces/website-state.interface'
 import PaginationContainer from './elements/pagination-container.component'
 import StatesDataService from '../services/states.service'
@@ -11,17 +10,16 @@ import Chart from './elements/chart.component'
 import AddWebsite from './software/add-website.component'
 import { motion } from 'framer-motion'
 
-import { retrieveWebsites } from '../slices/websites.slice'
+import { retrieveWebsites } from '../slices/software.slice'
 import { RootState, useAppDispatch } from '../store'
 import { useSelector } from 'react-redux'
-import { getStatesByWebsiteId } from '../slices/states.slice'
 import { Box, Container, Paper, Grid, Button, Alert, CircularProgress } from '@mui/material'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import WebsitesList from './software/websites-list'
 import SearchFilterBar from './elements/search-filter-bar.component'
 import socketIOClient from 'socket.io-client'
-import { getStepsByWebsiteId } from '../slices/websites_control_steps.slice'
 import TabsComponent from './software/tabs.component'
+import { WinGetSoftwareEntry } from '../../../types/common'
 
 const variants = {
   open: { height: '100%', opacity: 1 },

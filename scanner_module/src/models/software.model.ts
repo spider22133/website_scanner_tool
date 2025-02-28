@@ -46,7 +46,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
         type: DataTypes.STRING,
       },
       details: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
       },
       is_hidden: {
         allowNull: false,

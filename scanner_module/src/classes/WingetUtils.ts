@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { WingetPackageDetails, WinGetSoftwareEntry } from '@/types/common'
+import { WingetPackageDetails, WinGetSoftwareEntry } from '../../../types/common'
 import { logger } from '@utils/logger'
 
 const execAsync = promisify(exec)

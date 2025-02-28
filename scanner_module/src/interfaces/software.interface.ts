@@ -1,4 +1,4 @@
-import { WingetPackageDetails } from '@/types/common'
+import { WingetPackageDetails } from '../../../types/common'
 
 export interface Software {
   id: number

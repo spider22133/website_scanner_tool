@@ -1,4 +1,4 @@
-import { WinGetSoftwareEntry } from '../../interfaces/website.interface'
+import { WinGetSoftwareEntry } from '../../../../types/common'
 import WebsitesListItem from './webseites-list-item.component'
 import React from 'react'
 import { useSelector } from 'react-redux'
@@ -17,8 +17,6 @@ const WebsitesList: React.FC<Props> = ({ setActiveWebsite, currentIndex, showHid
   const countByVisibility = (isHidden: boolean) => {
     return software.filter(software => software.is_hidden === isHidden).length
   }
-
-  console.log('software', software)
 
   return (
     <>
