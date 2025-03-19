@@ -1,12 +1,12 @@
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useHistory } from 'react-router-dom';
-import * as Yup from 'yup';
-import IUser from '../../interfaces/user.interface';
-import { RootState, useAppDispatch } from '../../store';
-import { login } from '../../slices/auth.slice';
-import { useSelector } from 'react-redux';
-import { APIErrorNotification } from '../elements/error-notification.component';
+import { useForm, SubmitHandler, FieldValues } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useHistory } from 'react-router-dom'
+import * as Yup from 'yup'
+import IUser from '../../interfaces/user.interface'
+import { RootState, useAppDispatch } from '../../store'
+import { login } from '../../slices/auth.slice'
+import { useSelector } from 'react-redux'
+import { APIErrorNotification } from '../elements/error-notification.component'
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required('Email is required').email('Email is invalid'),
@@ -14,25 +14,25 @@ const validationSchema = Yup.object().shape({
     .required('Password is required')
     .min(6, 'Password must be at least 6 characters')
     .max(40, 'Password must not exceed 40 characters'),
-});
+})
 
 export default function LogIn() {
-  const { loading } = useSelector((state: RootState) => state.auth);
-  const messages = useSelector((state: RootState) => state.messages);
-  const history = useHistory();
-  const dispatch = useAppDispatch();
+  const { loading } = useSelector((state: RootState) => state.auth)
+  const messages = useSelector((state: RootState) => state.messages)
+  const history = useHistory()
+  const dispatch = useAppDispatch()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<IUser>({
     resolver: yupResolver(validationSchema),
-  });
+  })
 
   const onSubmit: SubmitHandler<IUser> = data => {
-    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/dashboard'));
-  };
+    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/dashboard'))
+  }
 
   return (
     <section className="vh-100-c" style={{ backgroundColor: '#508bfc' }}>
@@ -77,5 +77,5 @@ export default function LogIn() {
         </div>
       </div>
     </section>
-  );
+  )
 }

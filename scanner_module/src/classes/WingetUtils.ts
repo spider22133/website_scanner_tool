@@ -41,28 +41,28 @@ export class WingetUtils {
   private static parseSoftwareTable(input: string): WinGetSoftwareEntry[] {
     const lines = input.split('\n').slice(2) // Skip header lines
 
-    let entries: WinGetSoftwareEntry[] = []
+    const entries: WinGetSoftwareEntry[] = []
 
     for (const line of lines) {
-      // Split by whitespace, but preserve content after the version (e.g., "Tag: docker")
       const parts = line.trim().split(/\s+/)
-      if (parts.length < 3) continue // Skip malformed lines
+      if (parts.length < 4) continue // Skip malformed lines
 
+      // Extract name (everything until we detect an ID, which should contain a dot)
       const nameParts = []
       let i = 0
-      // Name can have multiple words, so collect until we hit the ID (which has dots or specific format)
       while (i < parts.length && !parts[i].includes('.') && parts[i] !== 'Unknown') {
         nameParts.push(parts[i])
         i++
       }
+
       const name = nameParts.join(' ')
       const winget_id = parts[i] || ''
       const version = parts[i + 1] || 'Unknown'
-      const source = parts[parts.length - 1] || ''
-      let match = parts.slice(i + 2, parts.length - 1).join(' ') || undefined
+      const source = parts[i + 2] || ''
 
-      // Clean up match field (remove if empty or just whitespace)
-      if (match && match.trim() === '') match = undefined
+      // Only accept correctly formatted entries (ignores parsed headers)
+      if (source !== 'winget' && source !== 'msstore') continue
+      if (!winget_id.includes('.')) continue // Ensure ID format
 
       entries.push({
         name,
@@ -71,7 +71,8 @@ export class WingetUtils {
         source,
       })
     }
-    entries = entries.filter(entrie => entrie.source !== 'msstore')
+
+    console.log(entries)
     return entries
   }
 

@@ -1,10 +1,10 @@
-import { iniState } from '../../slices/message.slice';
-import { Alert } from '@mui/material';
+import { iniState } from '../../slices/message.slice'
+import { Alert } from '@mui/material'
 
 type Props = {
-  websiteId: string;
-  messages: iniState[];
-};
+  websiteId: string
+  messages: iniState[]
+}
 export const APIErrorNotification = ({ messages, websiteId }: Props) => {
   return (
     <>
@@ -17,12 +17,12 @@ export const APIErrorNotification = ({ messages, websiteId }: Props) => {
               </Alert>
             ) : (
               ''
-            );
+            )
           })}
         </div>
       ) : (
         ''
       )}
     </>
-  );
-};
+  )
+}

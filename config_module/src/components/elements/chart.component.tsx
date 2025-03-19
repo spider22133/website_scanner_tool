@@ -1,21 +1,21 @@
-import { ApexOptions } from 'apexcharts';
-import { useEffect, useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
-import { addZero } from '../../helpers/chart.helper';
-import IState from '../../interfaces/website-state.interface';
-import { useTheme } from '@mui/material';
+import { ApexOptions } from 'apexcharts'
+import { useEffect, useState } from 'react'
+import ReactApexChart from 'react-apexcharts'
+import { addZero } from '../../helpers/chart.helper'
+import IState from '../../interfaces/website-state.interface'
+import { useTheme } from '@mui/material'
 type Props = {
-  states: IState[];
-  aggrStates: { avg: number; min: number; max: number } | undefined;
-};
+  states: IState[]
+  aggrStates: { avg: number; min: number; max: number } | undefined
+}
 export default function Chart({ states, aggrStates }: Props) {
-  const theme = useTheme();
+  const theme = useTheme()
   const [series, setSeries] = useState<ApexAxisChartSeries>([
     {
       name: 'Answer Time:',
       data: [0],
     },
-  ]);
+  ])
 
   const [options, setOptions] = useState<ApexOptions>({
     chart: {
@@ -68,24 +68,24 @@ export default function Chart({ states, aggrStates }: Props) {
       horizontalAlign: 'left',
     },
     colors: [theme.palette.info.main],
-  });
+  })
 
   useEffect(() => {
-    const answerTimes: number[] = [];
-    const createdTimes: string[] = [];
+    const answerTimes: number[] = []
+    const createdTimes: string[] = []
 
     states.forEach(e => {
       if (e.response_time) {
-        const date = new Date(e.createdAt);
-        const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`;
-        answerTimes.push(e.response_time);
-        createdTimes.push(time);
+        const date = new Date(e.createdAt)
+        const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`
+        answerTimes.push(e.response_time)
+        createdTimes.push(time)
       }
-    });
+    })
 
-    setSeries([{ data: answerTimes }]);
-    setOptions({ xaxis: { categories: createdTimes } });
-  }, [states.length]);
+    setSeries([{ data: answerTimes }])
+    setOptions({ xaxis: { categories: createdTimes } })
+  }, [states.length])
 
   return (
     <>
@@ -108,5 +108,5 @@ export default function Chart({ states, aggrStates }: Props) {
         </div>
       </div>
     </>
-  );
+  )
 }

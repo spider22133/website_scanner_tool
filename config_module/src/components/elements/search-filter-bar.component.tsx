@@ -44,26 +44,31 @@ const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
       <Autocomplete
-        options={softwareList}
+        options={softwareList} // Ensure this is an array (use empty array fallback)
         inputValue={inputValue}
-        filterOptions={x => x}
-        getOptionLabel={option => `${option.name} (${option.version})`}
+        filterOptions={options => (options.length === 0 ? [] : options)} // Force empty array when no results
+        getOptionLabel={option => (typeof option === 'string' ? option : `${option.name} (${option.version})`)}
+        noOptionsText="Keine Suchergebnisse"
         onInputChange={handleSearchChange}
-        onChange={(_, value) => setSelectedSoftware(value as WinGetSoftwareEntry)}
+        onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
         renderInput={params => <TextField {...params} variant="outlined" label="Search" fullWidth />}
-        renderOption={(props, option) => (
-          <li {...props} key={`${option.winget_id}-${option.version}`}>
-            <Box>
-              <Typography variant="body1">{option.name}</Typography>
-              <Typography variant="caption" color="textSecondary">
-                {option.winget_id} - v{option.version}
-              </Typography>
-            </Box>
-          </li>
-        )}
+        renderOption={(props, option) => {
+          if (typeof option === 'string') return null // Prevent rendering invalid options
+          return (
+            <li {...props} key={`${option.winget_id}-${option.version}`}>
+              <Box>
+                <Typography variant="body1">{option.name}</Typography>
+                <Typography variant="caption" color="textSecondary">
+                  {option.winget_id} - v{option.version}
+                </Typography>
+              </Box>
+            </li>
+          )
+        }}
         sx={{ flexGrow: 1 }}
         freeSolo
       />
+
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <IconButton disabled={!selectedSoftware} onClick={handleAddToList} color="primary" size="large">
           <AddCircleOutlineOutlinedIcon />

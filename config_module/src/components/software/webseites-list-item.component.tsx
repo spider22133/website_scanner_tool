@@ -136,7 +136,7 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
           initial="closed"
           transition={{ ease: 'easeOut', duration: '0.5' }}
         >
-          <EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} software={software} />
+          {/*<EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} software={software} />*/}
         </motion.div>
       </ListItem>
     )

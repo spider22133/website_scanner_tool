@@ -1,33 +1,33 @@
-import { useInput } from '../../helpers/form-input.helper';
-import React, { useState } from 'react';
-import AuthService from '../../services/auth.service';
-import { useHistory } from 'react-router-dom';
-import { AxiosError } from 'axios';
+import { useInput } from '../../helpers/form-input.helper'
+import React, { useState } from 'react'
+import AuthService from '../../services/auth.service'
+import { useHistory } from 'react-router-dom'
+import { AxiosError } from 'axios'
 
 export default function SignUp() {
-  const [firstName, setFirstname] = useInput('');
-  const [lastName, setLastname] = useInput('');
-  const [email, setEmail] = useInput('');
-  const [password, setPassword] = useInput('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [firstName, setFirstname] = useInput('')
+  const [lastName, setLastname] = useInput('')
+  const [email, setEmail] = useInput('')
+  const [password, setPassword] = useInput('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const history = useHistory();
+  const history = useHistory()
 
   const handleSignUp = (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     AuthService.signup({ firstName, lastName, email, password })
       .then(() => {
-        setLoading(false);
-        history.push('/login');
+        setLoading(false)
+        history.push('/login')
       })
       .catch((error: AxiosError) => {
-        setLoading(false);
-        setError(error.message);
-      });
-  };
+        setLoading(false)
+        setError(error.message)
+      })
+  }
 
   return (
     <section className="vh-100-c" style={{ backgroundColor: '#508bfc' }}>
@@ -66,5 +66,5 @@ export default function SignUp() {
         </div>
       </div>
     </section>
-  );
+  )
 }

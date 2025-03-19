@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { NavLink, Link } from 'react-router-dom';
-import { logout } from '../../slices/auth.slice';
-import { RootState, useAppDispatch } from '../../store';
+import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { NavLink, Link } from 'react-router-dom'
+import { logout } from '../../slices/auth.slice'
+import { RootState, useAppDispatch } from '../../store'
 
 export default function Header() {
-  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
-  const [toogle, setToogle] = useState(false);
+  const { isLoggedIn, user } = useSelector((state: RootState) => state.auth)
+  const [toogle, setToogle] = useState(false)
 
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: 'white' }}>
@@ -58,5 +58,5 @@ export default function Header() {
         </div>
       </div>
     </nav>
-  );
+  )
 }
