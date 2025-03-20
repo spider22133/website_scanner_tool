@@ -5,7 +5,7 @@ import SoftwareVersionService from '@services/software_versions.service'
 import { WinGetSoftwareEntry } from '../../../types/common'
 import CreateSoftwareDto from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
-import { WingetUtils } from '@/classes/WingetUtils'
+import { WingetUtils } from '@/classes/WingetApi'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
