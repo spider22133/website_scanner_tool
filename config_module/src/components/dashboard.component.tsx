@@ -20,6 +20,8 @@ import SearchFilterBar from './elements/search-filter-bar.component'
 import socketIOClient from 'socket.io-client'
 import TabsComponent from './software/tabs.component'
 import { WinGetSoftwareEntry } from '../../../types/common'
+import { CustomTabProps } from '../interfaces/common'
+import PackageDetails from './software/package-details.component'
 
 const variants = {
   open: { height: '100%', opacity: 1 },
@@ -99,15 +101,35 @@ const DashboardComponent: React.FC = () => {
     setValue({ toggleVisible: !value.toggleVisible })
   }
 
+  const tabs: CustomTabProps[] = [
+    {
+      tabType: 'MAIN',
+      tabLabel: 'Software Profile',
+      tabContent: software && <PackageDetails software={software[currentIndex]} />,
+    },
+    {
+      tabType: 'CREATE_BDS',
+      tabLabel: 'Create BDS',
+      tabContent: <div />,
+    },
+    {
+      tabType: 'API_CALL',
+      tabLabel: 'API Requests',
+      tabContent: <div />,
+    },
+  ]
+
   return (
     <Box sx={{ bgcolor: 'grey.A100', minHeight: '100vh', pb: 6 }}>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Paper sx={{ py: 3, px: 3 }}>
+              <SearchFilterBar value={value.toggleVisible} handleClickToggle={handleClickToggle} />
+            </Paper>
+          </Grid>
           <Grid item xs={12} lg={5}>
             <Box sx={{ position: { lg: 'sticky' }, top: { lg: 16 } }}>
-              <Paper sx={{ p: 3, mb: 2 }}>
-                <SearchFilterBar value={value.toggleVisible} handleClickToggle={handleClickToggle} />
-              </Paper>
               <Paper sx={{ p: 3, mb: 2 }}>
                 <WebsitesList currentIndex={currentIndex} showHidden={value.toggleVisible} setActiveWebsite={setActiveWebsite} />
               </Paper>
@@ -141,11 +163,12 @@ const DashboardComponent: React.FC = () => {
               </Box>
             ) : (
               <>
-                <TabsComponent steps={steps} />
-                <Paper sx={{ p: 4, mb: 2 }}>
+                <TabsComponent tabs={tabs} />
+
+                {/* <Paper sx={{ p: 4, mb: 2 }}>
                   {states.length > 0 ? <Chart states={states} aggrStates={aggrStates} /> : <Alert severity="warning">No data!</Alert>}
-                </Paper>
-                {states.length > 0 && (
+                </Paper> */}
+                {/* {states.length > 0 && (
                   <Paper sx={{ p: 4, mb: 2 }}>
                     <h2>Check list</h2>
                     <StatesTable states={displayedStates} />
@@ -163,7 +186,7 @@ const DashboardComponent: React.FC = () => {
                       )}
                     </div>
                   </Paper>
-                )}
+                )} */}
               </>
             )}
           </Grid>

@@ -4,7 +4,7 @@ import { deleteWebsite, updateWebsite } from '../../slices/software.slice'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
-import { Chip, IconButton, Link, ListItem, Stack, Tooltip, useTheme } from '@mui/material'
+import { Chip, IconButton, Link, ListItem, Stack, Tooltip, Typography, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/EditOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
@@ -17,7 +17,7 @@ import fetchData from '../../helpers/fetch-data.helper'
 import IState from '../../interfaces/website-state.interface'
 import WebsiteDataService from '../../services/website.service'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
-import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 
 TimeAgo.addDefaultLocale(en)
 
@@ -69,12 +69,10 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
               {software.is_current ? (
                 <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'success.main', fontSize: 20 }} />
               ) : (
-                <UnpublishedOutlinedIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
+                <ErrorOutlineIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
               )}
             </div>
-            <Link href={software.details?.homepage} underline="none" variant="body2" target="_blank">
-              {software.details?.homepage}
-            </Link>
+            <Typography variant="body2">{software.details?.publisher}</Typography>
           </div>
           <div className="">
             <Stack direction="column" alignItems="flex-end">
