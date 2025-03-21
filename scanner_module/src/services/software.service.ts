@@ -9,14 +9,14 @@ import { Op } from 'sequelize'
 class SoftwareService {
   public software = DB.Software
 
-  public async findAllSoftwares(): Promise<SoftwareModel[]> {
+  public async findAllSoftware(): Promise<SoftwareModel[]> {
     return await this.software.findAll()
   }
 
-  public async findSoftwareById(softwareId: number): Promise<SoftwareModel> {
+  public async findSoftwareById(softwareId: string): Promise<SoftwareModel> {
     if (isEmpty(softwareId)) throw new HttpException(400, 'Id is wrong')
 
-    const findSoftware: SoftwareModel = await this.software.findByPk(softwareId)
+    const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: softwareId } })
 
     if (!findSoftware) throw new HttpException(409, "Software doesn't exist")
 
@@ -57,13 +57,13 @@ class SoftwareService {
     return findSoftware
   }
 
-  public async searchQuery(data: string): Promise<Software[]> {
+  /* public async searchQuery(data: string): Promise<Software[]> {
     return await this.software.findAll({
       where: {
         [Op.or]: [{ name: { [Op.like]: `%${data}%` } }, { url: { [Op.like]: `%${data}%` } }],
       },
     })
-  }
+  } */
 }
 
 export default SoftwareService

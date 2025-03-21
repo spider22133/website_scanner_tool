@@ -8,72 +8,69 @@
 
 import util from 'util'
 import { exec } from 'child_process'
+import { BaramundiSearch } from '@/types/baramundi'
 
 const execPromise = util.promisify(exec) // Promisify exec for async/await
 
-
-
 export class BaramundiApi {
-  private baseUrl: string;
-  private username: string;
-  private password: string;
+  private baseUrl: string
+  private username: string
+  private password: string
 
   constructor(url: string, username: string, password: string) {
-    this.baseUrl = url;
-    this.username = username;
-    this.password = password;
+    this.baseUrl = url
+    this.username = username
+    this.password = password
   }
 
   private buildCurlCommand(endpoint: string, method: string = 'GET', data?: any): string {
-    const url = `${this.baseUrl}${endpoint}`;
-    let curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X ${method} "${url}"`;
+    const url = `${this.baseUrl}${endpoint}`
+    let curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X ${method} "${url}"`
 
     if (data) {
-      const jsonData = JSON.stringify(data).replace(/"/g, '\\"'); // Escape quotes for curl
-      curlCommand += ` -H "Content-Type: application/json" -d "${jsonData}"`;
+      const jsonData = JSON.stringify(data).replace(/"/g, '\\"') // Escape quotes for curl
+      curlCommand += ` -H "Content-Type: application/json" -d "${jsonData}"`
     }
 
-    return curlCommand;
+    return curlCommand
   }
 
   private async sendRequest(endpoint: string, method: string = 'GET', data?: any): Promise<any> {
-    const curlCommand = this.buildCurlCommand(endpoint, method, data);
+    const curlCommand = this.buildCurlCommand(endpoint, method, data)
 
     try {
-      const { stdout, stderr } = await execPromise(curlCommand, { maxBuffer: 1024 * 1024 * 1024 });
-      const responseData = stdout.trim();
+      const { stdout, stderr } = await execPromise(curlCommand, { maxBuffer: 1024 * 1024 * 1024 })
+      const responseData = stdout.trim()
 
       try {
-        return JSON.parse(responseData);
+        return JSON.parse(responseData)
       } catch (parseError) {
-        console.error('Error parsing JSON:', parseError.message);
-        console.log('Raw Response:', responseData);
-        return null;
+        console.error('Error parsing JSON:', parseError.message)
+        console.log('Raw Response:', responseData)
+        return null
       }
     } catch (error) {
-      console.error(`Error executing ${method} request:`, error.message);
+      console.error(`Error executing ${method} request:`, error.message)
+
       if (error.stderr) {
-        console.error('curl stderr:', error.stderr);
+        console.error('curl stderr:', error.stderr)
       }
-      return null;
+      return null
     }
   }
 
-  public async findApplicationByName(term: string): Promise<void> {
-    const endpoint = `/bConnect/v1.1/Search?type=software&term=${encodeURIComponent(term)}`;
-    const response = await this.sendRequest(endpoint, 'GET');
-    console.log('Response:', response);
+  public async findApplicationByName(term: string): Promise<BaramundiSearch[]> {
+    const endpoint = `/bConnect/v1.1/Search?type=software&term=${encodeURIComponent(term)}`
+    return await this.sendRequest(endpoint, 'GET')
   }
 
   public async createResource(endpoint: string, data: any): Promise<void> {
-    const response = await this.sendRequest(endpoint, 'POST', data);
-    console.log('Created Resource:', response);
+    const response = await this.sendRequest(endpoint, 'POST', data)
+    console.log('Created Resource:', response)
   }
 
   public async updateResource(endpoint: string, data: any): Promise<void> {
-    const response = await this.sendRequest(endpoint, 'PATCH', data);
-    console.log('Updated Resource:', response);
+    const response = await this.sendRequest(endpoint, 'PATCH', data)
+    console.log('Updated Resource:', response)
   }
 }
-
-

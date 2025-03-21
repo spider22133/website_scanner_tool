@@ -18,7 +18,7 @@ class SoftwareController {
 
   public getSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const findAllSoftwareData: Software[] = await this.softwareService.findAllSoftwares()
+      const findAllSoftwareData: Software[] = await this.softwareService.findAllSoftware()
 
       res.status(200).json({ data: findAllSoftwareData, message: 'findAll' })
     } catch (error) {
@@ -28,7 +28,7 @@ class SoftwareController {
 
   public getSoftwareById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteId = Number(req.params.id)
+      const websiteId = req.params.id
       const findOne: Software = await this.softwareService.findSoftwareById(websiteId)
 
       res.status(200).json({ data: findOne, message: 'findOne' })
@@ -62,22 +62,21 @@ class SoftwareController {
     }
   }
 
-  /* public checkSoftware = async (req: Request, res: Response, next: NextFunction) => {
+  public checkSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteId = Number(req.params.id)
-      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
+      const websiteId = req.params.id
+      console.log(websiteId);
+      
+      const findOne = await this.softwareService.findSoftwareById(websiteId)
+      console.log(findOne);
+      await this.softwareVersionChecker.checkSoftwareVersion(findOne)
 
-      await this.softwareVersionChecker.checkVersion(findOne.id.toString())
 
-      const steps = await this.softwareVersionService.findControlStepsBySoftwareId(websiteId)
-      const mainStep = steps.find(step => step.type === 'MAIN')
-      const latestState = await this.websiteStatesService.findLatestStateByStepId(mainStep.id)
-
-      res.status(200).json({ data: latestState, message: 'checked' })
+      //res.status(200).json({ data: latestState, message: 'checked' })
     } catch (error) {
       next(error)
     }
-  }*/
+  }
 
   public createSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -117,7 +116,7 @@ class SoftwareController {
     }
   }
 
-  public searchSoftware = async (req: Request, res: Response, next: NextFunction) => {
+ /*  public searchSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const searchString = String(req.params.query)
       const searchSoftwareData: Software[] = await this.softwareService.searchQuery(searchString)
@@ -126,7 +125,7 @@ class SoftwareController {
     } catch (error) {
       next(error)
     }
-  }
+  } */
 
   public searchWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {

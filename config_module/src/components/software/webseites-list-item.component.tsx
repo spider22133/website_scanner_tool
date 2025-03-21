@@ -1,7 +1,6 @@
 import { WinGetSoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
 import { deleteWebsite, updateWebsite } from '../../slices/software.slice'
-import EditWebsite from './edit-website.component'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
@@ -17,6 +16,8 @@ import en from 'javascript-time-ago/locale/en.json'
 import fetchData from '../../helpers/fetch-data.helper'
 import IState from '../../interfaces/website-state.interface'
 import WebsiteDataService from '../../services/website.service'
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
+import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined'
 
 TimeAgo.addDefaultLocale(en)
 
@@ -61,10 +62,15 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
         }}
         onClick={() => setActiveWebsite(software, index)}
       >
-        <div className="d-flex justify-content-between align-items-start align-items-center w-100">
+        <div className="d-flex justify-content-between align-items-center w-100">
           <div className="ms-2 me-auto">
-            <div className="fw-bold">
-              {software.name} <span className={`badge ${software.is_current ? 'bg-success' : 'bg-danger'} ms-2`}>{software.version}</span>
+            <div className="d-flex align-items-center fw-bold">
+              {software.name}
+              {software.is_current ? (
+                <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'success.main', fontSize: 20 }} />
+              ) : (
+                <UnpublishedOutlinedIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
+              )}
             </div>
             <Link href={software.details?.homepage} underline="none" variant="body2" target="_blank">
               {software.details?.homepage}
