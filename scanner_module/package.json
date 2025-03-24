@@ -43,6 +43,7 @@
     "ts-jest": "^27.0.7",
     "ts-node": "^10.9.2",
     "typescript": "^4.9.5",
+    "webex-node-bot-framework": "^2.5.1",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },

@@ -105,7 +105,7 @@ const DashboardComponent: React.FC = () => {
     {
       tabType: 'MAIN',
       tabLabel: 'Software Profile',
-      tabContent: software && <PackageDetails software={software[currentIndex]} />,
+      tabContent: !!software && !!software.length ? <PackageDetails software={software[currentIndex]} /> : <div />,
     },
     {
       tabType: 'CREATE_BDS',

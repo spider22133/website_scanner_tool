@@ -6,7 +6,7 @@ import { BaramundiApi } from './BaramundiApi'
 
 class SoftwareVersionChecker {
   public softwareService = new SoftwareService()
-  public softwareVersionService = new SoftwareVersionService() 
+  public softwareVersionService = new SoftwareVersionService()
   public socket: Socket
 
   private _baramundi: BaramundiApi
@@ -23,20 +23,34 @@ class SoftwareVersionChecker {
     try {
       const findAllSoftwaresData: SoftwareModel[] = await this.softwareService.findAllSoftware()
       for (const software of findAllSoftwaresData) {
-        console.log(software);
-        
-        // await this.checkSoftware(software)
+        await this.checkSoftwareVersion(software)
       }
     } catch (error) {
       console.log(error)
     }
   }
 
-  public async checkSoftwareVersion(item: SoftwareModel): Promise<{ status: number }> {
+  public async checkSoftwareVersion(item: SoftwareModel): Promise<{ status: number; message?: string }> {
     const resultAppList = await this._baramundi.findApplicationByName(item.name)
-   
-    resultAppList.map(app => console.log(app.Id, app.Name))
-    return new Promise(() => ({ status: 200 }))
+
+    let hasCurrentVersion = false
+    let hasAktuell = false
+
+    resultAppList.forEach(app => {
+      console.log(app.Id, app.Name)
+      if (app.Name.includes('Aktuell')) {
+        hasAktuell = true
+      }
+      if (app.Name.includes(item.version)) {
+        hasCurrentVersion = true
+      }
+    })
+
+    if (!hasAktuell && !hasCurrentVersion) {
+      return { status: 200, message: `Update required for ${item.name} - Current version ${item.version} not found` }
+    }
+
+    return { status: 200 }
   }
 }
 

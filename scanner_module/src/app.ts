@@ -1,6 +1,7 @@
+import 'dotenv/config'
 import { initRoles } from '@models/role.model'
 
-process.env['NODE_CONFIG_DIR'] = __dirname + '/config'
+process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
 
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
@@ -11,12 +12,14 @@ import hpp from 'hpp'
 import morgan from 'morgan'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+import { createServer, Server as HttpServer } from 'http'
+import { Server } from 'socket.io'
 import DB from '@databases'
 import Routes from '@/interfaces/route.interface'
 import errorMiddleware from '@middlewares/error.middleware'
 import { logger, stream } from '@utils/logger'
-import { Server } from 'socket.io'
-import { createServer, Server as HttpServer } from 'http'
+import { BaramundiApi } from './classes/BaramundiApi'
+import WebexBot from './classes/WebexNodeBotFramework'
 
 class App {
   public app: express.Application
@@ -24,6 +27,13 @@ class App {
   public env: string
   public httpServer: HttpServer
   public io: Server
+  public baramundi: BaramundiApi
+  public webexBot?: WebexBot // Optional
+
+  // Baramundi Credentials
+  private baraUrl: string
+  private baraUsername: string
+  private baraSecret: string
 
   constructor(routes: Routes[]) {
     this.app = express()
@@ -32,17 +42,33 @@ class App {
     this.httpServer = createServer(this.app)
     this.io = new Server(this.httpServer, { cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] } })
 
-    App.connectToDatabase()
+    // Load Baramundi credentials from env variables
+    this.baraUrl = process.env.BARAMUNDI_URL || 'https://sv-bara-app.med.tu-dresden.de:443'
+    this.baraUsername = process.env.BARAMUNDI_USERNAME
+    this.baraSecret = process.env.BARAMUNDI_SECRET
+
+    // Initialize app components
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeSwagger()
     this.initializeErrorHandling()
+
+    // Baramundi API initialization
+    this.baramundi = new BaramundiApi(this.baraUrl, this.baraUsername, this.baraSecret)
+
+    // Webex Bot Initialization (Only if token is provided)
+    if (process.env.WEBEX_BOT_TOKEN) {
+      this.webexBot = new WebexBot(process.env.WEBEX_BOT_TOKEN)
+    }
+
+    this.handleShutdown()
   }
 
-  public listen() {
+  public async listen() {
+    await this.connectToDatabase()
     this.httpServer.listen(this.port, () => {
       logger.info(`======= ENV: ${this.env} =======`)
-      logger.info(`🚀 App listening on the port ${this.port}`)
+      logger.info(`🚀 App listening on port ${this.port}`)
     })
   }
 
@@ -50,19 +76,20 @@ class App {
     return this.httpServer
   }
 
-  private static async connectToDatabase() {
-    DB.sequelize.sync({ force: false })
-    await initRoles()
+  private async connectToDatabase() {
+    try {
+      await DB.sequelize.sync({ force: false })
+      await initRoles()
+      logger.info('✅ Database connected successfully')
+    } catch (error) {
+      logger.error('❌ Database connection failed:', error)
+      process.exit(1)
+    }
   }
 
   private initializeMiddlewares() {
-    if (this.env === 'production') {
-      this.app.use(morgan('combined', { stream }))
-      this.app.use(cors({ origin: 'your.domain.com', credentials: true }))
-    } else {
-      this.app.use(morgan('dev', { stream }))
-      this.app.use(cors({ origin: true, credentials: true }))
-    }
+    this.configureLogging()
+    this.configureCors()
 
     this.app.use(hpp())
     this.app.use(helmet())
@@ -72,8 +99,20 @@ class App {
     this.app.use(cookieParser())
   }
 
+  private configureLogging() {
+    const logMode = this.env === 'production' ? 'combined' : 'dev'
+    this.app.use(morgan(logMode, { stream }))
+  }
+
+  private configureCors() {
+    const corsOptions = {
+      origin: this.env === 'production' ? 'your.domain.com' : true,
+      credentials: true,
+    }
+    this.app.use(cors(corsOptions))
+  }
+
   private initializeRoutes(routes: Routes[]) {
-    //this.app.use(authMiddleware);
     routes.forEach(route => {
       this.app.use('/', route.router)
     })
@@ -97,6 +136,14 @@ class App {
 
   private initializeErrorHandling() {
     this.app.use(errorMiddleware)
+  }
+
+  private handleShutdown() {
+    process.on('SIGINT', () => {
+      logger.info('🛑 Gracefully shutting down the server...')
+      this.webexBot?.stop()
+      process.exit(0)
+    })
   }
 }
 

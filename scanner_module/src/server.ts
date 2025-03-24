@@ -9,37 +9,35 @@ import SoftwareRoute from '@routes/software.route'
 import validateEnv from '@utils/validateEnv'
 import TimerController from '@controllers/timer.controller'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
-import { BaramundiApi } from './classes/BaramundiApi'
 
-process.env['NODE_CONFIG_DIR'] = __dirname + '/config'
-
+// 1️⃣ Environment Setup
+process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
 validateEnv()
 
+// 2️⃣ Dependency Initialization
 const softwareVersionChecker = new SoftwareVersionChecker()
-const timer = new TimerController(softwareVersionChecker)
+const timerController = new TimerController(softwareVersionChecker)
+timerController.interval = 3600000 // 1 hour
+timerController.run()
 
-// BARAMUNDI Connection
-const url = 'https://sv-bara-app.med.tu-dresden.de:443';  // Replace with your actual Baramundi API URL
-const username = process.env.BARAMUNDI_USERNAME;  // Replace with your username
-const secret = process.env.BARAMUNDI_SECRET;  // Replace with your secret/password
-const baramundiApi = new BaramundiApi(url, username, secret);
-softwareVersionChecker.connectBaramundiApi(baramundiApi)
-
-timer.interval = 3600000
-timer.run()
-
+// 3️⃣ Application Setup
 const app = new App([
   new IndexRoute(),
   new UsersRoute(),
   new AuthRoute(),
   new SoftwareRoute(softwareVersionChecker),
-  new TimerRoute(timer),
+  new TimerRoute(timerController),
   new WebsiteStepsRoute(),
 ])
 
+// 4️⃣ Start Application
+app.listen()
+
+// 5️⃣ Connect APIs after App is Running
+softwareVersionChecker.connectBaramundiApi(app.baramundi)
+
+// 6️⃣ WebSocket Handling (After Server Starts)
 app.io.on('connection', socket => {
-  console.log('New client connected')
+  console.log('[WebSocket] New client connected')
   softwareVersionChecker.connectSocket(socket)
 })
-
-app.listen()
