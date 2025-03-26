@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger'
 import Framework from 'webex-node-bot-framework'
 
 class WebexBot {
@@ -9,17 +10,22 @@ class WebexBot {
   }
 
   public async initialize(): Promise<void> {
+    if (this.isInitialized) {
+      logger.info('ℹ️ Webex Framework already initialized')
+      return Promise.resolve()
+    }
+
     return new Promise(resolve => {
       this.framework.start()
 
       this.framework.on('initialized', () => {
         this.isInitialized = true
-        console.log('✅ Webex Framework initialized successfully!')
+        logger.info('✅ Webex Framework initialized successfully!')
         resolve()
       })
 
       this.framework.on('spawn', bot => {
-        console.log(`🤖 Bot is active in space: ${bot.room.title}`)
+        logger.info(`🤖 Bot is active in space: ${bot.room.title}`)
       })
     })
   }
@@ -36,11 +42,15 @@ class WebexBot {
     })
   }
 
-  public stop(): void {
-    console.log('🛑 Stopping Webex Framework...')
-    this.framework.stop().then(() => {
-      process.exit()
-    })
+  public async stop(): Promise<void> {
+    logger.info('🛑 Stopping Webex Framework...')
+    try {
+      await this.framework.stop()
+      console.log('✅ Webex Framework stopped successfully')
+      this.isInitialized = false
+    } catch (error) {
+      console.error('❌ Error stopping Webex Framework:', error)
+    }
   }
 }
 

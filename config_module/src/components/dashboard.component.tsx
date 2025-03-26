@@ -50,9 +50,10 @@ const DashboardComponent: React.FC = () => {
     dispatch(retrieveWebsites())
 
     const socket = socketIOClient(ENDPOINT)
-    socket.on('updateWebsites', (data: any) => {
+    socket.on('updateSoftware', (data: any) => {
       if (data === 'changed') dispatch(retrieveWebsites())
     })
+
     return () => {
       socket.disconnect()
     }
@@ -104,17 +105,17 @@ const DashboardComponent: React.FC = () => {
   const tabs: CustomTabProps[] = [
     {
       tabType: 'MAIN',
-      tabLabel: 'Software Profile',
+      tabLabel: 'Softwareprofil',
       tabContent: !!software && !!software.length ? <PackageDetails software={software[currentIndex]} /> : <div />,
     },
     {
       tabType: 'CREATE_BDS',
-      tabLabel: 'Create BDS',
+      tabLabel: 'BDS erstellen',
       tabContent: <div />,
     },
     {
       tabType: 'API_CALL',
-      tabLabel: 'API Requests',
+      tabLabel: 'API-Anfragen',
       tabContent: <div />,
     },
   ]

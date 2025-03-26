@@ -1,10 +1,10 @@
 import { SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
 import { checkSoftware, deleteWebsite, updateSoftware } from '../../slices/software.slice'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
-import { Chip, IconButton, Link, ListItem, Stack, Tooltip, Typography, useTheme } from '@mui/material'
+import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress } from '@mui/material'
 import EditIcon from '@mui/icons-material/EditOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
@@ -12,10 +12,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined'
 import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en.json'
-import fetchData from '../../helpers/fetch-data.helper'
-import IState from '../../interfaces/website-state.interface'
-import WebsiteDataService from '../../services/website.service'
+import en from 'javascript-time-ago/locale/de.json'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 
@@ -37,8 +34,9 @@ const variants = {
 export default function WebsitesListItem({ software, index, currentIndex, setActiveWebsite, showHidden }: Props) {
   const { user } = useSelector((state: RootState) => state.auth)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [isChecking, setIsChecking] = useState(false) // Local state to track loading for this item
 
-  const timeAgo = new TimeAgo('en-US')
+  const timeAgo = new TimeAgo('de-DE')
   const dispatch = useAppDispatch()
   const theme = useTheme()
 
@@ -46,8 +44,10 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
     dispatch(deleteWebsite({ id }))
   }
 
-  const checkStatus = (id: string) => {
-    dispatch(checkSoftware(id))
+  const checkStatus = async (id: string) => {
+    setIsChecking(true)
+    await dispatch(checkSoftware(id))
+    setIsChecking(false)
   }
 
   const listItem = () => {
@@ -77,15 +77,19 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
             <Stack direction="column" alignItems="flex-end">
               <Stack direction="row" alignItems="center">
                 <Tooltip title="Prüfen" arrow>
-                  <IconButton
-                    aria-label="prüfen"
-                    onClick={e => {
-                      e.stopPropagation()
-                      checkStatus(software.winget_id)
-                    }}
-                  >
-                    <SensorsOutlinedIcon />
-                  </IconButton>
+                  {isChecking ? (
+                    <CircularProgress color="inherit" size="16px" sx={{ m: '12px' }} />
+                  ) : (
+                    <IconButton
+                      aria-label="prüfen"
+                      onClick={e => {
+                        e.stopPropagation()
+                        checkStatus(software.winget_id)
+                      }}
+                    >
+                      <SensorsOutlinedIcon />
+                    </IconButton>
+                  )}
                 </Tooltip>
                 <Tooltip title={software.is_hidden ? 'Anzeigen' : 'Ausblenden'} arrow>
                   <IconButton

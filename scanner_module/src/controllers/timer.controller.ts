@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 
 class TimerController {
-  private _interval = 3600000
+  private _interval = 86400000 // one day
   public timer: NodeJS.Timer
   public worker: SoftwareVersionChecker
 

@@ -10,7 +10,7 @@ class SoftwareService {
   public software = DB.Software
 
   public async findAllSoftware(): Promise<SoftwareModel[]> {
-    return await this.software.findAll()
+    return await this.software.findAll({ order: ['name'] })
   }
 
   public async findSoftwareById(softwareId: string): Promise<SoftwareModel> {

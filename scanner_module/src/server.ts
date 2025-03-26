@@ -9,6 +9,7 @@ import SoftwareRoute from '@routes/software.route'
 import validateEnv from '@utils/validateEnv'
 import TimerController from '@controllers/timer.controller'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
+import { logger } from './utils/logger'
 
 // 1️⃣ Environment Setup
 process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
@@ -17,7 +18,7 @@ validateEnv()
 // 2️⃣ Dependency Initialization
 const softwareVersionChecker = new SoftwareVersionChecker()
 const timerController = new TimerController(softwareVersionChecker)
-timerController.interval = 3600000 // 1 hour
+timerController.interval = 8640000 // 6 Minutes
 timerController.run()
 
 // 3️⃣ Application Setup
@@ -38,16 +39,16 @@ softwareVersionChecker.connectBaramundiApi(app.baramundi)
 
 // 6️⃣ WebSocket Handling (After Server Starts)
 app.io.on('connection', socket => {
-  console.log('[WebSocket] New client connected')
+  logger.info('[WebSocket] New client connected')
   softwareVersionChecker.connectSocket(socket)
 })
 
 // Wait for initialization, then send message
-app.webexBot.initialize().then(() => {
-  console.log('📢 Bot is ready to send messages.')
+// app.webexBot.initialize().then(() => {
+//   logger.info('📢 Bot is ready to send messages.')
 
-  // app.webexBot.sendMessage(
-  //   'Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYTQyM2Q3YjAtMDhjNC0xMWYwLWE2NTctZGRhYzZlMTVkNWM1',
-  //   'Hier kommt ein Bericht!',
-  // )
-})
+//   // app.webexBot.sendMessage(
+//   //   'Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYTQyM2Q3YjAtMDhjNC0xMWYwLWE2NTctZGRhYzZlMTVkNWM1',
+//   //   'Hier kommt ein Bericht!',
+//   // )
+// })

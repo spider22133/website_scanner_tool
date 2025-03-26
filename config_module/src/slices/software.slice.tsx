@@ -285,7 +285,7 @@ const websiteSlice = createSlice({
       state.loading = true
     })
     builder.addCase(createSoftware.fulfilled, (state, { payload }) => {
-      state.software.push({
+      state.software.unshift({
         ...payload,
         details: JSON.parse(payload.details as string) as WingetPackageDetails,
       })

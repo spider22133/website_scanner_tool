@@ -78,7 +78,7 @@ class App {
 
   private async connectToDatabase() {
     try {
-      await DB.sequelize.sync({ alter: true })
+      await DB.sequelize.sync({ force: false })
       await initRoles()
       logger.info('✅ Database connected successfully')
     } catch (error) {
@@ -142,6 +142,12 @@ class App {
     process.on('SIGINT', () => {
       logger.info('🛑 Gracefully shutting down the server...')
       this.webexBot?.stop()
+      process.exit(0)
+    })
+
+    process.on('SIGTERM', async () => {
+      logger.info('🛑 Gracefully shutting down the server...')
+      await this.webexBot?.stop()
       process.exit(0)
     })
   }
