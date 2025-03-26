@@ -27,7 +27,7 @@ export default function Header() {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/dashboard'}>
-                Version Control Dashboard
+                Versionskontroll-Dashboard
               </NavLink>
             </li>
           </ul>
@@ -36,22 +36,22 @@ export default function Header() {
             <ul className="navbar-nav">
               <li className="nav-item">
                 <div className="nav-link">
-                  Hello, {user.firstName} {user.lastName}
+                  Hallo, {user.firstName} {user.lastName}
                 </div>
               </li>
               <li className="nav-item">
                 <button className="btn btn-outline-danger btn-sm mt-1" onClick={() => dispatch(logout())}>
-                  Logout
+                  Abmelden
                 </button>
               </li>
             </ul>
           ) : (
             <div>
               <Link className="btn btn-outline-success" to="/login">
-                Login
+                Anmelden
               </Link>
               <Link className="btn btn-outline" to="/signup">
-                Signup
+                Registrieren
               </Link>
             </div>
           )}

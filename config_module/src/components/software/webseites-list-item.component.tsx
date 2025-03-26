@@ -76,9 +76,9 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
           <div className="">
             <Stack direction="column" alignItems="flex-end">
               <Stack direction="row" alignItems="center">
-                <Tooltip title="Check" arrow>
+                <Tooltip title="Prüfen" arrow>
                   <IconButton
-                    aria-label="check"
+                    aria-label="prüfen"
                     onClick={e => {
                       e.stopPropagation()
                       checkStatus(software.winget_id)
@@ -87,9 +87,9 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                     <SensorsOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title={software.is_hidden ? 'Show' : 'Hide'} arrow>
+                <Tooltip title={software.is_hidden ? 'Anzeigen' : 'Ausblenden'} arrow>
                   <IconButton
-                    aria-label="toggle visibility"
+                    aria-label="Sichtbarkeit umschalten"
                     onClick={e => {
                       e.stopPropagation()
                       dispatch(updateSoftware({ ...software, is_hidden: !software.is_hidden }))
@@ -99,19 +99,19 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                   </IconButton>
                 </Tooltip>
                 {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
-                  <Tooltip title="Edit" arrow>
-                    <IconButton aria-label="edit" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
+                  <Tooltip title="Bearbeiten" arrow>
+                    <IconButton aria-label="bearbeiten" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
                 )}
                 {user.roles && user.roles.includes('ROLE_ADMIN') && (
-                  <Tooltip title="Delete" arrow>
+                  <Tooltip title="Löschen" arrow>
                     <IconButton
-                      aria-label="edit"
+                      aria-label="löschen"
                       color="error"
                       onClick={() => {
-                        window.confirm('Are you sure you wish to delete this item?') ? handleRemove(software.winget_id) : ''
+                        window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?') ? handleRemove(software.winget_id) : ''
                       }}
                     >
                       <DeleteIcon />

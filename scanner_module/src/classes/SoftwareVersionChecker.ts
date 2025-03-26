@@ -55,7 +55,7 @@ class SoftwareVersionChecker {
       const resultAppList = await this._baramundi.findApplicationByName(updatedSoftware.name)
 
       for (const app of resultAppList) {
-        if (app.Name.includes('Aktuell')) {
+        if (/Aktuell\b/i.test(app.Name)) {
           currentBaramundiAppId = app.Id
         }
         if (app.Name.includes(updatedSoftware.version)) {

@@ -44,7 +44,9 @@ const AppSearchBar: React.FC = () => {
         noOptionsText="Keine Suchergebnisse"
         onInputChange={handleSearchChange}
         onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
-        renderInput={params => <TextField {...params} variant="outlined" label="Search" placeholder="Enter searched application name..." fullWidth />}
+        renderInput={params => (
+          <TextField {...params} variant="outlined" label="Suche" placeholder="Geben Sie den Namen der gesuchten Anwendung ein..." fullWidth />
+        )}
         renderOption={(props, option) => {
           if (typeof option === 'string') return null // Prevent rendering invalid options
           return (
@@ -63,7 +65,7 @@ const AppSearchBar: React.FC = () => {
       />
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <IconButton title="Add new application to the list" disabled={!selectedSoftware} onClick={handleAddToList} color="primary" size="large">
+        <IconButton title="Neue Anwendung zur Liste hinzufügen" disabled={!selectedSoftware} onClick={handleAddToList} color="primary" size="large">
           <PlaylistAddIcon />
         </IconButton>
       </Box>

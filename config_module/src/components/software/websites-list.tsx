@@ -4,8 +4,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../store'
 import { Box, List, Typography, Tooltip, IconButton } from '@mui/material'
-import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
-import Visibility from '@mui/icons-material/VisibilityOutlined'
 import AppFilterBar from '../elements/app-filter-bar.component'
 
 type Props = {
@@ -27,7 +25,7 @@ const WebsitesList: React.FC<Props> = ({ setActiveWebsite, handleClickToggle, cu
       <AppFilterBar value={showHidden} handleClickToggle={handleClickToggle} />
       <Box sx={{ width: '100%', textAlign: 'right', mt: 2 }}>
         <Typography variant="body2">
-          Hidden: {countByVisibility(true)} / Visible: {countByVisibility(false)} / Total: {software.length}
+          Ausgeblendet: {countByVisibility(true)} / Sichtbar: {countByVisibility(false)} / Gesamt: {software.length}
         </Typography>
       </Box>
       <List>

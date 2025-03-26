@@ -249,6 +249,7 @@ const websiteSlice = createSlice({
         state.software[index] = {
           ...state.software[index],
           ...payload,
+          details: JSON.parse(payload.details as string) as WingetPackageDetails,
         }
       }
     })

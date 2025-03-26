@@ -38,7 +38,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography className="fw-bold" color="text.secondary">
-                Description
+                Beschreibung
               </Typography>
               <Typography variant="body2" fontWeight={500}>
                 {description}
@@ -51,14 +51,14 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
-              Publisher
+              Herausgeber
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {publisher || 'Unknown Publisher'}
+              {publisher || 'Unbekannter Herausgeber'}
             </Typography>
             {publisherUrl && (
               <Typography variant="body2">
-                Website:{' '}
+                Webseite:{' '}
                 <Link href={publisherUrl} target="_blank" rel="noopener">
                   {publisherUrl}
                 </Link>
@@ -89,20 +89,20 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
                 </Typography>
               )}
               {installer.sha256 && (
-                <Tooltip title="SHA256 Checksum" arrow>
+                <Tooltip title="SHA256-Prüfsumme" arrow>
                   <Typography variant="body2" sx={{ wordBreak: 'break-word', fontSize: '0.9rem' }}>
                     SHA256: {installer.sha256}
                   </Typography>
                 </Tooltip>
               )}
-              {installer.releaseDate && <Typography variant="body2">Released: {installer.releaseDate}</Typography>}
+              {installer.releaseDate && <Typography variant="body2">Veröffentlicht: {installer.releaseDate}</Typography>}
             </Grid>
           )}
 
           {/* License Information */}
           <Grid item xs={12}>
             <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
-              License
+              Lizenz
             </Typography>
             {license && (
               <Typography variant="body2">
@@ -117,7 +117,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
             {copyright && <Typography variant="body2">{copyright}</Typography>}
             {homepage && (
               <Typography variant="body2">
-                Homepage:{' '}
+                Startseite:{' '}
                 <Link href={homepage} target="_blank" rel="noopener">
                   {homepage}
                 </Link>

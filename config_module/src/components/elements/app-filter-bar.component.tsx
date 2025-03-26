@@ -51,7 +51,7 @@ const AppFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
         noOptionsText="Keine Suchergebnisse"
         onInputChange={handleSearchChange}
         onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
-        renderInput={params => <TextField {...params} variant="outlined" label="Filter" placeholder="Filter by name..." fullWidth />}
+        renderInput={params => <TextField {...params} variant="outlined" label="Filter" placeholder="Nach Namen filtern..." fullWidth />}
         renderOption={(props, option) => {
           if (typeof option === 'string') return null // Prevent rendering invalid options
           return (
@@ -71,8 +71,8 @@ const AppFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
       />
 
       <Box sx={{ display: 'flex', alignItems: 'center', pr: 2 }}>
-        <Tooltip title={value ? 'Hide' : 'Show'} arrow>
-          <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end">
+        <Tooltip title={value ? 'Ausblenden' : 'Anzeigen'} arrow>
+          <IconButton aria-label="Sichtbarkeit umschalten" onClick={handleClickToggle} edge="end">
             {value ? <VisibilityOff /> : <Visibility />}
           </IconButton>
         </Tooltip>
