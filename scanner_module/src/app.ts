@@ -43,7 +43,7 @@ class App {
     this.io = new Server(this.httpServer, { cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] } })
 
     // Load Baramundi credentials from env variables
-    this.baraUrl = process.env.BARAMUNDI_URL || 'https://sv-bara-app.med.tu-dresden.de:443'
+    this.baraUrl = process.env.BARAMUNDI_URL
     this.baraUsername = process.env.BARAMUNDI_USERNAME
     this.baraSecret = process.env.BARAMUNDI_SECRET
 
@@ -78,7 +78,7 @@ class App {
 
   private async connectToDatabase() {
     try {
-      await DB.sequelize.sync({ force: false })
+      await DB.sequelize.sync({ alter: true })
       await initRoles()
       logger.info('✅ Database connected successfully')
     } catch (error) {

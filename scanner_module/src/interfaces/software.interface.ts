@@ -5,6 +5,7 @@ export interface Software {
   name: string
   winget_id: string
   version: string
+  bara_version: string
   source: string
   details: string
   is_hidden: boolean

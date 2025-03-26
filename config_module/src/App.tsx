@@ -10,9 +10,27 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import 'bootstrap/dist/css/bootstrap.css'
 import DashboardComponent from './components/dashboard.component'
 
+import { useSnackbar } from 'notistack'
+import { RootState } from './store'
+import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+
 const theme = createTheme()
 
 function App() {
+  const { enqueueSnackbar } = useSnackbar()
+  const messages = useSelector((state: RootState) => state.messages)
+
+  useEffect(() => {
+    if (messages) {
+      console.log(messages)
+
+      messages.forEach(item => {
+        enqueueSnackbar(item.message, { variant: item.variant })
+      })
+    }
+  }, [messages])
+
   return (
     <ThemeProvider theme={theme}>
       <Header />

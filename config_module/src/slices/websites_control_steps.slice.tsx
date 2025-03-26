@@ -71,7 +71,7 @@ export const getStepsByWebsiteId = createAsyncThunk<
     if (!error.response) {
       throw err
     }
-    dispatch(setMessage(error.response.data.message))
+    dispatch(setMessage({ message: error.response.data.message }))
     return rejectWithValue(error.response.data)
   }
 })
@@ -91,7 +91,7 @@ export const deleteWebsiteControlSteps = createAsyncThunk<
     if (!error.response) {
       throw err
     }
-    dispatch(setMessage(error.response.data.message))
+    dispatch(setMessage({ message: error.response.data.message }))
     return rejectWithValue(error.response.data)
   }
 })

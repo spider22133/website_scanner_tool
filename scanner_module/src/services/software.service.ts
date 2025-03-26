@@ -23,19 +23,19 @@ class SoftwareService {
     return findSoftware
   }
 
-  public async updateSoftware(id: number, data: CreateSoftwareDto): Promise<Software> {
-    const findSoftware: Software = await this.software.findByPk(id)
+  public async updateSoftware(id: string, data: CreateSoftwareDto): Promise<SoftwareModel> {
+    const findSoftware = await this.software.findOne({ where: { winget_id: id } })
     if (!findSoftware) throw new HttpException(409, 'There is no software with such id')
 
-    await this.software.update(data, { where: { id: id } })
+    await this.software.update(data, { where: { winget_id: id } })
 
-    return await this.software.findByPk(id)
+    return await this.software.findOne({ where: { winget_id: id } })
   }
 
-  public async createSoftware(softwareData: CreateSoftwareDto): Promise<Software> {
+  public async createSoftware(softwareData: CreateSoftwareDto): Promise<SoftwareModel> {
     if (isEmpty(softwareData)) throw new HttpException(400, 'Software data is empty')
 
-    const findSoftware: Software = await this.software.findOne({ where: { winget_id: softwareData.winget_id } })
+    const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: softwareData.winget_id } })
     if (findSoftware) throw new HttpException(409, `Winget ID ${softwareData.winget_id} already exists`)
 
     const software = await this.software.create(softwareData)

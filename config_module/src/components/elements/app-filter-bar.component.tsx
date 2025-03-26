@@ -3,22 +3,22 @@ import { createSoftware, queryWinGetSoftware } from '../../slices/software.slice
 import { useState, useMemo } from 'react'
 import { RootState, useAppDispatch } from '../../store'
 import { useSelector } from 'react-redux'
-import { WinGetSoftwareEntry } from '../../../../types/common'
+import { SoftwareEntry } from '../../../../types/common'
 import { debounce } from 'lodash'
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 
 type Props = {
   value: boolean
   handleClickToggle?: () => void
 }
 
-const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
+const AppFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
   const dispatch = useAppDispatch()
   const softwareList = useSelector((state: RootState) => state.software.softwareSearchList || [])
   const [inputValue, setInputValue] = useState('')
-  const [selectedSoftware, setSelectedSoftware] = useState<WinGetSoftwareEntry | null>(null)
+  const [selectedSoftware, setSelectedSoftware] = useState<SoftwareEntry | null>(null)
 
   const debouncedSearch = useMemo(
     () =>
@@ -51,7 +51,7 @@ const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
         noOptionsText="Keine Suchergebnisse"
         onInputChange={handleSearchChange}
         onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
-        renderInput={params => <TextField {...params} variant="outlined" label="Search" fullWidth />}
+        renderInput={params => <TextField {...params} variant="outlined" label="Filter" placeholder="Filter by name..." fullWidth />}
         renderOption={(props, option) => {
           if (typeof option === 'string') return null // Prevent rendering invalid options
           return (
@@ -66,21 +66,19 @@ const SearchFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
           )
         }}
         sx={{ flexGrow: 1 }}
+        size="small"
         freeSolo
       />
 
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <IconButton disabled={!selectedSoftware} onClick={handleAddToList} color="primary" size="large">
-          <AddCircleOutlineOutlinedIcon />
-        </IconButton>
+      <Box sx={{ display: 'flex', alignItems: 'center', pr: 2 }}>
+        <Tooltip title={value ? 'Hide' : 'Show'} arrow>
+          <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end">
+            {value ? <VisibilityOff /> : <Visibility />}
+          </IconButton>
+        </Tooltip>
       </Box>
-      <Tooltip title={value ? 'Hide' : 'Show'} arrow>
-        <IconButton aria-label="toggle visibility" onClick={handleClickToggle} edge="end">
-          {value ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
-      </Tooltip>
     </Stack>
   )
 }
 
-export default SearchFilterBar
+export default AppFilterBar

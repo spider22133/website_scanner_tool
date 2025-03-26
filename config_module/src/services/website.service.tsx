@@ -1,5 +1,5 @@
 import http from '../http-connection'
-import { WinGetSoftwareEntry } from '../../../types/common'
+import { SoftwareEntry } from '../../../types/common'
 
 type createProps = {
   name: string
@@ -18,7 +18,7 @@ const getWebsiteMainStepStates = (id: string) => {
   return http.get(`/software/${id}/main_states`)
 }
 
-const update = (data: WinGetSoftwareEntry) => {
+const update = (data: SoftwareEntry) => {
   const { winget_id, name, is_hidden } = data
   return http.put(`/software/${winget_id}`, { name, is_hidden })
 }
@@ -31,7 +31,7 @@ const create = (data: createProps) => {
   return http.post('/software/create', data)
 }
 
-const createSoftware = (data: WinGetSoftwareEntry) => {
+const createSoftware = (data: SoftwareEntry) => {
   return http.post('/software/create', data)
 }
 

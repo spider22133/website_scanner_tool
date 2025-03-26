@@ -8,7 +8,8 @@
 
 import util from 'util'
 import { exec } from 'child_process'
-import { BaramundiSearch } from '@/types/baramundi'
+import { BaramundiSearch, SoftwareType } from '@/types/baramundi'
+import { str } from 'envalid'
 
 const execPromise = util.promisify(exec) // Promisify exec for async/await
 
@@ -61,6 +62,11 @@ export class BaramundiApi {
 
   public async findApplicationByName(term: string): Promise<BaramundiSearch[]> {
     const endpoint = `/bConnect/v1.1/Search?type=software&term=${encodeURIComponent(term)}`
+    return await this.sendRequest(endpoint, 'GET')
+  }
+
+  public async getApplicationById(id: string): Promise<SoftwareType> {
+    const endpoint = `/bConnect/v1.1/Applications?id=${id}`
     return await this.sendRequest(endpoint, 'GET')
   }
 

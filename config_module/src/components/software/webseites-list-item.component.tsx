@@ -1,6 +1,6 @@
-import { WinGetSoftwareEntry } from '../../../../types/common'
+import { SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
-import { deleteWebsite, updateWebsite } from '../../slices/software.slice'
+import { checkSoftware, deleteWebsite, updateSoftware } from '../../slices/software.slice'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
@@ -23,10 +23,10 @@ TimeAgo.addDefaultLocale(en)
 
 type Props = {
   index: number
-  software: WinGetSoftwareEntry
+  software: SoftwareEntry
   currentIndex: number
   showHidden: boolean
-  setActiveWebsite: (software: WinGetSoftwareEntry, index: number) => void
+  setActiveWebsite: (software: SoftwareEntry, index: number) => void
 }
 
 const variants = {
@@ -37,7 +37,6 @@ const variants = {
 export default function WebsitesListItem({ software, index, currentIndex, setActiveWebsite, showHidden }: Props) {
   const { user } = useSelector((state: RootState) => state.auth)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [latestState, setLatestState] = useState<IState>()
 
   const timeAgo = new TimeAgo('en-US')
   const dispatch = useAppDispatch()
@@ -48,7 +47,7 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
   }
 
   const checkStatus = (id: string) => {
-    fetchData(WebsiteDataService.checkStatus(id), setLatestState)
+    dispatch(checkSoftware(id))
   }
 
   const listItem = () => {
@@ -93,7 +92,7 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                     aria-label="toggle visibility"
                     onClick={e => {
                       e.stopPropagation()
-                      dispatch(updateWebsite({ ...software, is_hidden: !software.is_hidden }))
+                      dispatch(updateSoftware({ ...software, is_hidden: !software.is_hidden }))
                     }}
                   >
                     {software.is_hidden ? <VisibilityOff /> : <Visibility />}
@@ -120,13 +119,13 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                   </Tooltip>
                 )}
               </Stack>
-              {latestState && (
+              {software.updatedAt && (
                 <Chip
                   icon={<DoneAllOutlinedIcon />}
                   sx={{ '& .MuiChip-iconSmall': { ml: '5px' } }}
                   variant="outlined"
                   size="small"
-                  label={timeAgo.format(new Date(latestState.createdAt))}
+                  label={timeAgo.format(new Date(software.updatedAt))}
                 />
               )}
             </Stack>

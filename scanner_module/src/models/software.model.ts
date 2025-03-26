@@ -1,6 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, HasManyGetAssociationsMixin, Association, HasManyCreateAssociationMixin } from 'sequelize'
 import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
+import { str } from 'envalid'
 
 export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source'>
 
@@ -9,6 +10,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public name: string
   public winget_id: string
   public version: string
+  public bara_version: string
   public source: string
   public details: string
   public is_hidden: boolean
@@ -40,6 +42,9 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
         type: DataTypes.STRING,
       },
       version: {
+        type: DataTypes.STRING,
+      },
+      bara_version: {
         type: DataTypes.STRING,
       },
       source: {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import IWebsite from '../../interfaces/website.interface'
-import { WinGetSoftwareEntry } from '../../../../types/common'
+import { SoftwareEntry } from '../../../../types/common'
 
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -9,7 +9,7 @@ import * as Yup from 'yup'
 import { RootState, useAppDispatch } from '../../store'
 import { useSelector } from 'react-redux'
 import { clearMessage } from '../../slices/message.slice'
-import { updateWebsite } from '../../slices/software.slice'
+import { updateSoftware } from '../../slices/software.slice'
 import { sleep } from '../../helpers/animation.helper'
 import { APIErrorNotification } from '../elements/error-notification.component'
 import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Stack } from '@mui/material'
@@ -22,7 +22,7 @@ const validationSchema = Yup.object().shape({
 })
 
 type Props = {
-  software: WinGetSoftwareEntry
+  software: SoftwareEntry
   setShowAddForm: React.Dispatch<React.SetStateAction<boolean>>
   showAddForm: boolean
 }
@@ -48,14 +48,15 @@ export default function EditWebsite({ software, setShowAddForm, showAddForm }: P
   const onSubmit: SubmitHandler<IWebsite> = data => {
     const { name } = data
     dispatch(
-      updateWebsite({
+      updateSoftware({
         winget_id: software.winget_id,
         name: name || software.name,
         version: '',
+        bara_version: '',
         source: '',
       }),
     ).then(async response => {
-      if (updateWebsite.fulfilled.match(response)) {
+      if (updateSoftware.fulfilled.match(response)) {
         dispatch(clearMessage(software.winget_id))
         await sleep(1000)
         setShowAddForm(false)

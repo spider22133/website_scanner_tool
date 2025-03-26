@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { WingetPackageDetails, WinGetSoftwareEntry } from '../../../types/common'
+import { WingetPackageDetails, SoftwareEntry } from '../../../types/common'
 import { logger } from '@utils/logger'
 
 const execAsync = promisify(exec)
@@ -28,7 +28,7 @@ export class WingetUtils {
     }
   }
 
-  public static async searchSoftware(query: string): Promise<WinGetSoftwareEntry[]> {
+  public static async searchSoftware(query: string): Promise<SoftwareEntry[]> {
     try {
       const stdout = await this.execWingetCommand(`winget search --name "${query.trim()}"`)
       return this.parseSoftwareTable(stdout)
@@ -38,10 +38,10 @@ export class WingetUtils {
     }
   }
 
-  private static parseSoftwareTable(input: string): WinGetSoftwareEntry[] {
+  private static parseSoftwareTable(input: string): SoftwareEntry[] {
     const lines = input.split('\n').slice(2) // Skip header lines
 
-    const entries: WinGetSoftwareEntry[] = []
+    const entries: SoftwareEntry[] = []
 
     for (const line of lines) {
       const parts = line.trim().split(/\s+/)
@@ -89,11 +89,11 @@ export class WingetUtils {
     let currentSection = ''
 
     const mapping: Record<string, keyof WingetPackageDetails> = {
+      version: 'version',
       publisher: 'publisher',
       'publisher url': 'publisherUrl',
       'publisher support url': 'publisherSupportUrl',
       author: 'author',
-      moniker: 'moniker',
       description: 'description',
       homepage: 'homepage',
       license: 'license',
@@ -101,6 +101,7 @@ export class WingetUtils {
       'privacy url': 'privacyUrl',
       copyright: 'copyright',
       'copyright url': 'copyrightUrl',
+      'release notes': 'releaseNotes',
     }
 
     const installerMapping: Record<string, keyof WingetPackageDetails['installer']> = {

@@ -8,15 +8,18 @@ import { Provider } from 'react-redux'
 import store from './store'
 import { StyledEngineProvider } from '@mui/system'
 import { CssBaseline } from '@mui/material'
+import { SnackbarProvider } from 'notistack'
 
 ReactDOM.render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
       <Provider store={store}>
-        <BrowserRouter>
-          <CssBaseline />
-          <App />
-        </BrowserRouter>
+        <SnackbarProvider maxSnack={3}>
+          <BrowserRouter>
+            <CssBaseline />
+            <App />
+          </BrowserRouter>
+        </SnackbarProvider>
       </Provider>
     </StyledEngineProvider>
   </React.StrictMode>,

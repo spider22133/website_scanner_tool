@@ -1,9 +1,9 @@
-import { iniState } from '../../slices/message.slice'
+import { MessageState } from '../../slices/message.slice'
 import { Alert } from '@mui/material'
 
 type Props = {
   websiteId: string
-  messages: iniState[]
+  messages: MessageState[]
 }
 export const APIErrorNotification = ({ messages, websiteId }: Props) => {
   return (

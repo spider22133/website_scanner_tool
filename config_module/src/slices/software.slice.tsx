@@ -1,18 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { WingetPackageDetails, WinGetSoftwareEntry } from '../../../types/common'
+import { WingetPackageDetails, SoftwareEntry } from '../../../types/common'
 import WebsiteDataService from '../services/website.service'
 import { AxiosError } from 'axios'
 import { setMessage } from './message.slice'
 import httpErrors from '../interfaces/api.error.interface'
 
 const initialState = {
-  softwareSearchList: [] as WinGetSoftwareEntry[],
-  software: [] as WinGetSoftwareEntry[],
+  softwareSearchList: [] as SoftwareEntry[],
+  software: [] as SoftwareEntry[],
   loading: false as boolean,
 }
 
 type setErrorType = {
-  data: WinGetSoftwareEntry
+  data: SoftwareEntry
   id: string
 }
 
@@ -37,8 +37,8 @@ type setErrorType = {
 // })
 
 export const createSoftware = createAsyncThunk<
-  WinGetSoftwareEntry,
-  WinGetSoftwareEntry,
+  SoftwareEntry,
+  SoftwareEntry,
   {
     rejectValue: httpErrors
   }
@@ -56,9 +56,9 @@ export const createSoftware = createAsyncThunk<
   }
 })
 
-export const updateWebsite = createAsyncThunk<
-  WinGetSoftwareEntry,
-  WinGetSoftwareEntry,
+export const updateSoftware = createAsyncThunk<
+  SoftwareEntry,
+  SoftwareEntry,
   {
     rejectValue: httpErrors
   }
@@ -77,8 +77,39 @@ export const updateWebsite = createAsyncThunk<
   }
 })
 
+export const checkSoftware = createAsyncThunk<
+  SoftwareEntry | void, // Can return SoftwareEntry or void
+  string,
+  {
+    rejectValue: httpErrors
+  }
+>('software/check', async (id, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await WebsiteDataService.checkStatus(id)
+    const { software, message } = res.data
+
+    if (software) {
+      return software // Return software if it exists
+    }
+
+    if (message) {
+      dispatch(setMessage({ id, message, variant: 'error' }))
+      return
+    }
+
+    return
+  } catch (err: any) {
+    const error: AxiosError<httpErrors> = err
+    if (!error.response) {
+      throw err
+    }
+    dispatch(setMessage({ message: error.response.data.message }))
+    return rejectWithValue(error.response.data)
+  }
+})
+
 export const retrieveWebsites = createAsyncThunk<
-  WinGetSoftwareEntry[],
+  SoftwareEntry[],
   void,
   {
     rejectValue: httpErrors
@@ -92,7 +123,7 @@ export const retrieveWebsites = createAsyncThunk<
     if (!error.response) {
       throw err
     }
-    dispatch(setMessage(error.response.data.message))
+    dispatch(setMessage({ message: error.response.data.message }))
     return rejectWithValue(error.response.data)
   }
 })
@@ -132,13 +163,13 @@ export const deleteWebsite = createAsyncThunk<
     if (!error.response) {
       throw err
     }
-    dispatch(setMessage(error.response.data.message))
+    dispatch(setMessage({ message: error.response.data.message }))
     return rejectWithValue(error.response.data)
   }
 })
 
 export const queryWinGetSoftware = createAsyncThunk<
-  WinGetSoftwareEntry[],
+  SoftwareEntry[],
   string,
   {
     rejectValue: httpErrors
@@ -152,7 +183,7 @@ export const queryWinGetSoftware = createAsyncThunk<
     if (!error.response) {
       throw err
     }
-    dispatch(setMessage(error.response.data.message))
+    dispatch(setMessage({ message: error.response.data.message }))
     return rejectWithValue(error.response.data)
   }
 })
@@ -189,11 +220,11 @@ const websiteSlice = createSlice({
       state.loading = false
     })
 
-    // Update website
-    builder.addCase(updateWebsite.pending, (state, {}) => {
+    // Update software
+    builder.addCase(updateSoftware.pending, (state, {}) => {
       state.loading = true
     })
-    builder.addCase(updateWebsite.fulfilled, (state, { payload }) => {
+    builder.addCase(updateSoftware.fulfilled, (state, { payload }) => {
       const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
 
       state.loading = false
@@ -202,7 +233,26 @@ const websiteSlice = createSlice({
         ...payload,
       }
     })
-    builder.addCase(updateWebsite.rejected, state => {
+    builder.addCase(updateSoftware.rejected, state => {
+      state.loading = false
+    })
+
+    // Check software
+    builder.addCase(checkSoftware.pending, (state, {}) => {
+      state.loading = true
+    })
+    builder.addCase(checkSoftware.fulfilled, (state, { payload }) => {
+      if (payload) {
+        const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
+
+        state.loading = false
+        state.software[index] = {
+          ...state.software[index],
+          ...payload,
+        }
+      }
+    })
+    builder.addCase(checkSoftware.rejected, state => {
       state.loading = false
     })
 

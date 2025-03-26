@@ -1,28 +1,30 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export interface iniState {
-  id: string
+// Corrected interface name
+export interface MessageState {
+  id?: string
   message: string
+  variant?: 'error' | 'info' | 'success' | 'warning' // Removed generic string
 }
 
-const initialState: iniState[] = []
+// Initial state is an array of messages
+const initialState: MessageState[] = []
 
 const messageSlice = createSlice({
   name: 'message',
   initialState,
   reducers: {
-    setMessage: (state, { payload }) => {
+    setMessage: (state, { payload }: PayloadAction<MessageState>) => {
       const index = state.findIndex(item => item.id === payload.id)
-      if (index === -1) state.push(payload)
-      else
-        state[index] = {
-          ...state[index],
-          ...payload,
-        }
+      if (index === -1) {
+        state.push(payload)
+      } else {
+        state[index] = { ...state[index], ...payload }
+      }
     },
-    clearMessage: (state, { payload }) => {
-      const newList: iniState[] = state.filter(item => item.id !== payload)
-      return [...newList]
+    clearMessage: (state, { payload }: PayloadAction<string>) => {
+      const index = state.findIndex(item => item.id === payload)
+      if (index !== -1) state.splice(index, 1) // Mutate state directly
     },
   },
 })

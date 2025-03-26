@@ -41,3 +41,13 @@ app.io.on('connection', socket => {
   console.log('[WebSocket] New client connected')
   softwareVersionChecker.connectSocket(socket)
 })
+
+// Wait for initialization, then send message
+app.webexBot.initialize().then(() => {
+  console.log('📢 Bot is ready to send messages.')
+
+  // app.webexBot.sendMessage(
+  //   'Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYTQyM2Q3YjAtMDhjNC0xMWYwLWE2NTctZGRhYzZlMTVkNWM1',
+  //   'Hier kommt ein Bericht!',
+  // )
+})

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { WinGetSoftwareEntry } from '../../../../types/common'
+import { SoftwareEntry } from '../../../../types/common'
 import { sleep } from '../../helpers/animation.helper'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { RootState, useAppDispatch } from '../../store'
@@ -38,7 +38,7 @@ export default function AddWebsite({ setShowAddForm, showAddForm }: Props) {
 
   const dispatch = useAppDispatch()
 
-  const onSubmit: SubmitHandler<WinGetSoftwareEntry> = async data => {
+  const onSubmit: SubmitHandler<SoftwareEntry> = async data => {
     dispatch(createSoftware(data)).then(async response => {
       if (createSoftware.fulfilled.match(response)) {
         dispatch(clearMessage('add'))

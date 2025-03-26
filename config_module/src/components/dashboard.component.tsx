@@ -16,10 +16,10 @@ import { useSelector } from 'react-redux'
 import { Box, Container, Paper, Grid, Button, Alert, CircularProgress } from '@mui/material'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
 import WebsitesList from './software/websites-list'
-import SearchFilterBar from './elements/search-filter-bar.component'
+import AppSearchBar from './elements/app-search-bar.component'
 import socketIOClient from 'socket.io-client'
 import TabsComponent from './software/tabs.component'
-import { WinGetSoftwareEntry } from '../../../types/common'
+import { SoftwareEntry } from '../../../types/common'
 import { CustomTabProps } from '../interfaces/common'
 import PackageDetails from './software/package-details.component'
 
@@ -73,7 +73,7 @@ const DashboardComponent: React.FC = () => {
     onPageChange()
   }, [states])
 
-  const setActiveWebsite = (website: WinGetSoftwareEntry, index: number) => {
+  const setActiveWebsite = (website: SoftwareEntry, index: number) => {
     setCurrentIndex(index)
     setCurrentPage(1)
     // getAggrStates(website.winget_id)
@@ -125,13 +125,18 @@ const DashboardComponent: React.FC = () => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Paper sx={{ py: 3, px: 3 }}>
-              <SearchFilterBar value={value.toggleVisible} handleClickToggle={handleClickToggle} />
+              <AppSearchBar />
             </Paper>
           </Grid>
           <Grid item xs={12} lg={5}>
             <Box sx={{ position: { lg: 'sticky' }, top: { lg: 16 } }}>
               <Paper sx={{ p: 3, mb: 2 }}>
-                <WebsitesList currentIndex={currentIndex} showHidden={value.toggleVisible} setActiveWebsite={setActiveWebsite} />
+                <WebsitesList
+                  currentIndex={currentIndex}
+                  showHidden={value.toggleVisible}
+                  setActiveWebsite={setActiveWebsite}
+                  handleClickToggle={handleClickToggle}
+                />
               </Paper>
               <motion.div
                 animate={showAddForm ? 'open' : 'closed'}

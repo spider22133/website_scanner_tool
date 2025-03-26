@@ -1,39 +1,35 @@
-export interface SoftwareEntry {
-  url: string
-  pattern: string
-  mainSelector: string
-}
-
 export interface WingetPackageDetails {
-  publisher?: string
-  publisherUrl?: string
-  publisherSupportUrl?: string
-  author?: string
-  moniker?: string
-  description?: string
-  homepage?: string
-  license?: string
-  licenseUrl?: string
-  privacyUrl?: string
-  copyright?: string
-  copyrightUrl?: string
+  version?: string;
+  publisher?: string;
+  publisherUrl?: string;
+  publisherSupportUrl?: string;
+  author?: string;
+  description?: string;
+  homepage?: string;
+  license?: string;
+  licenseUrl?: string;
+  privacyUrl?: string;
+  copyright?: string;
+  copyrightUrl?: string;
+  releaseNotes?: string;
   installer?: {
-    type?: string
-    locale?: string
-    url?: string
-    sha256?: string
-    releaseDate?: string
-    offlineSupported?: boolean
-  }
+    type?: string;
+    locale?: string;
+    url?: string;
+    sha256?: string;
+    releaseDate?: string;
+    offlineSupported?: boolean;
+  };
 }
 
-export interface WinGetSoftwareEntry {
-  name: string
-  winget_id: string
-  version: string
-  source: string
-  details?: WingetPackageDetails
-  is_hidden?: boolean
-  is_current?: boolean
-  updatedAt?: string
+export interface SoftwareEntry {
+  name: string;
+  winget_id: string;
+  version: string;
+  bara_version?: string;
+  source: string;
+  details?: WingetPackageDetails;
+  is_hidden?: boolean;
+  is_current?: boolean;
+  updatedAt?: string;
 }

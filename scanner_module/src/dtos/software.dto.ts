@@ -8,6 +8,9 @@ export default class CreateSoftwareDto {
   public version: string
 
   @IsString()
+  public bara_version: string
+
+  @IsString()
   public source: string
 
   @IsString()

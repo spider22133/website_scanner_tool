@@ -3,6 +3,10 @@ import { Socket } from 'socket.io'
 import { SoftwareModel } from '@models/software.model'
 import SoftwareVersionService from '@services/software_versions.service'
 import { BaramundiApi } from './BaramundiApi'
+import { WingetUtils } from './WingetApi'
+import validateEnv from '@utils/validateEnv'
+import { Software } from '@/interfaces/software.interface'
+import { SoftwareType } from '@/types/baramundi'
 
 class SoftwareVersionChecker {
   public softwareService = new SoftwareService()
@@ -30,27 +34,57 @@ class SoftwareVersionChecker {
     }
   }
 
-  public async checkSoftwareVersion(item: SoftwareModel): Promise<{ status: number; message?: string }> {
-    const resultAppList = await this._baramundi.findApplicationByName(item.name)
+  public async checkSoftwareVersion(item: SoftwareModel): Promise<{ software?: SoftwareModel; message?: string }> {
+    try {
+      let hasCurrentVersion = false
+      let currentBaramundiAppId: string | undefined
+      let updatedSoftware: SoftwareModel = item
 
-    let hasCurrentVersion = false
-    let hasAktuell = false
+      // Fetch package details
+      const packageDetails = await WingetUtils.showSoftware(updatedSoftware.winget_id)
 
-    resultAppList.forEach(app => {
-      console.log(app.Id, app.Name)
-      if (app.Name.includes('Aktuell')) {
-        hasAktuell = true
+      // Update software version if needed
+      if (packageDetails.version !== updatedSoftware.version) {
+        updatedSoftware = await this.softwareService.updateSoftware(updatedSoftware.winget_id, {
+          ...updatedSoftware,
+          bara_version: packageDetails.version,
+        })
       }
-      if (app.Name.includes(item.version)) {
-        hasCurrentVersion = true
-      }
-    })
 
-    if (!hasAktuell && !hasCurrentVersion) {
-      return { status: 200, message: `Update required for ${item.name} - Current version ${item.version} not found` }
+      // Retrieve application list
+      const resultAppList = await this._baramundi.findApplicationByName(updatedSoftware.name)
+
+      for (const app of resultAppList) {
+        if (app.Name.includes('Aktuell')) {
+          currentBaramundiAppId = app.Id
+        }
+        if (app.Name.includes(updatedSoftware.version)) {
+          hasCurrentVersion = true
+        }
+      }
+
+      // If no current version is found, return an update message
+      if (!currentBaramundiAppId && !hasCurrentVersion) {
+        return { message: `Update required for ${updatedSoftware.name} - Current version ${updatedSoftware.version} not found` }
+      }
+
+      // Update software only if a valid application ID exists
+      if (currentBaramundiAppId) {
+        const resultAppByID: SoftwareType = await this._baramundi.getApplicationById(currentBaramundiAppId)
+        if (resultAppByID) {
+          updatedSoftware = await this.softwareService.updateSoftware(updatedSoftware.winget_id, {
+            ...updatedSoftware,
+            bara_version: resultAppByID.Version,
+            is_current: updatedSoftware.version === resultAppByID.Version,
+          })
+        }
+      }
+
+      return { software: updatedSoftware }
+    } catch (error) {
+      console.error('Error in checkSoftwareVersion:', error)
+      return { message: 'An error occurred while checking the software version' }
     }
-
-    return { status: 200 }
   }
 }
 

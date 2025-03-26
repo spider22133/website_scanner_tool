@@ -1,15 +1,15 @@
 import React from 'react'
 import { Card, CardContent, Typography, Box, Divider, Link, Grid, Chip, Stack, Tooltip } from '@mui/material'
-import { WinGetSoftwareEntry } from '../../../../types/common'
+import { SoftwareEntry } from '../../../../types/common'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 
 interface PackageDetailsProps {
-  software: WinGetSoftwareEntry
+  software: SoftwareEntry
 }
 
 const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
-  const { name, version, details, is_current } = software
+  const { name, version, bara_version, details, is_current } = software
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
 
   return (
@@ -23,7 +23,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
           <Stack direction="row" spacing={1} alignItems="center">
             <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} />
             <Chip
-              label={`Baramundi: ${version}`}
+              label={`Baramundi: ${bara_version}`}
               color={is_current ? 'primary' : 'error'}
               size="small"
               sx={{ px: 1 }}
