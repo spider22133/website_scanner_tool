@@ -4,23 +4,28 @@ import { SoftwareModel } from '@models/software.model'
 import SoftwareVersionService from '@services/software_versions.service'
 import { BaramundiApi } from './BaramundiApi'
 import { WingetUtils } from './WingetApi'
-import validateEnv from '@utils/validateEnv'
-import { Software } from '@/interfaces/software.interface'
 import { SoftwareType } from '@/types/baramundi'
+import SoftwareUpdateNotifier from './SoftwareUpdateNotifier'
 
 class SoftwareVersionChecker {
-  public softwareService = new SoftwareService()
-  public softwareVersionService = new SoftwareVersionService()
-  public socket: Socket
+  private softwareService = new SoftwareService()
+  private softwareVersionService = new SoftwareVersionService()
 
-  private _baramundi: BaramundiApi
+  private notifier: SoftwareUpdateNotifier
+  private socket: Socket
+  private baramundi: BaramundiApi
 
   public connectSocket = (socket: Socket) => {
     this.socket = socket
   }
 
   public connectBaramundiApi = (baramundi: BaramundiApi) => {
-    this._baramundi = baramundi
+    this.baramundi = baramundi
+  }
+
+  public connectNotifier = (notifier: SoftwareUpdateNotifier) => {
+    this.notifier = notifier
+    this.notifier.connectSoftwareService(this.softwareService)
   }
 
   public async checkAllSoftware(): Promise<void> {
@@ -41,7 +46,9 @@ class SoftwareVersionChecker {
       let updatedSoftware: SoftwareModel = item
 
       // Fetch and update the software version if necessary
-      updatedSoftware = await this.updateSoftwareVersion(updatedSoftware)
+      const { software, isUpdated } = await this.updateSoftwareVersion(updatedSoftware)
+      updatedSoftware = software
+      console.log('updatedSoftware', updatedSoftware)
 
       // Retrieve Baramundi application details
       const { hasCurrentVersion, currentBaramundiAppId } = await this.findCurrentBaramundiApp(updatedSoftware)
@@ -52,8 +59,10 @@ class SoftwareVersionChecker {
       }
 
       // Update software only if a valid application ID exists
+      console.log('currentBaramundiAppId', currentBaramundiAppId)
+
       if (currentBaramundiAppId) {
-        updatedSoftware = await this.updateSoftwareFromBaramundi(updatedSoftware, currentBaramundiAppId)
+        updatedSoftware = await this.updateSoftwareFromBaramundi(updatedSoftware, currentBaramundiAppId, isUpdated)
       }
 
       return { software: updatedSoftware }
@@ -66,27 +75,32 @@ class SoftwareVersionChecker {
   /**
    * Fetches package details and updates the software version if needed.
    */
-  private async updateSoftwareVersion(software: SoftwareModel): Promise<SoftwareModel> {
+  private async updateSoftwareVersion(software: SoftwareModel): Promise<{ software: SoftwareModel; isUpdated: boolean }> {
+    let isUpdated = false
     const packageDetails = await WingetUtils.showSoftware(software.winget_id)
 
     if (packageDetails.version !== software.version) {
-      return this.softwareService.updateSoftware(software.winget_id, {
-        ...software,
-        bara_version: packageDetails.version,
-      })
+      isUpdated = true
+      return {
+        software: await this.softwareService.updateSoftware(software.winget_id, {
+          ...software,
+          version: packageDetails.version,
+        }),
+        isUpdated,
+      }
     }
 
-    return software
+    return { software, isUpdated }
   }
 
   /**
    * Searches for the current version of the application in Baramundi.
    */
-  private async findCurrentBaramundiApp(software: SoftwareModel): Promise<{ hasCurrentVersion: boolean; currentBaramundiAppId?: string }> {
+  public async findCurrentBaramundiApp(software: SoftwareModel): Promise<{ hasCurrentVersion: boolean; currentBaramundiAppId?: string }> {
     let hasCurrentVersion = false
     let currentBaramundiAppId: string | undefined
 
-    const resultAppList = await this._baramundi.findApplicationByName(software.name)
+    const resultAppList = await this.baramundi.findApplicationByName(software.name)
 
     for (const app of resultAppList) {
       if (/Aktuell\b/i.test(app.Name)) {
@@ -103,18 +117,23 @@ class SoftwareVersionChecker {
   /**
    * Updates software details from Baramundi if an application ID is available.
    */
-  private async updateSoftwareFromBaramundi(software: SoftwareModel, appId: string): Promise<SoftwareModel> {
-    const resultAppByID: SoftwareType = await this._baramundi.getApplicationById(appId)
+  public async updateSoftwareFromBaramundi(software: SoftwareModel, appId: string, webexVersionUpdated: boolean): Promise<SoftwareModel> {
+    const resultAppByID: SoftwareType = await this.baramundi.getApplicationById(appId)
+    let updatedSoftware = software
 
     if (resultAppByID) {
-      return this.softwareService.updateSoftware(software.winget_id, {
+      updatedSoftware = await this.softwareService.updateSoftware(software.winget_id, {
         ...software,
         bara_version: resultAppByID.Version,
         is_current: software.version === resultAppByID.Version,
       })
     }
 
-    return software
+    if (!updatedSoftware.is_current && webexVersionUpdated) {
+      this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID)
+    }
+
+    return updatedSoftware
   }
 }
 

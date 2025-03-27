@@ -8,7 +8,8 @@ import httpErrors from '../interfaces/api.error.interface'
 const initialState = {
   softwareSearchList: [] as SoftwareEntry[],
   software: [] as SoftwareEntry[],
-  loading: false as boolean,
+  loading: false,
+  createSoftwareLoading: false,
 }
 
 type setErrorType = {
@@ -282,17 +283,17 @@ const websiteSlice = createSlice({
     })
 
     builder.addCase(createSoftware.pending, (state, {}) => {
-      state.loading = true
+      state.createSoftwareLoading = true
     })
     builder.addCase(createSoftware.fulfilled, (state, { payload }) => {
       state.software.unshift({
         ...payload,
         details: JSON.parse(payload.details as string) as WingetPackageDetails,
       })
-      state.loading = false
+      state.createSoftwareLoading = false
     })
     builder.addCase(createSoftware.rejected, state => {
-      state.loading = false
+      state.createSoftwareLoading = false
     })
 
     // Delete website

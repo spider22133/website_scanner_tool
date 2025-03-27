@@ -10,6 +10,7 @@ import validateEnv from '@utils/validateEnv'
 import TimerController from '@controllers/timer.controller'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import { logger } from './utils/logger'
+import SoftwareUpdateNotifier from './classes/SoftwareUpdateNotifier'
 
 // 1️⃣ Environment Setup
 process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
@@ -36,6 +37,7 @@ app.listen()
 
 // 5️⃣ Connect APIs after App is Running
 softwareVersionChecker.connectBaramundiApi(app.baramundi)
+softwareVersionChecker.connectNotifier(new SoftwareUpdateNotifier(app.webexBot))
 
 // 6️⃣ WebSocket Handling (After Server Starts)
 app.io.on('connection', socket => {
@@ -43,12 +45,7 @@ app.io.on('connection', socket => {
   softwareVersionChecker.connectSocket(socket)
 })
 
-// Wait for initialization, then send message
-// app.webexBot.initialize().then(() => {
-//   logger.info('📢 Bot is ready to send messages.')
-
-//   // app.webexBot.sendMessage(
-//   //   'Y2lzY29zcGFyazovL3VybjpURUFNOmV1LWNlbnRyYWwtMV9rL1JPT00vYTQyM2Q3YjAtMDhjNC0xMWYwLWE2NTctZGRhYzZlMTVkNWM1',
-//   //   'Hier kommt ein Bericht!',
-//   // )
-// })
+// Webex Bot initialization
+app.webexBot.initialize().then(() => {
+  logger.info('📢 Bot is ready to send messages.')
+})

@@ -6,6 +6,7 @@ import { SoftwareEntry } from '../../../types/common'
 import CreateSoftwareDto from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
 import { WingetUtils } from '@/classes/WingetApi'
+import { logger } from '@/utils/logger'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
@@ -88,11 +89,22 @@ class SoftwareController {
     try {
       const softwareData: CreateSoftwareDto = req.body
       const packageDetails = await WingetUtils.showSoftware(softwareData.winget_id)
-      const createSoftwareData = await this.softwareService.createSoftware({
+
+      let createSoftwareData = await this.softwareService.createSoftware({
         ...softwareData,
         details: JSON.stringify(packageDetails),
-        is_current: true,
       })
+
+      const { hasCurrentVersion, currentBaramundiAppId } = await this.softwareVersionChecker.findCurrentBaramundiApp(createSoftwareData)
+
+      // If no current version is found, return an update message
+      if (!currentBaramundiAppId && !hasCurrentVersion) {
+        logger.error(`Update required for ${createSoftwareData.name} - Current version ${createSoftwareData.version} not found`)
+      }
+
+      if (currentBaramundiAppId) {
+        createSoftwareData = await this.softwareVersionChecker.updateSoftwareFromBaramundi(createSoftwareData, currentBaramundiAppId, true)
+      }
 
       res.status(201).json({ data: createSoftwareData, message: 'created' })
     } catch (error) {
