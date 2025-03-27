@@ -15,6 +15,7 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/de.json'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 
 TimeAgo.addDefaultLocale(en)
 
@@ -62,17 +63,21 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
         onClick={() => setActiveWebsite(software, index)}
       >
         <div className="d-flex justify-content-between align-items-center w-100">
-          <div className="ms-2 me-auto">
-            <div className="d-flex align-items-center fw-bold">
-              {software.name}
-              {software.is_current ? (
-                <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'success.main', fontSize: 20 }} />
-              ) : (
-                <ErrorOutlineIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
-              )}
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Inventory2OutlinedIcon />
+            <div className="me-auto">
+              <div className="d-flex align-items-center fw-bold">
+                {software.name}
+                {software.is_current ? (
+                  <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'success.main', fontSize: 20 }} />
+                ) : (
+                  <ErrorOutlineIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
+                )}
+              </div>
+              <Typography variant="body2">{software.details?.publisher}</Typography>
             </div>
-            <Typography variant="body2">{software.details?.publisher}</Typography>
-          </div>
+          </Stack>
+
           <div className="">
             <Stack direction="column" alignItems="flex-end">
               <Stack direction="row" alignItems="center">

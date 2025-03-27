@@ -72,3 +72,44 @@ h2,
 .list-group-numbered > li::before {
   position: absolute;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.dashboard-container {
+  background-color: #f2f2f2;
+  min-height: calc(100vh - 76px);
+}
+
+.left-column {
+  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1200px) {
+  .left-column {
+    height: auto;
+  }
+}
+
+.websites-list-container {
+  padding: 24px;
+  margin-bottom: 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 230px);
+}
+
+.search-bar-container {
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.tabs-container {
+  position: relative;
+}

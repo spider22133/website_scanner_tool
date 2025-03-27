@@ -15,15 +15,15 @@ class WebsiteControlStepsRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/`, authMiddleware, this.websiteControlStepsController.getWebsiteControlSteps)
-    this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.websiteControlStepsController.getWebsiteControlStepsByWebsiteId)
+    // this.router.get(`${this.path}/`, authMiddleware, this.websiteControlStepsController.getWebsiteControlSteps)
+    // this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.websiteControlStepsController.getWebsiteControlStepsByWebsiteId)
     this.router.put(`${this.path}/:id(\\d+)`, this.websiteControlStepsController.updateWebsiteControlStep)
     this.router.post(
       `${this.path}/create`,
       [validationMiddleware(CreateWebsiteControlStepDto, 'body'), authMiddleware],
       this.websiteControlStepsController.createWebsiteControlStep,
     )
-    this.router.delete(`${this.path}/:id(\\d+)`, authMiddleware, this.websiteControlStepsController.deleteWebsiteControlStep)
+    // this.router.delete(`${this.path}/:id(\\d+)`, authMiddleware, this.websiteControlStepsController.deleteWebsiteControlStep)
   }
 }
 

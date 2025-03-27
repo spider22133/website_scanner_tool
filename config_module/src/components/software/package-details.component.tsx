@@ -18,7 +18,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
         {/* Header Section */}
         <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight={600}>
-            {name}
+            WinGet Informationen zu "{name}":
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} />
