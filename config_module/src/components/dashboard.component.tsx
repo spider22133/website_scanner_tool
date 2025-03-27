@@ -148,7 +148,7 @@ const DashboardComponent: React.FC = () => {
                 <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
               </motion.div>
 
-              {user.roles &&
+              {/* {user.roles &&
                 (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
                 (!showAddForm ? (
                   <Button
@@ -159,7 +159,7 @@ const DashboardComponent: React.FC = () => {
                   >
                     Add new
                   </Button>
-                ) : null)}
+                ) : null)} */}
             </Box>
           </Grid>
           <Grid item xs={12} lg={7}>

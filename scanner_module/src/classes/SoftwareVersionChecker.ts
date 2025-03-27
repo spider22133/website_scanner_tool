@@ -25,7 +25,7 @@ class SoftwareVersionChecker {
 
   public connectNotifier = (notifier: SoftwareUpdateNotifier) => {
     this.notifier = notifier
-    this.notifier.connectSoftwareService(this.softwareService)
+    this.notifier.setSoftwareService(this.softwareService)
   }
 
   public async checkAllSoftware(): Promise<void> {
