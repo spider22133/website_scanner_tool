@@ -23,8 +23,6 @@ function App() {
 
   useEffect(() => {
     if (messages) {
-      console.log(messages)
-
       messages.forEach(item => {
         enqueueSnackbar(item.message, { variant: item.variant })
       })

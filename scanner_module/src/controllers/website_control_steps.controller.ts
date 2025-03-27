@@ -1,30 +1,29 @@
 import { NextFunction, Request, Response } from 'express'
-import { WebsiteControlStep } from '@interfaces/software_version.interface'
 import WebsiteControlStepsService from '@services/software_versions.service'
 import CreateWebsiteControlStepDto from '@dtos/version.dto'
 
 class WebsiteControlStepsController {
   public websiteControlStepsService = new WebsiteControlStepsService()
 
-  public getWebsiteControlSteps = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const findAllControlStepsData: WebsiteControlStep[] = await this.websiteControlStepsService.findAllWebsiteControlSteps()
-      res.status(200).json({ data: findAllControlStepsData, message: 'findAll' })
-    } catch (error) {
-      next(error)
-    }
-  }
+  // public getWebsiteControlSteps = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const findAllControlStepsData: WebsiteControlStep[] = await this.websiteControlStepsService.findAllWebsiteControlSteps()
+  //     res.status(200).json({ data: findAllControlStepsData, message: 'findAll' })
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
 
-  public getWebsiteControlStepsByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const websiteId = Number(req.params.id)
-      const findAllControlStepsData: WebsiteControlStep[] = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId)
+  // public getWebsiteControlStepsByWebsiteId = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const websiteId = Number(req.params.id)
+  //     const findAllControlStepsData: WebsiteControlStep[] = await this.websiteControlStepsService.findControlStepsByWebsiteId(websiteId)
 
-      res.status(200).json({ data: findAllControlStepsData, message: 'findControlStepsByWebsiteId' })
-    } catch (error) {
-      next(error)
-    }
-  }
+  //     res.status(200).json({ data: findAllControlStepsData, message: 'findControlStepsByWebsiteId' })
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
 
   public createWebsiteControlStep = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -39,7 +38,6 @@ class WebsiteControlStepsController {
 
   public updateWebsiteControlStep = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body)
       const stepId = Number(req.params.id)
       const stepData: CreateWebsiteControlStepDto = req.body
 
@@ -50,16 +48,16 @@ class WebsiteControlStepsController {
     }
   }
 
-  public deleteWebsiteControlStep = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const stepId = Number(req.params.id)
-      const deleteWebsiteControlStep: WebsiteControlStep = await this.websiteControlStepsService.deleteWebsiteControlStep(stepId)
+  // public deleteWebsiteControlStep = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const stepId = Number(req.params.id)
+  //     const deleteWebsiteControlStep: WebsiteControlStep = await this.websiteControlStepsService.deleteWebsiteControlStep(stepId)
 
-      res.status(200).json({ data: deleteWebsiteControlStep, message: 'deleted' })
-    } catch (error) {
-      next(error)
-    }
-  }
+  //     res.status(200).json({ data: deleteWebsiteControlStep, message: 'deleted' })
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
 }
 
 export default WebsiteControlStepsController

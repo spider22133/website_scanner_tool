@@ -10,6 +10,7 @@ import util from 'util'
 import { exec } from 'child_process'
 import { BaramundiSearch, SoftwareType } from '@/types/baramundi'
 import { str } from 'envalid'
+import { logger } from '@/utils/logger'
 
 const execPromise = util.promisify(exec) // Promisify exec for async/await
 
@@ -46,15 +47,14 @@ export class BaramundiApi {
       try {
         return JSON.parse(responseData)
       } catch (parseError) {
-        console.error('Error parsing JSON:', parseError.message)
-        console.log('Raw Response:', responseData)
+        logger.error('Error parsing JSON:', parseError.message)
         return null
       }
     } catch (error) {
-      console.error(`Error executing ${method} request:`, error.message)
+      logger.error(`Error executing ${method} request:`, error.message)
 
       if (error.stderr) {
-        console.error('curl stderr:', error.stderr)
+        logger.error('curl stderr:', error.stderr)
       }
       return null
     }
@@ -68,15 +68,5 @@ export class BaramundiApi {
   public async getApplicationById(id: string): Promise<SoftwareType> {
     const endpoint = `/bConnect/v1.1/Applications?id=${id}`
     return await this.sendRequest(endpoint, 'GET')
-  }
-
-  public async createResource(endpoint: string, data: any): Promise<void> {
-    const response = await this.sendRequest(endpoint, 'POST', data)
-    console.log('Created Resource:', response)
-  }
-
-  public async updateResource(endpoint: string, data: any): Promise<void> {
-    const response = await this.sendRequest(endpoint, 'PATCH', data)
-    console.log('Updated Resource:', response)
   }
 }

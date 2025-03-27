@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import WebexBot from './WebexNodeBotFramework'
 import { SoftwareModel } from '@/models/software.model'
 import SoftwareService from '@/services/software.service'
+import { logger } from '@/utils/logger'
 
 // Define constants for date formats to avoid repetition
 const DATE_FORMAT = 'YYYY-MM-DD'
@@ -27,7 +28,7 @@ class SoftwareUpdateNotifier {
 
   public async sendDailySoftwareUpdates(roomId: string): Promise<void> {
     if (!this.softwareService) {
-      console.error('❌ SoftwareService not initialized')
+      logger.error('❌ SoftwareService not initialized')
       return
     }
 
@@ -36,7 +37,7 @@ class SoftwareUpdateNotifier {
       const todaysUpdates = this.getTodaysUpdates(allSoftwareUpdates)
 
       if (todaysUpdates.length === 0) {
-        console.log('ℹ️ Keine Software-Updates für heute gefunden.')
+        logger.info('ℹ️ Keine Software-Updates für heute gefunden.')
         return
       }
 
@@ -44,10 +45,10 @@ class SoftwareUpdateNotifier {
       if (message) {
         this.webexBot.sendMessage(roomId, message)
       } else {
-        console.log('ℹ️ Keine relevanten Updates zum Senden.')
+        logger.info('ℹ️ Keine relevanten Updates zum Senden.')
       }
     } catch (error) {
-      console.error('❌ Fehler beim Senden der Software-Update-Nachricht:', error)
+      logger.error('❌ Fehler beim Senden der Software-Update-Nachricht:', error)
       throw error // Re-throw for upstream handling if needed
     }
   }

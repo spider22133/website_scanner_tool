@@ -48,7 +48,6 @@ class SoftwareVersionChecker {
       // Fetch and update the software version if necessary
       const { software, isUpdated } = await this.updateSoftwareVersion(updatedSoftware)
       updatedSoftware = software
-      console.log('updatedSoftware', updatedSoftware)
 
       // Retrieve Baramundi application details
       const { hasCurrentVersion, currentBaramundiAppId } = await this.findCurrentBaramundiApp(updatedSoftware)
@@ -59,8 +58,6 @@ class SoftwareVersionChecker {
       }
 
       // Update software only if a valid application ID exists
-      console.log('currentBaramundiAppId', currentBaramundiAppId)
-
       if (currentBaramundiAppId) {
         updatedSoftware = await this.updateSoftwareFromBaramundi(updatedSoftware, currentBaramundiAppId, isUpdated)
       }

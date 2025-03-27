@@ -32,12 +32,11 @@ class WebexBot {
 
   public sendMessage(roomId: string, message: string): void {
     if (!this.isInitialized) {
-      console.warn('⚠️ WebexBot is not initialized yet.')
+      logger.warn('⚠️ WebexBot is not initialized yet.')
       return
     }
 
     this.framework.bots.forEach(bot => {
-      console.log(bot.room.id === roomId)
       if (bot.room.id === roomId) bot.say(message)
     })
   }
@@ -46,10 +45,10 @@ class WebexBot {
     logger.info('🛑 Stopping Webex Framework...')
     try {
       await this.framework.stop()
-      console.log('✅ Webex Framework stopped successfully')
+      logger.info('✅ Webex Framework stopped successfully')
       this.isInitialized = false
     } catch (error) {
-      console.error('❌ Error stopping Webex Framework:', error)
+      logger.error('❌ Error stopping Webex Framework:', error)
     }
   }
 }

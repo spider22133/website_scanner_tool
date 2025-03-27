@@ -21,7 +21,6 @@ export class WingetUtils {
   public static async showSoftware(packageId: string): Promise<WingetPackageDetails | null> {
     try {
       const stdout = await this.execWingetCommand(`winget show --id ${packageId}`)
-      console.log(stdout)
       return this.parseShowOutput(stdout)
     } catch (error) {
       return null
@@ -72,7 +71,6 @@ export class WingetUtils {
       })
     }
 
-    console.log(entries)
     return entries
   }
 
