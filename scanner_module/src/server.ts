@@ -18,8 +18,7 @@ validateEnv()
 
 // 2️⃣ Dependency Initialization
 const softwareVersionChecker = new SoftwareVersionChecker()
-const timerController = new TimerController(softwareVersionChecker)
-timerController.interval = 8640000 // 6 Minutes
+const timerController = TimerController.getInstance(softwareVersionChecker)
 timerController.run()
 
 // 3️⃣ Application Setup

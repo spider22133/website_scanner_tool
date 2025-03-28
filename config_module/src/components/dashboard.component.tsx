@@ -14,7 +14,7 @@ import PackageDetails from './software/package-details.component'
 
 const DashboardComponent: React.FC = () => {
   const ENDPOINT = 'http://localhost:3001/'
-  const itemsPerPage = 9
+  const itemsPerPage = 20
   const dispatch = useAppDispatch()
 
   const { software } = useSelector((state: RootState) => state.software)
@@ -107,7 +107,7 @@ const DashboardComponent: React.FC = () => {
                 setActiveWebsite={setActiveWebsite}
                 handleClickToggle={handleClickToggle}
               />
-              <Box className="pagination" sx={{ mt: 'auto', pt: 2 }}>
+              {/* <Box className="pagination" sx={{ mt: 'auto', pt: 2 }}>
                 {software.length > 0 && (
                   <PaginationContainer
                     totalItems={software.length}
@@ -117,10 +117,10 @@ const DashboardComponent: React.FC = () => {
                     setCurrentPage={setCurrentPage}
                   />
                 )}
-              </Box>
+              </Box> */}
             </Paper>
           </Grid>
-          <Grid item xs={12} lg={7} className="tabs-container">
+          <Grid item xs={12} lg={4} className="tabs-container">
             <Box>
               <TabsComponent tabs={tabs} />
             </Box>

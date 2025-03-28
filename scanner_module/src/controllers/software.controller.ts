@@ -95,15 +95,15 @@ class SoftwareController {
         details: JSON.stringify(packageDetails),
       })
 
-      const { hasCurrentVersion, currentBaramundiAppId } = await this.softwareVersionChecker.findCurrentBaramundiApp(createSoftwareData)
+      const { currentBaramundiAppId } = await this.softwareVersionChecker.findCurrentBaramundiApp(createSoftwareData)
 
       // If no current version is found, return an update message
-      if (!currentBaramundiAppId && !hasCurrentVersion) {
+      if (!currentBaramundiAppId) {
         logger.error(`Update required for ${createSoftwareData.name} - Current version ${createSoftwareData.version} not found`)
       }
 
       if (currentBaramundiAppId) {
-        createSoftwareData = await this.softwareVersionChecker.updateSoftwareFromBaramundi(createSoftwareData, currentBaramundiAppId, true)
+        createSoftwareData = await this.softwareVersionChecker.updateSoftwareFromBaramundi(createSoftwareData, currentBaramundiAppId)
       }
 
       res.status(201).json({ data: createSoftwareData, message: 'created' })

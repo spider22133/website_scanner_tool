@@ -13,7 +13,7 @@ class TimerRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.get(`${this.path}/:interval(\\d+)`, this.timerController.updateInterval)
+    this.router.get(`${this.path}/:interval(\\d+)`, this.timerController.updateTriggerTime)
   }
 }
 

@@ -21,7 +21,7 @@ const WebsitesList: React.FC<Props> = ({ setActiveWebsite, handleClickToggle, cu
   }
 
   return (
-    <Box sx={{ height: '92%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '97%', display: 'flex', flexDirection: 'column' }}>
       <AppFilterBar value={showHidden} handleClickToggle={handleClickToggle} />
       <Box sx={{ width: '100%', textAlign: 'right', mt: 2 }}>
         <Typography variant="body2">
