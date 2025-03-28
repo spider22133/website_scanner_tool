@@ -64,10 +64,10 @@ class SoftwareUpdateNotifier {
     }
 
     const timestamp = dayjs().format(FULL_TIMESTAMP_FORMAT)
-    const header = `**🆕 NON-MSW Changelog - ${timestamp}**`
+    const header = `**🆕 NON-MSW Changelog**`
 
     // Improved table formatting with better readability
-    const tableHeader = ['| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version |', '|-----|-------|----------------|---------|---------|'].join('\n')
+    const tableHeader = ['| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version |', '|----|-------|----------------|---------|---------|'].join('\n')
 
     const tableRows = updates
       .map((software, index) => {
