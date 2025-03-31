@@ -3,7 +3,7 @@ import WebsitesListItem from './webseites-list-item.component'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../store'
-import { Box, List, Typography, Skeleton } from '@mui/material'
+import { Box, List, Typography, Skeleton, Stack } from '@mui/material'
 import AppFilterBar from '../elements/app-filter-bar.component'
 
 type Props = {
@@ -18,14 +18,25 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
     return software.filter(software => software.is_hidden === isHidden).length
   }
 
+  const countByCurrentStatus = (isCurrent: boolean) => {
+    return software.filter(software => software.is_current === isCurrent).length
+  }
+
   return (
     <Box sx={{ height: '97%', display: 'flex', flexDirection: 'column' }}>
       <AppFilterBar />
-      <Box sx={{ width: '100%', textAlign: 'right', mt: 2 }}>
-        <Typography variant="body2">
-          Ausgeblendet: {countByVisibility(true)} / Sichtbar: {countByVisibility(false)} / Gesamt: {software.length}
-        </Typography>
-      </Box>
+      <Stack direction={'row'} justifyContent={'space-between'} sx={{ mt: 2 }}>
+        <Box>
+          <Typography variant="body2">
+            Aktuell: {countByCurrentStatus(true)} / Ungültig: {countByCurrentStatus(false)}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="body2">
+            Ausgeblendet: {countByVisibility(true)} / Sichtbar: {countByVisibility(false)} / Gesamt: {software.length}
+          </Typography>
+        </Box>
+      </Stack>
       <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
         <List>
           {createSoftwareLoading && <Skeleton variant="rectangular" width="100%" height={84} />}

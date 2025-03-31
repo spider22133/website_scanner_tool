@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, TextField, Tooltip, InputAdornment } from '@mui/material'
+import { Box, IconButton, Stack, TextField, Tooltip, InputAdornment, Autocomplete } from '@mui/material'
 import { useState, ChangeEvent, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { updateSoftwareFilteredList } from '../../slices/software.slice'
@@ -12,6 +12,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 interface FilterState {
   searchTerm: string
   showHidden: boolean
+  status: string // 'Alle', 'Aktuell', 'Nicht aktuell'
 }
 
 const AppFilterBar: React.FC = () => {
@@ -20,6 +21,7 @@ const AppFilterBar: React.FC = () => {
   const [filterState, setFilterState] = useState<FilterState>({
     searchTerm: '',
     showHidden: false,
+    status: 'Alle',
   })
 
   const updateFilteredSoftwareList = (filteredSoftware: SoftwareEntry[]) => {
@@ -30,7 +32,10 @@ const AppFilterBar: React.FC = () => {
     return allSoftwareEntries.filter(software => {
       const matchesName = software.name.toLowerCase().includes(filter.searchTerm.toLowerCase())
       const matchesVisibility = software.is_hidden === filter.showHidden
-      return matchesName && matchesVisibility
+      const matchesStatus =
+        filter.status === 'Alle' || (filter.status === 'Aktuell' && software.is_current) || (filter.status === 'Ungültig' && !software.is_current)
+
+      return matchesName && matchesVisibility && matchesStatus
     })
   }
 
@@ -50,6 +55,10 @@ const AppFilterBar: React.FC = () => {
     updateFilterState({ showHidden: !filterState.showHidden })
   }
 
+  const handleStatusChange = (event: ChangeEvent<{}>, value: string | null) => {
+    updateFilterState({ status: value || 'Alle' })
+  }
+
   useEffect(() => {
     updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
   }, [])
@@ -57,6 +66,7 @@ const AppFilterBar: React.FC = () => {
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ width: '100%' }}>
       <TextField
+        label="Name"
         placeholder="Nach Namen filtern..."
         variant="outlined"
         value={filterState.searchTerm}
@@ -71,6 +81,15 @@ const AppFilterBar: React.FC = () => {
         size="small"
         fullWidth
         aria-label="Software filter input"
+      />
+      <Autocomplete
+        options={['Alle', 'Aktuell', 'Ungültig']}
+        value={filterState.status}
+        onChange={handleStatusChange}
+        renderInput={params => <TextField {...params} label="Gültigkeit" variant="outlined" size="small" />}
+        sx={{ minWidth: 180 }}
+        aria-label="Status filter"
+        disableClearable
       />
       <Box sx={{ display: 'flex', alignItems: 'center', pr: 2 }}>
         <Tooltip title={filterState.showHidden ? 'Ausblenden' : 'Anzeigen'} arrow>

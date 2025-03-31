@@ -20,7 +20,7 @@ const DashboardComponent: React.FC = () => {
   const itemsPerPage = 20
   const dispatch = useAppDispatch()
 
-  const { software } = useSelector((state: RootState) => state.software)
+  const { software, softwareFilteredList } = useSelector((state: RootState) => state.software)
 
   const [displayedSoftware, setDisplayedSoftware] = useState<SoftwareEntry[]>([])
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -78,7 +78,8 @@ const DashboardComponent: React.FC = () => {
       tabType: 'MAIN',
       tabIcon: <ArticleOutlinedIcon />,
       tabLabel: 'Softwareprofil',
-      tabContent: !!software && !!software.length ? <PackageDetails software={software[currentIndex]} /> : <div />,
+      tabContent:
+        !!softwareFilteredList && !!softwareFilteredList.length ? <PackageDetails software={softwareFilteredList[currentIndex]} /> : <div />,
     },
     {
       tabType: 'CREATE_BDS',

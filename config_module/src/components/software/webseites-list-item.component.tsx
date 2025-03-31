@@ -14,7 +14,7 @@ import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/de.json'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 
 TimeAgo.addDefaultLocale(en)
@@ -70,7 +70,7 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                 {software.is_current ? (
                   <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'success.main', fontSize: 20 }} />
                 ) : (
-                  <ErrorOutlineIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
+                  <UnpublishedOutlinedIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
                 )}
               </div>
               <Typography variant="body2">{software.details?.publisher}</Typography>
