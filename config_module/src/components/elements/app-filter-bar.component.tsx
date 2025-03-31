@@ -12,7 +12,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 interface FilterState {
   searchTerm: string
   showHidden: boolean
-  status: string // 'Alle', 'Aktuell', 'Nicht aktuell'
+  status: string // 'Alle', 'Aktuell', 'Ungültig'
 }
 
 const AppFilterBar: React.FC = () => {
@@ -61,7 +61,7 @@ const AppFilterBar: React.FC = () => {
 
   useEffect(() => {
     updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
-  }, [])
+  }, [allSoftwareEntries])
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ width: '100%' }}>

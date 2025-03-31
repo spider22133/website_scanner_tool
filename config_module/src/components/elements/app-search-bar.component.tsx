@@ -11,13 +11,18 @@ import SearchIcon from '@mui/icons-material/Search'
 const AppSearchBar: React.FC = () => {
   const dispatch = useAppDispatch()
   const softwareList = useSelector((state: RootState) => state.software.softwareSearchList || [])
+
+  const [loading, setLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [selectedSoftware, setSelectedSoftware] = useState<SoftwareEntry | null>(null)
 
   const debouncedSearch = useMemo(
     () =>
       debounce((query: string) => {
-        if (query.length >= 3) dispatch(queryWinGetSoftware(query))
+        if (query.length >= 3) {
+          setLoading(true)
+          dispatch(queryWinGetSoftware(query)).finally(() => setLoading(false))
+        }
       }, 700),
     [dispatch],
   )
@@ -38,19 +43,20 @@ const AppSearchBar: React.FC = () => {
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
       <Autocomplete
-        options={softwareList} // Ensure this is an array (use empty array fallback)
+        options={softwareList}
         inputValue={inputValue}
-        filterOptions={options => (options.length === 0 ? [] : options)} // Force empty array when no results
-        getOptionLabel={option => (typeof option === 'string' ? option : `${option.name} (${option.version})`)}
-        noOptionsText="Keine Suchergebnisse"
+        loading={loading}
+        filterOptions={x => x}
+        getOptionLabel={option => `${option.name} (${option.version})`}
         onInputChange={handleSearchChange}
-        onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
+        onChange={(_, value) => setSelectedSoftware(value)}
         renderInput={params => (
           <TextField
             {...params}
             variant="outlined"
             placeholder="Geben Sie den Namen der gesuchten Anwendung ein..."
             InputProps={{
+              ...params.InputProps,
               startAdornment: (
                 <InputAdornment position="start">
                   <SearchIcon />
@@ -61,7 +67,6 @@ const AppSearchBar: React.FC = () => {
           />
         )}
         renderOption={(props, option) => {
-          if (typeof option === 'string') return null // Prevent rendering invalid options
           return (
             <li {...props} key={`${option.winget_id}-${option.version}`}>
               <Box>
@@ -74,7 +79,6 @@ const AppSearchBar: React.FC = () => {
           )
         }}
         sx={{ flexGrow: 1 }}
-        freeSolo
       />
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>

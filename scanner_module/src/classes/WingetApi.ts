@@ -85,6 +85,8 @@ export class WingetUtils {
     }
 
     let currentSection = ''
+    let isDescription = false
+    let descriptionLines: string[] = []
 
     const mapping: Record<string, keyof WingetPackageDetails> = {
       version: 'version',
@@ -111,10 +113,24 @@ export class WingetUtils {
       'offline distribution supported': 'offlineSupported',
     }
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+
       if (line.startsWith('Installer:')) {
         currentSection = 'installer'
+        isDescription = false
         continue
+      }
+
+      if (isDescription) {
+        // Check if we've hit the next section header
+        if (lines[i + 1]?.includes(':')) {
+          isDescription = false
+          entry.description = descriptionLines.join('\n')
+        } else {
+          descriptionLines.push(line)
+          continue
+        }
       }
 
       const [key, ...valueParts] = line.split(':')
@@ -123,10 +139,18 @@ export class WingetUtils {
       const value = valueParts.join(':').trim()
       const keyFormatted = key.trim().toLowerCase()
 
+      if (keyFormatted === 'description') {
+        isDescription = true
+        descriptionLines = [value]
+        continue
+      }
+
       if (currentSection === 'installer') {
         const installerKey = installerMapping[keyFormatted]
         if (installerKey) {
-          Object.assign(entry.installer, { [installerKey]: installerKey === 'offlineSupported' ? value.toLowerCase() === 'true' : value })
+          Object.assign(entry.installer, {
+            [installerKey]: installerKey === 'offlineSupported' ? value.toLowerCase() === 'true' : value,
+          })
         }
       } else {
         const entryKey = mapping[keyFormatted]
@@ -134,6 +158,11 @@ export class WingetUtils {
           Object.assign(entry, { [entryKey]: value })
         }
       }
+    }
+
+    // Handle case where description is the last field
+    if (isDescription) {
+      entry.description = descriptionLines.join('\n')
     }
 
     return entry

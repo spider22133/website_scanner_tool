@@ -90,7 +90,10 @@ class SoftwareVersionChecker {
       })
     }
 
-    return software
+    return await this.softwareService.updateSoftware(software.winget_id, {
+      ...software,
+      details: JSON.stringify(packageDetails),
+    })
   }
 
   /**

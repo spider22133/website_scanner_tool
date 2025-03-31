@@ -25,7 +25,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
   return (
     <Box sx={{ height: '97%', display: 'flex', flexDirection: 'column' }}>
       <AppFilterBar />
-      <Stack direction={'row'} justifyContent={'space-between'} sx={{ mt: 2 }}>
+      <Stack direction={'row'} justifyContent={'space-between'} sx={{ mt: 4 }}>
         <Box>
           <Typography variant="body2">
             Aktuell: {countByCurrentStatus(true)} / Ungültig: {countByCurrentStatus(false)}
