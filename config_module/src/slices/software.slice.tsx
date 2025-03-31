@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { WingetPackageDetails, SoftwareEntry } from '../../../types/common'
 import WebsiteDataService from '../services/website.service'
 import { AxiosError } from 'axios'
@@ -7,6 +7,7 @@ import httpErrors from '../interfaces/api.error.interface'
 
 const initialState = {
   softwareSearchList: [] as SoftwareEntry[],
+  softwareFilteredList: [] as SoftwareEntry[],
   software: [] as SoftwareEntry[],
   loading: false,
   createSoftwareLoading: false,
@@ -192,7 +193,12 @@ export const queryWinGetSoftware = createAsyncThunk<
 const websiteSlice = createSlice({
   name: 'website',
   initialState,
-  reducers: {},
+  reducers: {
+    updateSoftwareFilteredList: (state, { payload }: PayloadAction<SoftwareEntry[]>) => {
+      state.softwareFilteredList = []
+      state.softwareFilteredList.push(...payload)
+    },
+  },
   extraReducers: builder => {
     // Create website
     // builder.addCase(createWebsite.pending, (state, {}) => {
@@ -303,4 +309,8 @@ const websiteSlice = createSlice({
   },
 })
 
-export default websiteSlice.reducer
+const { reducer, actions } = websiteSlice
+
+export const { updateSoftwareFilteredList } = actions
+
+export default reducer

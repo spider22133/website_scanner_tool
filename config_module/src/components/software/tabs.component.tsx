@@ -14,8 +14,15 @@ const TabsComponent: React.FC<Props> = ({ tabs }) => {
       <TabContext value={value}>
         <Box>
           <TabList onChange={(e, newValue) => setValue(newValue)} variant="scrollable">
-            {tabs.map(({ tabType, tabLabel }, index) => (
-              <Tab key={index} label={tabLabel} value={tabType} sx={{ textTransform: 'none', fontWeight: 'bold' }} />
+            {tabs.map(({ tabType, tabLabel, tabIcon }, index) => (
+              <Tab
+                key={index}
+                icon={tabIcon}
+                label={tabLabel}
+                value={tabType}
+                sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                iconPosition="start"
+              />
             ))}
           </TabList>
         </Box>

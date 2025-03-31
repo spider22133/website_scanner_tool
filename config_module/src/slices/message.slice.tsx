@@ -17,14 +17,22 @@ const messageSlice = createSlice({
     setMessage: (state, { payload }: PayloadAction<MessageState>) => {
       const index = state.findIndex(item => item.id === payload.id)
       if (index === -1) {
-        state.push(payload)
+        // Add a unique ID if not provided
+        const newMessage = {
+          ...payload,
+          id: payload.id || Date.now().toString(), // Ensure each message has a unique ID
+        }
+        state.push(newMessage)
       } else {
         state[index] = { ...state[index], ...payload }
       }
     },
     clearMessage: (state, { payload }: PayloadAction<string>) => {
       const index = state.findIndex(item => item.id === payload)
-      if (index !== -1) state.splice(index, 1) // Mutate state directly
+      if (index !== -1) state.splice(index, 1)
+    },
+    clearAllMessages: state => {
+      return [] // Reset state to empty array
     },
   },
 })

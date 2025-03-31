@@ -12,22 +12,25 @@ import DashboardComponent from './components/dashboard.component'
 
 import { useSnackbar } from 'notistack'
 import { RootState } from './store'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 
 const theme = createTheme()
 
 function App() {
   const { enqueueSnackbar } = useSnackbar()
+  const dispatch = useDispatch()
   const messages = useSelector((state: RootState) => state.messages)
 
   useEffect(() => {
-    if (messages) {
-      messages.forEach(item => {
-        enqueueSnackbar(item.message, { variant: item.variant })
+    if (messages.length > 0) {
+      // Only show the latest message (last in array) to avoid showing all
+      const latestMessage = messages[messages.length - 1]
+      enqueueSnackbar(latestMessage.message, {
+        variant: latestMessage.variant,
       })
     }
-  }, [messages])
+  }, [messages, enqueueSnackbar, dispatch])
 
   return (
     <ThemeProvider theme={theme}>

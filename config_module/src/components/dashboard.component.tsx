@@ -4,13 +4,16 @@ import { retrieveWebsites } from '../slices/software.slice'
 import { RootState, useAppDispatch } from '../store'
 import { useSelector } from 'react-redux'
 import { Box, Container, Paper, Grid } from '@mui/material'
-import WebsitesList from './software/websites-list'
+import SoftwareList from './software/software-list'
 import AppSearchBar from './elements/app-search-bar.component'
 import socketIOClient from 'socket.io-client'
 import TabsComponent from './software/tabs.component'
 import { SoftwareEntry } from '../../../types/common'
 import { CustomTabProps } from '../interfaces/common'
 import PackageDetails from './software/package-details.component'
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
+import FlipOutlinedIcon from '@mui/icons-material/FlipOutlined'
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 
 const DashboardComponent: React.FC = () => {
   const ENDPOINT = 'http://localhost:3001/'
@@ -22,9 +25,6 @@ const DashboardComponent: React.FC = () => {
   const [displayedSoftware, setDisplayedSoftware] = useState<SoftwareEntry[]>([])
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [value, setValue] = useState({
-    toggleVisible: false,
-  })
 
   useEffect(() => {
     dispatch(retrieveWebsites())
@@ -69,24 +69,27 @@ const DashboardComponent: React.FC = () => {
     setDisplayedSoftware(software.slice(startItem, endItem))
   }
 
-  const handleClickToggle = () => {
-    setValue({ toggleVisible: !value.toggleVisible })
+  const onFilterChange = (filteredSoftware: SoftwareEntry[]) => {
+    console.log(filteredSoftware)
   }
 
   const tabs: CustomTabProps[] = [
     {
       tabType: 'MAIN',
+      tabIcon: <ArticleOutlinedIcon />,
       tabLabel: 'Softwareprofil',
       tabContent: !!software && !!software.length ? <PackageDetails software={software[currentIndex]} /> : <div />,
     },
     {
       tabType: 'CREATE_BDS',
+      tabIcon: <FlipOutlinedIcon />,
       tabLabel: 'BDS erstellen',
       tabContent: <div />,
     },
     {
-      tabType: 'API_CALL',
-      tabLabel: 'API-Anfragen',
+      tabType: 'STATUS_REPORTS',
+      tabIcon: <AssessmentOutlinedIcon />,
+      tabLabel: 'Status Berichte',
       tabContent: <div />,
     },
   ]
@@ -100,13 +103,7 @@ const DashboardComponent: React.FC = () => {
               <AppSearchBar />
             </Paper>
             <Paper className="websites-list-container">
-              <WebsitesList
-                software={displayedSoftware}
-                currentIndex={currentIndex}
-                showHidden={value.toggleVisible}
-                setActiveWebsite={setActiveWebsite}
-                handleClickToggle={handleClickToggle}
-              />
+              <SoftwareList software={displayedSoftware} currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
               {/* <Box className="pagination" sx={{ mt: 'auto', pt: 2 }}>
                 {software.length > 0 && (
                   <PaginationContainer

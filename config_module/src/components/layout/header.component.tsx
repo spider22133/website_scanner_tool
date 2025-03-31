@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: 'white' }}>
       <Box className="container-fluid">
-        <Box sx={{ pl: 2, py: 1, width: '100%', display: 'flex' }}>
+        <Box sx={{ px: 2, py: 1, width: '100%', display: 'flex' }}>
           <Link className="navbar-brand" to={'/dashboard'}>
             <img src="/logo.jpg" alt="logo" width="50" height="50" />
           </Link>

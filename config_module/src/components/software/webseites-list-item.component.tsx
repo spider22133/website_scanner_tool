@@ -23,7 +23,6 @@ type Props = {
   index: number
   software: SoftwareEntry
   currentIndex: number
-  showHidden: boolean
   setActiveWebsite: (software: SoftwareEntry, index: number) => void
 }
 
@@ -32,7 +31,7 @@ const variants = {
   closed: { opacity: 0 },
 }
 
-export default function WebsitesListItem({ software, index, currentIndex, setActiveWebsite, showHidden }: Props) {
+export default function WebsitesListItem({ software, index, currentIndex, setActiveWebsite }: Props) {
   const { user } = useSelector((state: RootState) => state.auth)
   const [showAddForm, setShowAddForm] = useState(false)
   const [isChecking, setIsChecking] = useState(false) // Local state to track loading for this item
@@ -154,5 +153,5 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
     )
   }
 
-  return <>{showHidden ? listItem() : !software.is_hidden && listItem()}</>
+  return <>{listItem()}</>
 }

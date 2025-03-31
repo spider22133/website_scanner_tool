@@ -1,79 +1,81 @@
-import { Box, IconButton, Stack, TextField, Tooltip, Autocomplete, Typography } from '@mui/material'
-import { createSoftware, queryWinGetSoftware } from '../../slices/software.slice'
-import { useState, useMemo } from 'react'
-import { RootState, useAppDispatch } from '../../store'
+import { Box, IconButton, Stack, TextField, Tooltip, InputAdornment } from '@mui/material'
+import { useState, ChangeEvent, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { updateSoftwareFilteredList } from '../../slices/software.slice'
 import { SoftwareEntry } from '../../../../types/common'
-import { debounce } from 'lodash'
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import { RootState, useAppDispatch } from '../../store'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
+import FilterListIcon from '@mui/icons-material/FilterList'
 
-type Props = {
-  value: boolean
-  handleClickToggle?: () => void
+// Define filter state interface
+interface FilterState {
+  searchTerm: string
+  showHidden: boolean
 }
 
-const AppFilterBar: React.FC<Props> = ({ handleClickToggle, value }) => {
+const AppFilterBar: React.FC = () => {
   const dispatch = useAppDispatch()
-  const softwareList = useSelector((state: RootState) => state.software.softwareSearchList || [])
-  const [inputValue, setInputValue] = useState('')
-  const [selectedSoftware, setSelectedSoftware] = useState<SoftwareEntry | null>(null)
+  const allSoftwareEntries = useSelector((state: RootState) => state.software.software ?? [])
+  const [filterState, setFilterState] = useState<FilterState>({
+    searchTerm: '',
+    showHidden: false,
+  })
 
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((query: string) => {
-        if (query.length >= 3) dispatch(queryWinGetSoftware(query))
-      }, 700),
-    [dispatch],
-  )
-
-  const handleSearchChange = (_: React.SyntheticEvent, value: string, reason: string) => {
-    setInputValue(value)
-    if (reason === 'input') debouncedSearch(value)
+  const updateFilteredSoftwareList = (filteredSoftware: SoftwareEntry[]) => {
+    dispatch(updateSoftwareFilteredList(filteredSoftware))
   }
 
-  const handleAddToList = () => {
-    if (selectedSoftware) {
-      dispatch(createSoftware(selectedSoftware))
-      setSelectedSoftware(null)
-      setInputValue('')
-    }
+  const getFilteredSoftwareList = (filter: FilterState): SoftwareEntry[] => {
+    return allSoftwareEntries.filter(software => {
+      const matchesName = software.name.toLowerCase().includes(filter.searchTerm.toLowerCase())
+      const matchesVisibility = software.is_hidden === filter.showHidden
+      return matchesName && matchesVisibility
+    })
   }
+
+  const updateFilterState = (updates: Partial<FilterState>) => {
+    setFilterState(prevState => {
+      const newFilterState = { ...prevState, ...updates }
+      updateFilteredSoftwareList(getFilteredSoftwareList(newFilterState))
+      return newFilterState
+    })
+  }
+
+  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateFilterState({ searchTerm: event.target.value })
+  }
+
+  const toggleVisibilityFilter = () => {
+    updateFilterState({ showHidden: !filterState.showHidden })
+  }
+
+  useEffect(() => {
+    updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
+  }, [])
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-      <Autocomplete
-        options={softwareList} // Ensure this is an array (use empty array fallback)
-        inputValue={inputValue}
-        filterOptions={options => (options.length === 0 ? [] : options)} // Force empty array when no results
-        getOptionLabel={option => (typeof option === 'string' ? option : `${option.name} (${option.version})`)}
-        noOptionsText="Keine Suchergebnisse"
-        onInputChange={handleSearchChange}
-        onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
-        renderInput={params => <TextField {...params} variant="outlined" label="Filter" placeholder="Nach Namen filtern..." fullWidth />}
-        renderOption={(props, option) => {
-          if (typeof option === 'string') return null // Prevent rendering invalid options
-          return (
-            <li {...props} key={`${option.winget_id}-${option.version}`}>
-              <Box>
-                <Typography variant="body1">{option.name}</Typography>
-                <Typography variant="caption" color="textSecondary">
-                  {option.winget_id} - v{option.version}
-                </Typography>
-              </Box>
-            </li>
-          )
+    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ width: '100%' }}>
+      <TextField
+        placeholder="Nach Namen filtern..."
+        variant="outlined"
+        value={filterState.searchTerm}
+        onChange={handleSearchTermChange}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <FilterListIcon />
+            </InputAdornment>
+          ),
         }}
-        sx={{ flexGrow: 1 }}
         size="small"
-        freeSolo
+        fullWidth
+        aria-label="Software filter input"
       />
-
       <Box sx={{ display: 'flex', alignItems: 'center', pr: 2 }}>
-        <Tooltip title={value ? 'Ausblenden' : 'Anzeigen'} arrow>
-          <IconButton aria-label="Sichtbarkeit umschalten" onClick={handleClickToggle} edge="end">
-            {value ? <VisibilityOff /> : <Visibility />}
+        <Tooltip title={filterState.showHidden ? 'Ausblenden' : 'Anzeigen'} arrow>
+          <IconButton aria-label="Toggle hidden software visibility" onClick={toggleVisibilityFilter} edge="end">
+            {filterState.showHidden ? <VisibilityOff /> : <Visibility />}
           </IconButton>
         </Tooltip>
       </Box>

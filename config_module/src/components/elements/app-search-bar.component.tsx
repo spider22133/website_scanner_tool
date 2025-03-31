@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, TextField, Autocomplete, Typography } from '@mui/material'
+import { Box, IconButton, Stack, TextField, Autocomplete, Typography, InputAdornment } from '@mui/material'
 import { createSoftware, queryWinGetSoftware } from '../../slices/software.slice'
 import { useState, useMemo } from 'react'
 import { RootState, useAppDispatch } from '../../store'
@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 import { SoftwareEntry } from '../../../../types/common'
 import { debounce } from 'lodash'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd'
+import SearchIcon from '@mui/icons-material/Search'
 
 const AppSearchBar: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -45,7 +46,19 @@ const AppSearchBar: React.FC = () => {
         onInputChange={handleSearchChange}
         onChange={(_, value) => setSelectedSoftware(typeof value === 'string' ? null : value)}
         renderInput={params => (
-          <TextField {...params} variant="outlined" label="Suche" placeholder="Geben Sie den Namen der gesuchten Anwendung ein..." fullWidth />
+          <TextField
+            {...params}
+            variant="outlined"
+            placeholder="Geben Sie den Namen der gesuchten Anwendung ein..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            fullWidth
+          />
         )}
         renderOption={(props, option) => {
           if (typeof option === 'string') return null // Prevent rendering invalid options

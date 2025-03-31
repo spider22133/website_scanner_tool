@@ -9,20 +9,18 @@ import AppFilterBar from '../elements/app-filter-bar.component'
 type Props = {
   software: SoftwareEntry[]
   currentIndex: number
-  showHidden: boolean
-  handleClickToggle?: () => void
   setActiveWebsite: (software: SoftwareEntry, index: number) => void
 }
 
-const WebsitesList: React.FC<Props> = ({ setActiveWebsite, handleClickToggle, currentIndex, showHidden, software }) => {
-  const { createSoftwareLoading } = useSelector((state: RootState) => state.software)
+const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, software }) => {
+  const { createSoftwareLoading, softwareFilteredList } = useSelector((state: RootState) => state.software)
   const countByVisibility = (isHidden: boolean) => {
     return software.filter(software => software.is_hidden === isHidden).length
   }
 
   return (
     <Box sx={{ height: '97%', display: 'flex', flexDirection: 'column' }}>
-      <AppFilterBar value={showHidden} handleClickToggle={handleClickToggle} />
+      <AppFilterBar />
       <Box sx={{ width: '100%', textAlign: 'right', mt: 2 }}>
         <Typography variant="body2">
           Ausgeblendet: {countByVisibility(true)} / Sichtbar: {countByVisibility(false)} / Gesamt: {software.length}
@@ -31,16 +29,9 @@ const WebsitesList: React.FC<Props> = ({ setActiveWebsite, handleClickToggle, cu
       <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
         <List>
           {createSoftwareLoading && <Skeleton variant="rectangular" width="100%" height={84} />}
-          {software &&
-            software.map((software: SoftwareEntry, index) => (
-              <WebsitesListItem
-                key={index}
-                index={index}
-                currentIndex={currentIndex}
-                software={software}
-                showHidden={showHidden}
-                setActiveWebsite={setActiveWebsite}
-              />
+          {softwareFilteredList &&
+            softwareFilteredList.map((software: SoftwareEntry, index) => (
+              <WebsitesListItem key={index} index={index} currentIndex={currentIndex} software={software} setActiveWebsite={setActiveWebsite} />
             ))}
         </List>
       </Box>
@@ -48,4 +39,4 @@ const WebsitesList: React.FC<Props> = ({ setActiveWebsite, handleClickToggle, cu
   )
 }
 
-export default WebsitesList
+export default SoftwareList
