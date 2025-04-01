@@ -34,8 +34,8 @@ sequelize.authenticate()
 const DB = {
   Roles: RoleModel(sequelize),
   SoftwareVersions: SoftwareVersionModel(sequelize),
-  Software: SoftwareModel(sequelize),
   Users: UserModel(sequelize),
+  Software: SoftwareModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
 }

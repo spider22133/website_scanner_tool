@@ -78,7 +78,7 @@ class App {
 
   private async connectToDatabase() {
     try {
-      await DB.sequelize.sync({ force: false })
+      await DB.sequelize.sync({ alter: true })
       await initRoles()
       logger.info('✅ Database connected successfully')
     } catch (error) {

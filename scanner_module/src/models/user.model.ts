@@ -7,9 +7,14 @@ import {
   BelongsToManyHasAssociationMixin,
   BelongsToManyCountAssociationsMixin,
   Association,
+  HasManyGetAssociationsMixin,
+  HasManySetAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyCountAssociationsMixin,
 } from 'sequelize'
 import { User } from '@/interfaces/user.interface'
 import { RoleModel } from './role.model'
+import { SoftwareModel } from './software.model'
 
 export type UserCreationAttributes = Optional<User, 'id'>
 
@@ -26,6 +31,11 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public getRoles!: BelongsToManyGetAssociationsMixin<RoleModel> // Note the null assertions!
   public hasRole!: BelongsToManyHasAssociationMixin<RoleModel, number>
   public countRoles!: BelongsToManyCountAssociationsMixin
+
+  public getSoftware!: HasManyGetAssociationsMixin<SoftwareModel>
+  public setSoftware!: HasManySetAssociationsMixin<SoftwareModel, number>
+  public removeSoftware!: HasManyRemoveAssociationMixin<SoftwareModel, number>
+  public countSoftware!: HasManyCountAssociationsMixin
 
   public static associations: {
     roles: Association<UserModel, RoleModel>

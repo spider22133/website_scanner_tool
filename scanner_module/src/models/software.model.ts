@@ -1,7 +1,17 @@
-import { Sequelize, DataTypes, Model, Optional, HasManyGetAssociationsMixin, Association, HasManyCreateAssociationMixin } from 'sequelize'
+import {
+  Sequelize,
+  DataTypes,
+  Model,
+  Optional,
+  HasManyGetAssociationsMixin,
+  Association,
+  HasManyCreateAssociationMixin,
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+} from 'sequelize'
 import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
-import { str } from 'envalid'
+import { UserModel } from './user.model'
 
 export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source'>
 
@@ -22,6 +32,9 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public getVersions!: HasManyGetAssociationsMixin<SoftwareVersionModel>
   public createVersion!: HasManyCreateAssociationMixin<SoftwareVersionModel>
 
+  public getUser!: BelongsToGetAssociationMixin<UserModel>
+  public setUser!: BelongsToSetAssociationMixin<UserModel, number>
+
   public async getLastVersion(): Promise<SoftwareVersionModel | null> {
     const versions = await this.getVersions({
       order: [['updatedAt', 'DESC']],
@@ -33,7 +46,8 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   }
 
   public static associations: {
-    projects: Association<SoftwareModel, SoftwareVersionModel>
+    versions: Association<SoftwareModel, SoftwareVersionModel>
+    users: Association<SoftwareModel, UserModel>
   }
 }
 
@@ -90,6 +104,17 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
   SoftwareVersionModel.belongsTo(SoftwareModel, {
     foreignKey: 'software_id',
     as: 'software',
+  })
+
+  UserModel.hasMany(SoftwareModel, {
+    foreignKey: 'user_id',
+    as: 'software',
+    onDelete: 'CASCADE',
+  })
+
+  SoftwareModel.belongsTo(UserModel, {
+    foreignKey: 'user_id',
+    as: 'user',
   })
 
   return SoftwareModel
