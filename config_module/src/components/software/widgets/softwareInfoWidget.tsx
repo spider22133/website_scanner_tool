@@ -1,24 +1,24 @@
 import React from 'react'
+import { SoftwareEntry } from '../../../../../types/common'
 import { Card, CardContent, Typography, Box, Divider, Link, Grid, Chip, Stack, Tooltip } from '@mui/material'
-import { SoftwareEntry } from '../../../../types/common'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 
-interface PackageDetailsProps {
+interface SoftwareInfoWidgetProps {
   software: SoftwareEntry
 }
 
-const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
-  const { name, version, bara_version, details, is_current } = software
+const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => {
+  const { version, bara_version, details, is_current } = software
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
 
   return (
-    <Card sx={{ my: 2, p: 2 }}>
+    <Card sx={{ my: 2, p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardContent>
         {/* Header Section */}
         <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight={600}>
-            {name}
+            Information
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} />
@@ -130,4 +130,4 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ software }) => {
   )
 }
 
-export default PackageDetails
+export default SoftwareInfoWidget

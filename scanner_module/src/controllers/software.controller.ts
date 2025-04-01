@@ -54,8 +54,8 @@ class SoftwareController {
   public updateSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteData: CreateSoftwareDto = req.body
-
-      const updateSoftwareData = await this.softwareService.updateSoftware(req.params.id, { ...websiteData, is_current: true })
+      const updateSoftwareData = await this.softwareService.updateSoftware(req.params.id, { ...websiteData })
+      console.log(updateSoftwareData)
       res.status(200).json({ data: updateSoftwareData, message: 'updated' })
     } catch (error) {
       next(error)

@@ -19,8 +19,8 @@ const getWebsiteMainStepStates = (id: string) => {
 }
 
 const update = (data: SoftwareEntry) => {
-  const { winget_id, name, is_hidden } = data
-  return http.put(`/software/${winget_id}`, { name, is_hidden })
+  const { winget_id } = data
+  return http.put(`/software/${winget_id}`, { ...data })
 }
 
 const checkStatus = (id: string) => {

@@ -233,11 +233,13 @@ const websiteSlice = createSlice({
     })
     builder.addCase(updateSoftware.fulfilled, (state, { payload }) => {
       const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
+      console.log(payload)
 
       state.loading = false
       state.software[index] = {
         ...state.software[index],
         ...payload,
+        details: JSON.parse(payload.details as string) as WingetPackageDetails,
       }
     })
     builder.addCase(updateSoftware.rejected, state => {

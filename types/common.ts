@@ -25,9 +25,10 @@ export interface WingetPackageDetails {
 export interface SoftwareEntry {
   name: string;
   winget_id: string;
+  user_id?: string;
   version: string;
   bara_version?: string;
-  source: string;
+  source?: string;
   details?: WingetPackageDetails;
   is_hidden?: boolean;
   is_current?: boolean;

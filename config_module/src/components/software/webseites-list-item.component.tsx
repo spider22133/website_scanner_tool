@@ -106,13 +106,13 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                     {software.is_hidden ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </Tooltip>
-                {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
+                {/* {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
                   <Tooltip title="Bearbeiten" arrow>
                     <IconButton aria-label="bearbeiten" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
-                )}
+                )} */}
                 {user.roles && user.roles.includes('ROLE_ADMIN') && (
                   <Tooltip title="Löschen" arrow>
                     <IconButton

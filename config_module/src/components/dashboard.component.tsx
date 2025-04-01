@@ -10,10 +10,11 @@ import socketIOClient from 'socket.io-client'
 import TabsComponent from './software/tabs.component'
 import { SoftwareEntry } from '../../../types/common'
 import { CustomTabProps } from '../interfaces/common'
-import PackageDetails from './software/package-details.component'
+import SoftwareDetails from './software/details.component'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import FlipOutlinedIcon from '@mui/icons-material/FlipOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
+import { retrieveUsers } from '../slices/user.slice'
 
 const DashboardComponent: React.FC = () => {
   const ENDPOINT = 'http://localhost:3001/'
@@ -28,6 +29,7 @@ const DashboardComponent: React.FC = () => {
 
   useEffect(() => {
     dispatch(retrieveWebsites())
+    dispatch(retrieveUsers())
 
     const socket = socketIOClient(ENDPOINT)
     socket.on('updateSoftware', (data: any) => {
@@ -79,7 +81,7 @@ const DashboardComponent: React.FC = () => {
       tabIcon: <ArticleOutlinedIcon />,
       tabLabel: 'Softwareprofil',
       tabContent:
-        !!softwareFilteredList && !!softwareFilteredList.length ? <PackageDetails software={softwareFilteredList[currentIndex]} /> : <div />,
+        !!softwareFilteredList && !!softwareFilteredList.length ? <SoftwareDetails software={softwareFilteredList[currentIndex]} /> : <div />,
     },
     {
       tabType: 'CREATE_BDS',
@@ -118,10 +120,8 @@ const DashboardComponent: React.FC = () => {
               </Box> */}
             </Paper>
           </Grid>
-          <Grid item xs={12} lg={4} className="tabs-container">
-            <Box>
-              <TabsComponent tabs={tabs} />
-            </Box>
+          <Grid item xs={12} lg={7} className="tabs-container">
+            <TabsComponent tabs={tabs} />
           </Grid>
         </Grid>
       </Container>

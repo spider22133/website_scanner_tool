@@ -1,4 +1,4 @@
-import { IsString, IsBoolean } from 'class-validator'
+import { IsString, IsBoolean, IsNumber } from 'class-validator'
 
 export default class CreateSoftwareDto {
   @IsString()
@@ -15,6 +15,9 @@ export default class CreateSoftwareDto {
 
   @IsString()
   public winget_id: string
+
+  @IsNumber()
+  public user_id: number
 
   @IsString()
   public details: string
