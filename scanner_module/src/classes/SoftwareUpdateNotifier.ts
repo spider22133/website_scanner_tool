@@ -34,14 +34,14 @@ class SoftwareUpdateNotifier {
 
     try {
       const allSoftwareUpdates = await this.softwareService.findAllSoftware()
-      const todaysUpdates = this.getTodaysUpdates(allSoftwareUpdates)
+      const todaysUpdates = await this.getTodaysUpdates(allSoftwareUpdates)
 
-      if (todaysUpdates.length === 0) {
+      if (todaysUpdates?.length === 0) {
         logger.info('ℹ️ Keine Software-Updates für heute gefunden.')
         return
       }
 
-      const message = this.formatSoftwareUpdateMessage(todaysUpdates)
+      const message = await this.formatSoftwareUpdateMessage(todaysUpdates)
       if (message) {
         this.webexBot.sendMessage(roomId, message)
       } else {
@@ -53,33 +53,80 @@ class SoftwareUpdateNotifier {
     }
   }
 
-  private getTodaysUpdates(updates: SoftwareModel[]): SoftwareModel[] {
+  private async getTodaysUpdates(updates: SoftwareModel[]): Promise<SoftwareModel[]> {
     const today = dayjs().format(DATE_FORMAT)
-    return updates.filter(software => dayjs(software.updatedAt).format(DATE_FORMAT) === today && !software.is_current)
+    const results: SoftwareModel[] = updates.filter(item => !item.is_current)
+    let hasUpdate = false
+
+    await Promise.all(
+      results.map(async software => {
+        const latestVersion = await software.getLastVersion()
+
+        if (latestVersion && dayjs(latestVersion.updatedAt).format(DATE_FORMAT) === today) {
+          hasUpdate = true
+        }
+      }),
+    )
+
+    if (hasUpdate) {
+      return results.filter((software): software is SoftwareModel => software !== null)
+    }
+
+    return []
   }
 
-  private formatSoftwareUpdateMessage(updates: SoftwareModel[]): string | null {
+  private async formatSoftwareUpdateMessage(updates: SoftwareModel[]): Promise<string | null> {
     if (updates.length === 0) {
       return null
     }
 
-    const timestamp = dayjs().format(FULL_TIMESTAMP_FORMAT)
     const header = `**🆕 NON-MSW Changelog**`
-
-    // Improved table formatting with better readability
     const tableHeader = ['| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version |', '|----|-------|----------------|---------|---------|'].join('\n')
 
-    const tableRows = updates
-      .map((software, index) => {
-        const date = dayjs(software.updatedAt).format(DISPLAY_DATE_FORMAT)
-        const time = dayjs(software.updatedAt).format(TIME_FORMAT)
-        const name = software.name || 'Unbekannt'
+    // Fetch all versions and process them
+    const sortedUpdates = await this.getSortedUpdates(updates)
+
+    if (sortedUpdates.length === 0) {
+      return null
+    }
+
+    const tableRows = sortedUpdates
+      .reverse()
+      .map((item, index) => {
+        const { software, date, time } = item
         const version = software.version || 'N/A'
-        return `| ${index + 1} | ${date} | ${time} | ${name} | ${version} |`
+        const name = software.name || 'Unbekannt'
+        return `| ${sortedUpdates.length - index} | ${dayjs(date).format(DISPLAY_DATE_FORMAT)} | ${time} | ${name} | ${version} |`
       })
       .join('\n')
 
     return [header, '', 'Hier sind die neuesten Software-Updates für heute:', '', tableHeader, tableRows, ''].join('\n')
+  }
+
+  // Helper function to get sorted updates
+  private async getSortedUpdates(updates: SoftwareModel[]): Promise<{ software: SoftwareModel; date: Date; time: string }[]> {
+    const updatesWithVersions = await Promise.all(
+      updates.map(async software => {
+        const latestVersion = await software.getLastVersion()
+        if (latestVersion) {
+          const time = dayjs(latestVersion.updatedAt).format(TIME_FORMAT)
+          return { software, date: latestVersion.updatedAt, time }
+        }
+        return null
+      }),
+    )
+
+    // Filter out null values and sort by date and time
+    const validUpdates = updatesWithVersions.filter(item => item !== null) as { software: SoftwareModel; date: Date; time: string }[]
+
+    return validUpdates.sort((a, b) => {
+      // Sort first by date, then by time if the dates are equal
+      const dateDiff = dayjs(b.date).isBefore(dayjs(a.date)) ? 1 : -1
+      if (dateDiff === -1) {
+        return dayjs(b.time).isBefore(dayjs(a.time)) ? 1 : -1
+      }
+      return dateDiff
+    })
   }
 }
 

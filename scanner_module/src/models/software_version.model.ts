@@ -25,14 +25,22 @@ export default function (sequelize: Sequelize): typeof SoftwareVersionModel {
       },
       software_id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
       },
       version: {
         type: DataTypes.STRING,
+        allowNull: false,
       },
     },
     {
       tableName: 'software_versions',
       sequelize,
+      indexes: [
+        {
+          unique: true,
+          fields: ['version', 'software_id'],
+        },
+      ],
     },
   )
 

@@ -32,19 +32,14 @@ class SoftwareVersionChecker {
   public async checkAllSoftware(): Promise<void> {
     try {
       const findAllSoftwaresData: SoftwareModel[] = await this.softwareService.findAllSoftware()
-      let notificationSent = false
 
       for (const software of findAllSoftwaresData) {
-        const result = await this.checkSoftwareVersion(software)
-
-        // Check if the software was updated and the notification has not been sent yet
-        if (result.software && !result.software.is_current && !notificationSent) {
-          this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID)
-          notificationSent = true
-        }
+        await this.checkSoftwareVersion(software)
       }
 
-      this.socket.emit('updateSoftware', 'changed')
+      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV)
+
+      this.socket.connected && this.socket.emit('updateSoftware', 'changed')
     } catch (error) {
       console.log(error)
     }
@@ -84,15 +79,21 @@ class SoftwareVersionChecker {
 
     if (packageDetails.version !== software.version) {
       isUpdated = true
-      return await this.softwareService.updateSoftware(software.winget_id, {
-        ...software,
-        version: packageDetails.version,
-      })
+      return await this.softwareService.updateSoftware(
+        software.winget_id,
+        {
+          ...software,
+          version: packageDetails.version,
+          is_current: false,
+        },
+        true,
+      )
     }
 
     return await this.softwareService.updateSoftware(software.winget_id, {
       ...software,
       details: JSON.stringify(packageDetails),
+      is_current: true,
     })
   }
 

@@ -8,9 +8,8 @@ dayjs.extend(weekday)
 class TimerController {
   private static _instance: TimerController
   private timer?: NodeJS.Timeout
-  private triggerHour = 7 // Default trigger time: 07:00
+  private triggerHour = 9 // Default trigger time: 07:00
   private triggerMinute = 0
-
   private constructor(public worker: SoftwareVersionChecker) {}
 
   public static getInstance(worker: SoftwareVersionChecker): TimerController {

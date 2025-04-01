@@ -22,6 +22,16 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public getVersions!: HasManyGetAssociationsMixin<SoftwareVersionModel>
   public createVersion!: HasManyCreateAssociationMixin<SoftwareVersionModel>
 
+  public async getLastVersion(): Promise<SoftwareVersionModel | null> {
+    const versions = await this.getVersions({
+      order: [['updatedAt', 'DESC']],
+      limit: 1,
+    })
+
+    // Return the first version if available, or null
+    return versions.length > 0 ? versions[0] : null
+  }
+
   public static associations: {
     projects: Association<SoftwareModel, SoftwareVersionModel>
   }

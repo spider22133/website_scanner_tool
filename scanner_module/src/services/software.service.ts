@@ -23,11 +23,25 @@ class SoftwareService {
     return findSoftware
   }
 
-  public async updateSoftware(id: string, data: CreateSoftwareDto): Promise<SoftwareModel> {
+  public async updateSoftware(id: string, data: CreateSoftwareDto, withVersion = false): Promise<SoftwareModel> {
     const findSoftware = await this.software.findOne({ where: { winget_id: id } })
     if (!findSoftware) throw new HttpException(409, 'There is no software with such id')
 
     await this.software.update(data, { where: { winget_id: id } })
+
+    if (withVersion && findSoftware) {
+      // Check for existing version
+      const existingVersion = await findSoftware.getVersions({ where: { version: data.version } })
+      if (existingVersion.length > 0) {
+        throw new HttpException(409, `Version ${data.version} already exists for this software`)
+      }
+
+      // Create new version
+      await findSoftware.createVersion({
+        version: data.version,
+        software_id: findSoftware.id,
+      })
+    }
 
     return await this.software.findOne({ where: { winget_id: id } })
   }
