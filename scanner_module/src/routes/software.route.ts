@@ -20,10 +20,8 @@ class SoftwareRoute implements Route {
   private initializeRoutes() {
     this.router.get(`${this.path}`, authMiddleware, this.softwareController.getSoftware)
     this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.softwareController.getSoftwareById)
-    // this.router.get(`${this.path}/q=:query`, authMiddleware, this.softwareController.searchWebsite)
     this.router.get(`${this.path}/q=:query`, authMiddleware, this.softwareController.searchWinGetSoftware)
     this.router.get(`${this.path}/:id/check`, authMiddleware, this.softwareController.checkSoftware)
-    // this.router.get(`${this.path}/:id(\\d+)/main_states`, authMiddleware, this.softwareController.getWebsiteMainStepStates)
     this.router.put(`${this.path}/:id`, validationMiddleware(CreateSoftwareDto, 'body', true), this.softwareController.updateSoftware)
     this.router.post(
       `${this.path}/create`,

@@ -1,93 +1,126 @@
-import React, { useEffect, useState } from 'react'
-import { SoftwareEntry } from '../../../../../types/common'
-import { Autocomplete, Chip, IconButton, Paper, Stack, TextField, Typography } from '@mui/material'
-import EditIcon from '@mui/icons-material/EditOutlined'
+import React, { useEffect } from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
+
+import { Autocomplete, Chip, Paper, Stack, TextField, Typography } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton'
 import SaveIcon from '@mui/icons-material/SaveOutlined'
+
 import { RootState } from '../../../store'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateSoftware } from '../../../slices/software.slice'
 import IUser from '../../../interfaces/user.interface'
+import { SoftwareEntry } from '../../../../../types/common'
 
 interface SoftwareSettingsWidgetProps {
   software: SoftwareEntry
 }
 
+const validationSchema = Yup.object().shape({
+  mainResponsible: Yup.object().nullable().required('Hauptverantwortlicher ist erforderlich'),
+  // representatives: Yup.array().of(Yup.object()).min(1, 'Mindestens ein Vertreter ist erforderlich'),
+})
+
 const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ software }) => {
-  const { winget_id, version, name } = software
   const { users } = useSelector((state: RootState) => state.users)
   const dispatch = useDispatch()
 
-  const [isMainResponsibleEditable, setMainResponsibleEditable] = useState(false)
-  const [isRepresentativeEditable, setRepresentativeEditable] = useState(false)
-  const [selectedMainResponsible, setSelectedMainResponsible] = useState<IUser | null>(null)
-  const [selectedRepresentatives, setSelectedRepresentatives] = useState<IUser[]>([])
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors, isDirty },
+  } = useForm<{
+    mainResponsible: IUser | null
+    representatives: IUser[]
+  }>({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      mainResponsible: null,
+      // representatives: [],
+    },
+  })
 
-  const toggleMainResponsibleEdit = () => {
-    if (isMainResponsibleEditable && selectedMainResponsible) {
-      // Check if the selected value differs from the current one
-      if (selectedMainResponsible.id !== software.user_id) {
-        dispatch(updateSoftware({ winget_id, name, version, user_id: selectedMainResponsible.id }))
-      }
-    }
-    setMainResponsibleEditable(!isMainResponsibleEditable)
-  }
-
-  const toggleRepresentativeEdit = () => {
-    if (isRepresentativeEditable && selectedRepresentatives.length > 0) {
-      // Create an array of selected representative IDs
-      const selectedIds = selectedRepresentatives.map(rep => rep.id)
-      // Check if the selected IDs differ from the stored software representatives
-      // if (JSON.stringify(selectedIds) !== JSON.stringify(software.representative_ids)) {
-      //   dispatch(updateSoftware({ ...software, representative_ids: selectedIds }))
-      // }
-    }
-    setRepresentativeEditable(!isRepresentativeEditable)
-  }
+  const mainResponsible = watch('mainResponsible')
+  // const representatives = watch('representatives')
 
   useEffect(() => {
-    setSelectedMainResponsible(users.find(item => item.id === software.user_id) || null)
-    // setSelectedRepresentatives(users.filter(user => software.representative_ids?.includes(user.id)))
-  }, [software, users])
+    const initialResponsible = users.find(user => user.id === software.user_id) || null
+    // Assuming representatives are fetched or derived from elsewhere, set an empty array initially
+    reset({
+      mainResponsible: initialResponsible,
+      // representatives: [],
+    })
+  }, [software, users, reset])
+
+  const onSubmit: SubmitHandler<{ mainResponsible: IUser | null; representatives: IUser[] }> = data => {
+    if (!isDirty) return
+    const updatedSoftware = {
+      version: software.version,
+      winget_id: software.winget_id,
+      name: software.name,
+      user_id: data.mainResponsible?.id,
+      // Here we assume you have some way to update representatives (if needed)
+      // representative_ids: data.representatives.map(rep => rep.id), // Uncomment if applicable
+    }
+    dispatch(updateSoftware(updatedSoftware))
+  }
 
   return (
     <Paper sx={{ my: 2, p: 4, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Stack spacing={3} sx={{ width: '100%' }}>
-        <Typography variant="h5" fontWeight={600}>
-          Einstellungen
-        </Typography>
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Autocomplete
-            options={users}
-            getOptionLabel={option => option.email}
-            value={selectedMainResponsible}
-            onChange={(event, value) => setSelectedMainResponsible(value)}
-            renderInput={params => <TextField {...params} variant="filled" label="Hauptverantwortlicher" />}
-            sx={{ flexGrow: 1 }}
-            readOnly={!isMainResponsibleEditable}
-          />
-          <IconButton onClick={toggleMainResponsibleEdit} color={isMainResponsibleEditable ? 'primary' : 'default'} size="large">
-            {isMainResponsibleEditable ? <SaveIcon /> : <EditIcon />}
-          </IconButton>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3} sx={{ width: '100%' }}>
+          <Typography variant="h5" fontWeight={600}>
+            Einstellungen
+          </Typography>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Autocomplete
+              options={users}
+              getOptionLabel={option => option.email}
+              value={mainResponsible}
+              onChange={(_, value) => setValue('mainResponsible', value, { shouldDirty: true })}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Hauptverantwortlicher"
+                  error={!!errors.mainResponsible}
+                  helperText={errors.mainResponsible?.message}
+                  variant="filled"
+                />
+              )}
+              sx={{ flexGrow: 1 }}
+            />
+          </Stack>
+          {/* <Stack direction="row" alignItems="center" spacing={2}>
+            <Autocomplete
+              multiple
+              options={users}
+              getOptionLabel={option => option.email}
+              // value={representatives}
+              onChange={(_, value) => setValue('representatives', value, { shouldDirty: true })}
+              renderTags={(value: readonly IUser[], getTagProps) =>
+                value.map((option, index) => <Chip {...getTagProps({ index })} key={option.id} label={option.email} />)
+              }
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Vertreter"
+                  error={!!errors.representatives}
+                  variant="filled"
+                  // helperText={errors.representatives?.message}
+                />
+              )}
+              sx={{ flexGrow: 1 }}
+            />
+          </Stack> */}
+          <LoadingButton type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
+            Speichern
+          </LoadingButton>
         </Stack>
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Autocomplete
-            multiple
-            options={users}
-            getOptionLabel={option => option.email}
-            value={selectedRepresentatives}
-            onChange={(event, value) => setSelectedRepresentatives(value)}
-            renderTags={(value: readonly IUser[], getTagProps) =>
-              value.map((option: IUser, index: number) => <Chip variant="outlined" size="small" label={option.email} {...getTagProps({ index })} />)
-            }
-            renderInput={params => <TextField {...params} variant="filled" label="Vertreter" />}
-            sx={{ flexGrow: 1 }}
-            readOnly={!isRepresentativeEditable}
-          />
-          <IconButton onClick={toggleRepresentativeEdit} color={isRepresentativeEditable ? 'primary' : 'default'} size="large">
-            {isRepresentativeEditable ? <SaveIcon /> : <EditIcon />}
-          </IconButton>
-        </Stack>
-      </Stack>
+      </form>
     </Paper>
   )
 }

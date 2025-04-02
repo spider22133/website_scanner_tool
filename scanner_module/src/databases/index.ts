@@ -5,6 +5,7 @@ import UserModel from '@/models/user.model'
 import RoleModel from '@models/role.model'
 import SoftwareModel from '@/models/software.model'
 import SoftwareVersionModel from '@models/software_version.model'
+import SoftwareRepresentativeModel from '@models/software_representative.model'
 
 const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig')
 const sequelize = new Sequelize(database, user, password, {
@@ -31,9 +32,10 @@ const sequelize = new Sequelize(database, user, password, {
 
 sequelize.authenticate()
 
-const DB = {
+const DB: any = {
   Roles: RoleModel(sequelize),
   SoftwareVersions: SoftwareVersionModel(sequelize),
+  SoftwareRepresentative: SoftwareRepresentativeModel(sequelize),
   Users: UserModel(sequelize),
   Software: SoftwareModel(sequelize),
   sequelize, // connection instance (RAW queries)

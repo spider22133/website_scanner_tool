@@ -8,10 +8,13 @@ import {
   HasManyCreateAssociationMixin,
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManySetAssociationsMixin,
 } from 'sequelize'
 import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
 import { UserModel } from './user.model'
+import { SoftwareRepresentative } from './software_representative.model'
 
 export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source'>
 
@@ -35,6 +38,9 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public getUser!: BelongsToGetAssociationMixin<UserModel>
   public setUser!: BelongsToSetAssociationMixin<UserModel, number>
 
+  public getRepresentatives!: BelongsToManyGetAssociationsMixin<SoftwareRepresentative>
+  public setRepresentatives!: BelongsToManySetAssociationsMixin<SoftwareRepresentative, number>
+
   public async getLastVersion(): Promise<SoftwareVersionModel | null> {
     const versions = await this.getVersions({
       order: [['updatedAt', 'DESC']],
@@ -48,6 +54,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public static associations: {
     versions: Association<SoftwareModel, SoftwareVersionModel>
     users: Association<SoftwareModel, UserModel>
+    representatives: Association<SoftwareModel, SoftwareRepresentative>
   }
 }
 
@@ -94,6 +101,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
     },
   )
 
+  // Software Version
   SoftwareModel.hasMany(SoftwareVersionModel, {
     sourceKey: 'id',
     foreignKey: 'software_id',
@@ -106,6 +114,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
     as: 'software',
   })
 
+  // Responsible for Software
   UserModel.hasMany(SoftwareModel, {
     foreignKey: 'user_id',
     as: 'software',
@@ -115,6 +124,19 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
   SoftwareModel.belongsTo(UserModel, {
     foreignKey: 'user_id',
     as: 'user',
+  })
+
+  // Representatives for Software
+  UserModel.belongsToMany(SoftwareModel, {
+    through: SoftwareRepresentative,
+    foreignKey: 'user_id',
+    otherKey: 'software_id',
+  })
+
+  SoftwareModel.belongsToMany(UserModel, {
+    through: SoftwareRepresentative,
+    foreignKey: 'software_id',
+    otherKey: 'user_id',
   })
 
   return SoftwareModel

@@ -38,24 +38,11 @@ class SoftwareController {
     }
   }
 
-  /*  public getSoftwareMainStepStates = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const websiteId = Number(req.params.id)
-      const steps = await this.softwareVersionService.findControlStepsBySoftwareId(websiteId)
-      const mainStep = steps.find(step => step.type === 'MAIN')
-      const states = await this.websiteStatesService.findStatesByStepId(mainStep.id)
-
-      res.status(200).json({ data: states, message: 'findOne' })
-    } catch (error) {
-      next(error)
-    }
-  }*/
-
   public updateSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteData: CreateSoftwareDto = req.body
       const updateSoftwareData = await this.softwareService.updateSoftware(req.params.id, { ...websiteData })
-      console.log(updateSoftwareData)
+
       res.status(200).json({ data: updateSoftwareData, message: 'updated' })
     } catch (error) {
       next(error)
@@ -122,17 +109,6 @@ class SoftwareController {
       next(error)
     }
   }
-
-  /*  public searchSoftware = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const searchString = String(req.params.query)
-      const searchSoftwareData: Software[] = await this.softwareService.searchQuery(searchString)
-
-      res.status(200).json({ data: searchSoftwareData })
-    } catch (error) {
-      next(error)
-    }
-  } */
 
   public searchWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
