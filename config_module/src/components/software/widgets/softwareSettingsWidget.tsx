@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Autocomplete, Chip, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Chip, IconButton, Paper, Stack, TextField, Typography } from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
 import SaveIcon from '@mui/icons-material/SaveOutlined'
 
@@ -11,7 +11,8 @@ import { RootState } from '../../../store'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives } from '../../../slices/software.slice'
 import IUser from '../../../interfaces/user.interface'
-import { IRepresentative, SoftwareEntry } from '../../../../../types/common'
+import { SoftwareEntry } from '../../../../../types/common'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 interface SoftwareSettingsWidgetProps {
   software: SoftwareEntry
@@ -82,59 +83,69 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   }
 
   return (
-    <Paper sx={{ my: 2, p: 4, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={3} sx={{ width: '100%' }}>
-          <Typography variant="h5" fontWeight={600}>
-            Einstellungen
-          </Typography>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Autocomplete
-              options={users}
-              getOptionLabel={option => option.email}
-              value={mainResponsible}
-              onChange={(_, value) => setValue('mainResponsible', value, { shouldDirty: true })}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Hauptverantwortlicher"
-                  error={!!errors.mainResponsible}
-                  helperText={errors.mainResponsible?.message}
-                  variant="filled"
-                />
-              )}
-              sx={{ flexGrow: 1 }}
-            />
-          </Stack>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Autocomplete
-              multiple
-              options={users}
-              getOptionLabel={option => option.email}
-              value={mainRepresentatives}
-              onChange={(_, value) => setValue('mainRepresentatives', value, { shouldDirty: true })}
-              renderTags={(value: readonly IUser[], getTagProps) =>
-                value.map((option, index) => <Chip {...getTagProps({ index })} key={option.id} label={option.email} size="small" />)
-              }
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label="Vertreter"
-                  error={!!errors.mainRepresentatives?.[0]}
-                  variant="filled"
-                  helperText={errors.mainRepresentatives?.[0]?.message}
-                />
-              )}
-              sx={{ flexGrow: 1 }}
-            />
-          </Stack>
+    <Accordion defaultExpanded sx={{ p: 2 }}>
+      <AccordionSummary
+        expandIcon={
+          <IconButton sx={{ mx: 2 }}>
+            <ExpandMoreIcon />
+          </IconButton>
+        }
+      >
+        <Typography variant="h5" fontWeight={600}>
+          Einstellungen
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={3} sx={{ width: '100%' }}>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Autocomplete
+                options={users}
+                getOptionLabel={option => option.email}
+                value={mainResponsible}
+                onChange={(_, value) => setValue('mainResponsible', value, { shouldDirty: true })}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label="Hauptverantwortlicher"
+                    error={!!errors.mainResponsible}
+                    helperText={errors.mainResponsible?.message}
+                    variant="filled"
+                  />
+                )}
+                sx={{ flexGrow: 1 }}
+              />
+            </Stack>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Autocomplete
+                multiple
+                options={users}
+                getOptionLabel={option => option.email}
+                value={mainRepresentatives}
+                onChange={(_, value) => setValue('mainRepresentatives', value, { shouldDirty: true })}
+                renderTags={(value: readonly IUser[], getTagProps) =>
+                  value.map((option, index) => <Chip {...getTagProps({ index })} key={option.id} label={option.email} size="small" />)
+                }
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label="Vertreter"
+                    error={!!errors.mainRepresentatives?.[0]}
+                    variant="filled"
+                    helperText={errors.mainRepresentatives?.[0]?.message}
+                  />
+                )}
+                sx={{ flexGrow: 1 }}
+              />
+            </Stack>
 
-          <LoadingButton type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
-            Speichern
-          </LoadingButton>
-        </Stack>
-      </form>
-    </Paper>
+            <LoadingButton type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
+              Speichern
+            </LoadingButton>
+          </Stack>
+        </form>
+      </AccordionDetails>
+    </Accordion>
   )
 }
 

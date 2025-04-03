@@ -9,12 +9,16 @@ import Visibility from '@mui/icons-material/VisibilityOutlined'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import IUser from '../../interfaces/user.interface'
 
-// Define filter state interface
 interface FilterState {
   searchTerm: string
   showHidden: boolean
-  status: string // 'Alle', 'Aktuell', 'Ungültig'
+  status: string
   responsible: IUser | string
+}
+
+const optionLabelMap: Record<string, string> = {
+  all: 'Alle',
+  none: 'Keinem zugewiesen',
 }
 
 const AppFilterBar: React.FC = () => {
@@ -43,7 +47,9 @@ const AppFilterBar: React.FC = () => {
         (filter.status === 'Fehlgeschlagen' && software.is_current && software.bara_version === null)
 
       const matchesResponsible =
-        filter.responsible === 'all' || (typeof filter.responsible !== 'string' && software.user_id === filter.responsible.id)
+        filter.responsible === 'all' ||
+        (filter.responsible === 'none' && software.user_id === null) ||
+        (typeof filter.responsible !== 'string' && software.user_id === filter.responsible.id)
 
       return matchesName && matchesVisibility && matchesStatus && matchesResponsible
     })
@@ -65,11 +71,11 @@ const AppFilterBar: React.FC = () => {
     updateFilterState({ showHidden: !filterState.showHidden })
   }
 
-  const handleStatusChange = (event: ChangeEvent<{}>, value: string | null) => {
+  const handleStatusChange = (_: ChangeEvent<{}>, value: string | null) => {
     updateFilterState({ status: value || 'all' })
   }
 
-  const handleResponsibleChange = (event: ChangeEvent<{}>, value: IUser | string | null) => {
+  const handleResponsibleChange = (_: ChangeEvent<{}>, value: IUser | string | null) => {
     updateFilterState({ responsible: value || 'all' })
   }
 
@@ -77,14 +83,14 @@ const AppFilterBar: React.FC = () => {
     updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
   }, [allSoftwareEntries])
 
-  const responsibleOptions = ['all' as const, ...users] as const
+  const staticOptions = ['all', 'none'] as const
+  const responsibleOptions = [...staticOptions, ...users]
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ width: '100%' }}>
+    <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
       <TextField
         label="Name"
         placeholder="Nach Namen filtern..."
-        variant="outlined"
         value={filterState.searchTerm}
         onChange={handleSearchTermChange}
         InputProps={{
@@ -101,28 +107,28 @@ const AppFilterBar: React.FC = () => {
       <Autocomplete
         options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen']}
         value={filterState.status}
-        getOptionLabel={option => (option === 'all' ? 'Alle' : option)}
+        getOptionLabel={option => optionLabelMap[option] || option}
         onChange={handleStatusChange}
-        renderInput={params => <TextField {...params} label="Gültigkeit" variant="outlined" size="small" />}
-        sx={{ minWidth: 180 }}
-        aria-label="Status filter"
+        renderInput={params => <TextField {...params} label="Gültigkeit" size="small" />}
         disableClearable
+        sx={{ minWidth: 180 }}
       />
       <Autocomplete
         options={responsibleOptions}
-        value={typeof filterState.responsible === 'string' ? 'all' : filterState.responsible}
-        getOptionLabel={option => (option === 'all' ? 'Alle' : (option as IUser).email)}
+        value={
+          responsibleOptions.find(option =>
+            typeof option === 'string' ? option === filterState.responsible : option.id === (filterState.responsible as IUser)?.id,
+          ) || 'none'
+        }
+        getOptionLabel={option => optionLabelMap[option as string] || (option as IUser).email}
         onChange={handleResponsibleChange}
-        renderInput={params => <TextField {...params} label="Hauptverantwortlicher" variant="outlined" size="small" />}
-        sx={{ minWidth: 250 }}
-        aria-label="Status filter"
+        renderInput={params => <TextField {...params} label="Hauptverantwortlicher" size="small" />}
         disableClearable
+        sx={{ minWidth: 250 }}
       />
-      <Box sx={{ display: 'flex', alignItems: 'center', pr: 2 }}>
-        <Tooltip title={filterState.showHidden ? 'Ausblenden' : 'Anzeigen'} arrow>
-          <IconButton aria-label="Toggle hidden software visibility" onClick={toggleVisibilityFilter} edge="end">
-            {filterState.showHidden ? <VisibilityOff /> : <Visibility />}
-          </IconButton>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Tooltip title={filterState.showHidden ? 'Ausblenden' : 'Anzeigen'}>
+          <IconButton onClick={toggleVisibilityFilter}>{filterState.showHidden ? <VisibilityOff /> : <Visibility />}</IconButton>
         </Tooltip>
       </Box>
     </Stack>

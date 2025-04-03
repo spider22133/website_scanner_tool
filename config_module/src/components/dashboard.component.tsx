@@ -100,7 +100,13 @@ const DashboardComponent: React.FC = () => {
     <Box className="dashboard-container">
       <Container maxWidth={false} sx={{ mt: 2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} lg={5} className="left-column">
+          <Grid
+            className="left-column"
+            size={{
+              xs: 12,
+              lg: 5,
+            }}
+          >
             <Paper className="search-bar-container">
               <AppSearchBar />
             </Paper>
@@ -119,7 +125,13 @@ const DashboardComponent: React.FC = () => {
               </Box> */}
             </Paper>
           </Grid>
-          <Grid item xs={12} lg={7} className="tabs-container">
+          <Grid
+            className="tabs-container"
+            size={{
+              xs: 12,
+              lg: 7,
+            }}
+          >
             <TabsComponent tabs={tabs} />
           </Grid>
         </Grid>

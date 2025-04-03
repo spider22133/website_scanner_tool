@@ -1,8 +1,9 @@
 import React from 'react'
 import { SoftwareEntry } from '../../../../../types/common'
-import { Card, CardContent, Typography, Box, Divider, Link, Grid, Chip, Stack, Tooltip } from '@mui/material'
+import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary, IconButton } from '@mui/material'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 interface SoftwareInfoWidgetProps {
   software: SoftwareEntry
@@ -15,10 +16,15 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
 
   return (
-    <Card sx={{ my: 2, p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <CardContent>
-        {/* Header Section */}
-        <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ mb: 2 }}>
+    <Accordion defaultExpanded sx={{ p: 2 }}>
+      <AccordionSummary
+        expandIcon={
+          <IconButton sx={{ mx: 2 }}>
+            <ExpandMoreIcon />
+          </IconButton>
+        }
+      >
+        <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
           <Typography variant="h5" fontWeight={600}>
             Information
           </Typography>
@@ -33,12 +39,13 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
             />
           </Stack>
         </Stack>
-
+      </AccordionSummary>
+      <AccordionDetails>
         <Divider sx={{ mb: 2 }} />
 
         {description && (
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Typography className="fw-bold" color="text.secondary">
                 Beschreibung
               </Typography>
@@ -51,7 +58,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
 
         {/* Publisher Information */}
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
               Herausgeber
             </Typography>
@@ -78,7 +85,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
 
           {/* Installer Information */}
           {installer && (
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
                 Installer
               </Typography>
@@ -102,7 +109,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
           )}
 
           {/* License Information */}
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
               Lizenz
             </Typography>
@@ -127,8 +134,8 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
             )}
           </Grid>
         </Grid>
-      </CardContent>
-    </Card>
+      </AccordionDetails>
+    </Accordion>
   )
 }
 
