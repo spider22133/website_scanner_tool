@@ -1,7 +1,7 @@
 import React from 'react'
 import { SoftwareEntry } from '../../../../types/common'
 import SoftwareInfoWidget from './widgets/softwareInfoWidget'
-import { Alert, AlertTitle, Box, Grid, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Grid, Paper, Typography } from '@mui/material'
 import SoftwareSettingsWidget from './widgets/softwareSettingsWidget'
 import Masonry from '@mui/lab/Masonry'
 
@@ -38,10 +38,8 @@ const SoftwareDetails: React.FC<PackageDetailsProps> = ({ software }) => {
       <Grid size={12}>
         <Box width={'100%'}>
           <Masonry component={'div'} columns={2} spacing={2} defaultHeight={450} defaultColumns={2} defaultSpacing={2} sequential>
-            {software && <SoftwareInfoWidget software={software} />}
-            {software && <SoftwareSettingsWidget software={software} />}
-            {software && <SoftwareSettingsWidget software={software} />}
-            {software && <SoftwareSettingsWidget software={software} />}
+            <Paper>{software && <SoftwareInfoWidget software={software} />}</Paper>
+            <Paper> {software && <SoftwareSettingsWidget software={software} />}</Paper>
           </Masonry>
         </Box>
       </Grid>

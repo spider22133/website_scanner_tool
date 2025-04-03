@@ -98,7 +98,7 @@ const DashboardComponent: React.FC = () => {
 
   return (
     <Box className="dashboard-container">
-      <Container maxWidth={false} sx={{ mt: 2 }}>
+      <Container maxWidth={false} sx={{ pt: 2 }}>
         <Grid container spacing={2}>
           <Grid
             className="left-column"
