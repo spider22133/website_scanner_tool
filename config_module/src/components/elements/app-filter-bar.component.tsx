@@ -7,21 +7,25 @@ import { RootState, useAppDispatch } from '../../store'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import FilterListIcon from '@mui/icons-material/FilterList'
+import IUser from '../../interfaces/user.interface'
 
 // Define filter state interface
 interface FilterState {
   searchTerm: string
   showHidden: boolean
   status: string // 'Alle', 'Aktuell', 'Ungültig'
+  responsible: IUser | string
 }
 
 const AppFilterBar: React.FC = () => {
   const dispatch = useAppDispatch()
-  const allSoftwareEntries = useSelector((state: RootState) => state.software.software ?? [])
+  const allSoftwareEntries = useSelector((state: RootState) => state.software.software)
+  const { users } = useSelector((state: RootState) => state.users)
   const [filterState, setFilterState] = useState<FilterState>({
     searchTerm: '',
     showHidden: false,
-    status: 'Alle',
+    status: 'all',
+    responsible: 'all',
   })
 
   const updateFilteredSoftwareList = (filteredSoftware: SoftwareEntry[]) => {
@@ -33,9 +37,15 @@ const AppFilterBar: React.FC = () => {
       const matchesName = software.name.toLowerCase().includes(filter.searchTerm.toLowerCase())
       const matchesVisibility = software.is_hidden === filter.showHidden
       const matchesStatus =
-        filter.status === 'Alle' || (filter.status === 'Aktuell' && software.is_current) || (filter.status === 'Ungültig' && !software.is_current)
+        filter.status === 'all' ||
+        (filter.status === 'Aktuell' && software.is_current && software.bara_version !== null) ||
+        (filter.status === 'Ungültig' && !software.is_current) ||
+        (filter.status === 'Fehlgeschlagen' && software.is_current && software.bara_version === null)
 
-      return matchesName && matchesVisibility && matchesStatus
+      const matchesResponsible =
+        filter.responsible === 'all' || (typeof filter.responsible !== 'string' && software.user_id === filter.responsible.id)
+
+      return matchesName && matchesVisibility && matchesStatus && matchesResponsible
     })
   }
 
@@ -56,12 +66,18 @@ const AppFilterBar: React.FC = () => {
   }
 
   const handleStatusChange = (event: ChangeEvent<{}>, value: string | null) => {
-    updateFilterState({ status: value || 'Alle' })
+    updateFilterState({ status: value || 'all' })
+  }
+
+  const handleResponsibleChange = (event: ChangeEvent<{}>, value: IUser | string | null) => {
+    updateFilterState({ responsible: value || 'all' })
   }
 
   useEffect(() => {
     updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
   }, [allSoftwareEntries])
+
+  const responsibleOptions = ['all' as const, ...users] as const
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ width: '100%' }}>
@@ -83,11 +99,22 @@ const AppFilterBar: React.FC = () => {
         aria-label="Software filter input"
       />
       <Autocomplete
-        options={['Alle', 'Aktuell', 'Ungültig']}
+        options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen']}
         value={filterState.status}
+        getOptionLabel={option => (option === 'all' ? 'Alle' : option)}
         onChange={handleStatusChange}
         renderInput={params => <TextField {...params} label="Gültigkeit" variant="outlined" size="small" />}
         sx={{ minWidth: 180 }}
+        aria-label="Status filter"
+        disableClearable
+      />
+      <Autocomplete
+        options={responsibleOptions}
+        value={typeof filterState.responsible === 'string' ? 'all' : filterState.responsible}
+        getOptionLabel={option => (option === 'all' ? 'Alle' : (option as IUser).email)}
+        onChange={handleResponsibleChange}
+        renderInput={params => <TextField {...params} label="Hauptverantwortlicher" variant="outlined" size="small" />}
+        sx={{ minWidth: 250 }}
         aria-label="Status filter"
         disableClearable
       />

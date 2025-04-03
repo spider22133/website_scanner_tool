@@ -7,6 +7,8 @@ import CreateSoftwareDto from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
 import { WingetUtils } from '@/classes/WingetApi'
 import { logger } from '@/utils/logger'
+import { SoftwareModel } from '@/models/software.model'
+import { SoftwareRepresentative } from '@/models/software_representative.model'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
@@ -22,6 +24,44 @@ class SoftwareController {
       const findAllSoftwareData: Software[] = await this.softwareService.findAllSoftware()
 
       res.status(200).json({ data: findAllSoftwareData, message: 'findAll' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public getSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = req.params.id
+      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
+      const representatives: SoftwareRepresentative[] = await findOne.getRepresentatives()
+
+      res.status(200).json({ data: representatives, message: 'findAll' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public setSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const softwareId = req.params.id
+      const representativeIds = req.body // Expects an array of user IDs
+
+      // Validate representative IDs
+      if (!Array.isArray(representativeIds) || representativeIds.some(id => typeof id !== 'number')) {
+        return res.status(400).json({ message: 'Invalid representative IDs' })
+      }
+
+      // Find the software entry by ID
+      const software: SoftwareModel = await this.softwareService.findSoftwareById(softwareId)
+
+      if (!software) {
+        return res.status(404).json({ message: 'Software not found' })
+      }
+
+      // Update representatives (assumes representativeIds is an array of user IDs)
+      await software.setRepresentatives(representativeIds)
+
+      res.status(200).json({ message: 'Representatives updated successfully' })
     } catch (error) {
       next(error)
     }

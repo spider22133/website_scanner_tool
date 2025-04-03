@@ -3,6 +3,9 @@ import WebexBot from './WebexNodeBotFramework'
 import { SoftwareModel } from '@/models/software.model'
 import SoftwareService from '@/services/software.service'
 import { logger } from '@/utils/logger'
+import UserService from '@/services/users.service'
+import { UserModel } from '@/models/user.model'
+import { User } from '@/interfaces/user.interface'
 
 // Define constants for date formats to avoid repetition
 const DATE_FORMAT = 'YYYY-MM-DD'
@@ -12,13 +15,13 @@ const FULL_TIMESTAMP_FORMAT = 'ddd, DD MMM YYYY HH:mm:ss Z'
 
 class SoftwareUpdateNotifier {
   private readonly webexBot: WebexBot
-  private softwareService: SoftwareService | null = null
+  private softwareService: SoftwareService
+  private userService: UserService = new UserService()
 
   constructor(webexBot: WebexBot) {
     this.webexBot = webexBot
   }
 
-  // Use explicit method to set service with null check
   public setSoftwareService(softwareService: SoftwareService): void {
     if (!softwareService) {
       throw new Error('SoftwareService cannot be null or undefined')
@@ -27,11 +30,6 @@ class SoftwareUpdateNotifier {
   }
 
   public async sendDailySoftwareUpdates(roomId: string): Promise<void> {
-    if (!this.softwareService) {
-      logger.error('❌ SoftwareService not initialized')
-      return
-    }
-
     try {
       const allSoftwareUpdates = await this.softwareService.findAllSoftware()
       const todaysUpdates = await this.getTodaysUpdates(allSoftwareUpdates)
@@ -81,7 +79,10 @@ class SoftwareUpdateNotifier {
     }
 
     const header = `**🆕 NON-MSW Changelog**`
-    const tableHeader = ['| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version |', '|----|-------|----------------|---------|---------|'].join('\n')
+    const tableHeader = [
+      '| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version | Verantwortlich |',
+      '|----|-------|----------------|---------|---------|----------------|',
+    ].join('\n')
 
     // Fetch all versions and process them
     const sortedUpdates = await this.getSortedUpdates(updates)
@@ -90,17 +91,31 @@ class SoftwareUpdateNotifier {
       return null
     }
 
-    const tableRows = sortedUpdates
-      .reverse()
-      .map((item, index) => {
+    // Generate table rows asynchronously
+    const tableRows = await Promise.all(
+      sortedUpdates.reverse().map(async (item, index) => {
         const { software, date, time } = item
         const version = software.version || 'N/A'
         const name = software.name || 'Unbekannt'
-        return `| ${sortedUpdates.length - index} | ${dayjs(date).format(DISPLAY_DATE_FORMAT)} | ${time} | ${name} | ${version} |`
-      })
-      .join('\n')
+        const responsibleId = software.user_id
 
-    return [header, '', 'Hier sind die neuesten Software-Updates für heute:', '', tableHeader, tableRows, ''].join('\n')
+        let responsibleName = 'Unbekannt'
+        if (responsibleId) {
+          try {
+            const responsible = await this.userService.findUserById(responsibleId)
+            responsibleName = `${responsible.firstName} ${responsible.lastName}`
+          } catch (error) {
+            responsibleName = 'Nicht gefunden'
+          }
+        }
+
+        return `| ${sortedUpdates.length - index} | ${dayjs(date).format(
+          DISPLAY_DATE_FORMAT,
+        )} | ${time} | ${name} | ${version} | ${responsibleName} |`
+      }),
+    )
+
+    return [header, '', 'Hier sind die neuesten Software-Updates für heute:', '', tableHeader, ...tableRows, ''].join('\n')
   }
 
   // Helper function to get sorted updates

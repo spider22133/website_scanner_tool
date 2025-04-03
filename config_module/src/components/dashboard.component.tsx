@@ -80,8 +80,7 @@ const DashboardComponent: React.FC = () => {
       tabType: 'MAIN',
       tabIcon: <ArticleOutlinedIcon />,
       tabLabel: 'Softwareprofil',
-      tabContent:
-        !!softwareFilteredList && !!softwareFilteredList.length ? <SoftwareDetails software={softwareFilteredList[currentIndex]} /> : <div />,
+      tabContent: <SoftwareDetails software={softwareFilteredList[currentIndex]} />,
     },
     {
       tabType: 'CREATE_BDS',

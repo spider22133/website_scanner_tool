@@ -25,7 +25,7 @@ export interface WingetPackageDetails {
 export interface SoftwareEntry {
   name: string;
   winget_id: string;
-  user_id?: string;
+  user_id?: number;
   version: string;
   bara_version?: string;
   source?: string;
@@ -33,4 +33,22 @@ export interface SoftwareEntry {
   is_hidden?: boolean;
   is_current?: boolean;
   updatedAt?: string;
+}
+
+export interface ISoftwareRepresentative {
+  user_id: number;
+  software_id: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IRepresentative {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  createdAt: string;
+  updatedAt: string;
+  SoftwareRepresentative: ISoftwareRepresentative;
 }

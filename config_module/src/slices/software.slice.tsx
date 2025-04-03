@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { WingetPackageDetails, SoftwareEntry } from '../../../types/common'
-import WebsiteDataService from '../services/website.service'
+import { WingetPackageDetails, SoftwareEntry, IRepresentative } from '../../../types/common'
+import WebsiteDataService from '../services/software.service'
 import { AxiosError } from 'axios'
 import { setMessage } from './message.slice'
 import httpErrors from '../interfaces/api.error.interface'
@@ -9,6 +9,7 @@ const initialState = {
   softwareSearchList: [] as SoftwareEntry[],
   softwareFilteredList: [] as SoftwareEntry[],
   software: [] as SoftwareEntry[],
+  representatives: [] as IRepresentative[],
   loading: false,
   createSoftwareLoading: false,
 }
@@ -190,6 +191,28 @@ export const queryWinGetSoftware = createAsyncThunk<
   }
 })
 
+export const fetchSoftwareRepresentatives = createAsyncThunk('softwareRepresentatives/fetch', async (id: string, { rejectWithValue }) => {
+  try {
+    const response = await WebsiteDataService.getSoftwareRepresentatives(id)
+    return response.data.data
+  } catch (error: any) {
+    return rejectWithValue(error.message)
+  }
+})
+
+// Async thunk to set software representatives
+export const updateSoftwareRepresentatives = createAsyncThunk(
+  'softwareRepresentatives/update',
+  async ({ id, data }: { id: string; data: number[] }, { rejectWithValue }) => {
+    try {
+      await WebsiteDataService.setSoftwareRepresentatives(id, data)
+      return data
+    } catch (error: any) {
+      return rejectWithValue(error.message)
+    }
+  },
+)
+
 const websiteSlice = createSlice({
   name: 'website',
   initialState,
@@ -200,59 +223,29 @@ const websiteSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    // Create website
-    // builder.addCase(createWebsite.pending, (state, {}) => {
-    //   state.loading = true
-    // })
-    // builder.addCase(createWebsite.fulfilled, (state, { payload }) => {
-    //   state.loading = false
-    //   state.software.push(payload)
-    // })
-    // builder.addCase(createWebsite.rejected, state => {
-    //   state.loading = false
-    // })
-
     // Retrieve websites
-    builder.addCase(retrieveWebsites.pending, (state, {}) => {
-      state.loading = true
-    })
-    builder.addCase(retrieveWebsites.fulfilled, (state, { payload }) => {
-      state.software = payload.map(item => ({
-        ...item,
-        details: JSON.parse(item.details as string) as WingetPackageDetails,
-      }))
-      state.loading = false
-    })
-    builder.addCase(retrieveWebsites.rejected, state => {
-      state.loading = false
-    })
+    builder
+      .addCase(retrieveWebsites.pending, (state, {}) => {
+        state.loading = true
+      })
+      .addCase(retrieveWebsites.fulfilled, (state, { payload }) => {
+        state.software = payload.map(item => ({
+          ...item,
+          details: JSON.parse(item.details as string) as WingetPackageDetails,
+        }))
+        state.loading = false
+      })
+      .addCase(retrieveWebsites.rejected, state => {
+        state.loading = false
+      })
 
-    // Update software
-    builder.addCase(updateSoftware.pending, (state, {}) => {
-      state.loading = true
-    })
-    builder.addCase(updateSoftware.fulfilled, (state, { payload }) => {
-      const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
-      console.log(payload)
-
-      state.loading = false
-      state.software[index] = {
-        ...state.software[index],
-        ...payload,
-        details: JSON.parse(payload.details as string) as WingetPackageDetails,
-      }
-    })
-    builder.addCase(updateSoftware.rejected, state => {
-      state.loading = false
-    })
-
-    // Check software
-    builder.addCase(checkSoftware.pending, (state, {}) => {
-      state.loading = true
-    })
-    builder.addCase(checkSoftware.fulfilled, (state, { payload }) => {
-      if (payload) {
+      // Update software
+      .addCase(updateSoftware.pending, (state, {}) => {
+        state.loading = true
+      })
+      .addCase(updateSoftware.fulfilled, (state, { payload }) => {
         const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
+        console.log(payload)
 
         state.loading = false
         state.software[index] = {
@@ -260,54 +253,85 @@ const websiteSlice = createSlice({
           ...payload,
           details: JSON.parse(payload.details as string) as WingetPackageDetails,
         }
-      }
-    })
-    builder.addCase(checkSoftware.rejected, state => {
-      state.loading = false
-    })
-
-    // Search in websites
-    // builder.addCase(queryWebsites.pending, (state, {}) => {
-    //   state.loading = true
-    // })
-    // builder.addCase(queryWebsites.fulfilled, (state, { payload }) => {
-    //   state.loading = false
-    //   state.websites = payload
-    // })
-    // builder.addCase(queryWebsites.rejected, state => {
-    //   state.loading = false
-    // })
-
-    // Search in WinGet software repository
-    builder.addCase(queryWinGetSoftware.pending, (state, {}) => {
-      state.loading = true
-    })
-    builder.addCase(queryWinGetSoftware.fulfilled, (state, { payload }) => {
-      state.softwareSearchList = payload.filter((item, index, self) => index === self.findIndex(t => t.winget_id === item.winget_id))
-      state.loading = false
-    })
-    builder.addCase(queryWinGetSoftware.rejected, state => {
-      state.loading = false
-    })
-
-    builder.addCase(createSoftware.pending, (state, {}) => {
-      state.createSoftwareLoading = true
-    })
-    builder.addCase(createSoftware.fulfilled, (state, { payload }) => {
-      state.software.unshift({
-        ...payload,
-        details: JSON.parse(payload.details as string) as WingetPackageDetails,
       })
-      state.createSoftwareLoading = false
-    })
-    builder.addCase(createSoftware.rejected, state => {
-      state.createSoftwareLoading = false
-    })
+      .addCase(updateSoftware.rejected, state => {
+        state.loading = false
+      })
 
-    // Delete website
-    builder.addCase(deleteWebsite.fulfilled, (state, { payload }) => {
-      state.software = state.software.filter(item => item.winget_id !== payload.id)
-    })
+      // Check software
+      .addCase(checkSoftware.pending, (state, {}) => {
+        state.loading = true
+      })
+      .addCase(checkSoftware.fulfilled, (state, { payload }) => {
+        if (payload) {
+          const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
+
+          state.loading = false
+          state.software[index] = {
+            ...state.software[index],
+            ...payload,
+            details: JSON.parse(payload.details as string) as WingetPackageDetails,
+          }
+        }
+      })
+      .addCase(checkSoftware.rejected, state => {
+        state.loading = false
+      })
+
+      // Search in WinGet software repository
+      .addCase(queryWinGetSoftware.pending, (state, {}) => {
+        state.loading = true
+      })
+      .addCase(queryWinGetSoftware.fulfilled, (state, { payload }) => {
+        state.softwareSearchList = payload.filter((item, index, self) => index === self.findIndex(t => t.winget_id === item.winget_id))
+        state.loading = false
+      })
+      .addCase(queryWinGetSoftware.rejected, state => {
+        state.loading = false
+      })
+
+      .addCase(createSoftware.pending, (state, {}) => {
+        state.createSoftwareLoading = true
+      })
+      .addCase(createSoftware.fulfilled, (state, { payload }) => {
+        state.software.unshift({
+          ...payload,
+          details: JSON.parse(payload.details as string) as WingetPackageDetails,
+        })
+        state.createSoftwareLoading = false
+      })
+      .addCase(createSoftware.rejected, state => {
+        state.createSoftwareLoading = false
+      })
+
+      // Delete website
+
+      .addCase(deleteWebsite.fulfilled, (state, { payload }) => {
+        state.software = state.software.filter(item => item.winget_id !== payload.id)
+      })
+
+      // Fetch representatives
+      .addCase(fetchSoftwareRepresentatives.pending, state => {
+        state.loading = true
+      })
+      .addCase(fetchSoftwareRepresentatives.fulfilled, (state, action: PayloadAction<IRepresentative[]>) => {
+        state.representatives = action.payload
+        state.loading = false
+      })
+      .addCase(fetchSoftwareRepresentatives.rejected, (state, action) => {
+        state.loading = false
+      })
+
+      // Update representatives
+      .addCase(updateSoftwareRepresentatives.pending, state => {
+        state.loading = true
+      })
+      .addCase(updateSoftwareRepresentatives.fulfilled, state => {
+        state.loading = false
+      })
+      .addCase(updateSoftwareRepresentatives.rejected, (state, action) => {
+        state.loading = false
+      })
   },
 })
 

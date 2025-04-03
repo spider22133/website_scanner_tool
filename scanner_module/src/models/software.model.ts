@@ -22,6 +22,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public id: number
   public name: string
   public winget_id: string
+  public user_id: number
   public version: string
   public bara_version: string
   public source: string
@@ -71,6 +72,9 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       },
       winget_id: {
         type: DataTypes.STRING,
+      },
+      user_id: {
+        type: DataTypes.NUMBER,
       },
       version: {
         type: DataTypes.STRING,
@@ -127,16 +131,18 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
   })
 
   // Representatives for Software
-  UserModel.belongsToMany(SoftwareModel, {
-    through: SoftwareRepresentative,
-    foreignKey: 'user_id',
-    otherKey: 'software_id',
-  })
-
   SoftwareModel.belongsToMany(UserModel, {
     through: SoftwareRepresentative,
     foreignKey: 'software_id',
     otherKey: 'user_id',
+    as: 'representatives',
+  })
+
+  UserModel.belongsToMany(SoftwareModel, {
+    through: SoftwareRepresentative,
+    foreignKey: 'user_id',
+    otherKey: 'software_id',
+    as: 'representedSoftware',
   })
 
   return SoftwareModel

@@ -9,6 +9,8 @@ interface SoftwareInfoWidgetProps {
 }
 
 const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => {
+  console.log('software', software)
+
   const { version, bara_version, details, is_current } = software
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
 
@@ -24,7 +26,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
             <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} />
             <Chip
               label={`Baramundi: ${bara_version}`}
-              color={is_current ? 'primary' : 'error'}
+              color={is_current ? (software.bara_version !== null ? 'primary' : 'error') : 'warning'}
               size="small"
               sx={{ px: 1 }}
               icon={is_current ? <TaskAltIcon /> : <ErrorOutlineIcon />}

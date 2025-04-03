@@ -9,9 +9,9 @@ import SaveIcon from '@mui/icons-material/SaveOutlined'
 
 import { RootState } from '../../../store'
 import { useSelector, useDispatch } from 'react-redux'
-import { updateSoftware } from '../../../slices/software.slice'
+import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives } from '../../../slices/software.slice'
 import IUser from '../../../interfaces/user.interface'
-import { SoftwareEntry } from '../../../../../types/common'
+import { IRepresentative, SoftwareEntry } from '../../../../../types/common'
 
 interface SoftwareSettingsWidgetProps {
   software: SoftwareEntry
@@ -19,11 +19,12 @@ interface SoftwareSettingsWidgetProps {
 
 const validationSchema = Yup.object().shape({
   mainResponsible: Yup.object().nullable().required('Hauptverantwortlicher ist erforderlich'),
-  // representatives: Yup.array().of(Yup.object()).min(1, 'Mindestens ein Vertreter ist erforderlich'),
+  representatives: Yup.array().of(Yup.object()).min(1, 'Mindestens ein Vertreter ist erforderlich'),
 })
 
 const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ software }) => {
   const { users } = useSelector((state: RootState) => state.users)
+  const { representatives } = useSelector((state: RootState) => state.software)
   const dispatch = useDispatch()
 
   const {
@@ -35,38 +36,49 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
     formState: { errors, isDirty },
   } = useForm<{
     mainResponsible: IUser | null
-    representatives: IUser[]
+    mainRepresentatives: IUser[]
   }>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       mainResponsible: null,
-      // representatives: [],
+      mainRepresentatives: [],
     },
   })
 
   const mainResponsible = watch('mainResponsible')
-  // const representatives = watch('representatives')
+  const mainRepresentatives = watch('mainRepresentatives')
+
+  useEffect(() => {
+    dispatch(fetchSoftwareRepresentatives(software.winget_id))
+  }, [software])
 
   useEffect(() => {
     const initialResponsible = users.find(user => user.id === software.user_id) || null
-    // Assuming representatives are fetched or derived from elsewhere, set an empty array initially
+
+    const initialRepresentatives = representatives
+      .map(repr => users.find(user => user.email === repr.email))
+      .filter((user): user is IUser => user !== undefined) // Filter out undefined values
+
     reset({
       mainResponsible: initialResponsible,
-      // representatives: [],
+      mainRepresentatives: initialRepresentatives,
     })
-  }, [software, users, reset])
+  }, [software, representatives, users, reset])
 
-  const onSubmit: SubmitHandler<{ mainResponsible: IUser | null; representatives: IUser[] }> = data => {
+  const onSubmit: SubmitHandler<{ mainResponsible: IUser | null; mainRepresentatives: IUser[] }> = data => {
     if (!isDirty) return
     const updatedSoftware = {
       version: software.version,
       winget_id: software.winget_id,
       name: software.name,
       user_id: data.mainResponsible?.id,
-      // Here we assume you have some way to update representatives (if needed)
-      // representative_ids: data.representatives.map(rep => rep.id), // Uncomment if applicable
     }
+
     dispatch(updateSoftware(updatedSoftware))
+
+    if (mainRepresentatives && mainRepresentatives.length > 0) {
+      dispatch(updateSoftwareRepresentatives({ id: software.winget_id, data: mainRepresentatives.map(user => user.id || 0) }))
+    }
   }
 
   return (
@@ -94,28 +106,29 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
               sx={{ flexGrow: 1 }}
             />
           </Stack>
-          {/* <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={2}>
             <Autocomplete
               multiple
               options={users}
               getOptionLabel={option => option.email}
-              // value={representatives}
-              onChange={(_, value) => setValue('representatives', value, { shouldDirty: true })}
+              value={mainRepresentatives}
+              onChange={(_, value) => setValue('mainRepresentatives', value, { shouldDirty: true })}
               renderTags={(value: readonly IUser[], getTagProps) =>
-                value.map((option, index) => <Chip {...getTagProps({ index })} key={option.id} label={option.email} />)
+                value.map((option, index) => <Chip {...getTagProps({ index })} key={option.id} label={option.email} size="small" />)
               }
               renderInput={params => (
                 <TextField
                   {...params}
                   label="Vertreter"
-                  error={!!errors.representatives}
+                  error={!!errors.mainRepresentatives?.[0]}
                   variant="filled"
-                  // helperText={errors.representatives?.message}
+                  helperText={errors.mainRepresentatives?.[0]?.message}
                 />
               )}
               sx={{ flexGrow: 1 }}
             />
-          </Stack> */}
+          </Stack>
+
           <LoadingButton type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
             Speichern
           </LoadingButton>

@@ -104,6 +104,8 @@ class SoftwareVersionChecker {
     let currentBaramundiAppId: string | undefined
 
     let resultAppList = await this.baramundi.findApplicationByName(software.name)
+    console.log(resultAppList)
+
     resultAppList = resultAppList.filter(app => app.AdditionalInfo !== 'AppleMac')
 
     // Try to find the exact version first

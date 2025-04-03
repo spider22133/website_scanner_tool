@@ -10,7 +10,7 @@ const getAll = () => {
   return http.get('/software')
 }
 
-const getWebsiteById = (id: string) => {
+const getSoftwareById = (id: string) => {
   return http.get(`/software/${id}`)
 }
 
@@ -25,6 +25,14 @@ const update = (data: SoftwareEntry) => {
 
 const checkStatus = (id: string) => {
   return http.get(`/software/${id}/check`)
+}
+
+const getSoftwareRepresentatives = (id: string) => {
+  return http.get(`/software/${id}/representatives`)
+}
+
+const setSoftwareRepresentatives = (id: string, data: number[]) => {
+  return http.post(`/software/${id}/representatives`, data)
 }
 
 const create = (data: createProps) => {
@@ -49,7 +57,7 @@ const searchWithWinGet = (query: string) => {
 
 const WebsiteDataService = {
   getAll,
-  getWebsiteById,
+  getWebsiteById: getSoftwareById,
   update,
   create,
   createSoftware,
@@ -57,6 +65,8 @@ const WebsiteDataService = {
   searchWithWinGet,
   checkStatus,
   getWebsiteMainStepStates,
+  getSoftwareRepresentatives,
+  setSoftwareRepresentatives,
 }
 
 export default WebsiteDataService

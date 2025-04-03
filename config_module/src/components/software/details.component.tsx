@@ -12,10 +12,10 @@ const SoftwareDetails: React.FC<PackageDetailsProps> = ({ software }) => {
   return (
     <Grid item container spacing={2} alignItems="stretch">
       <Grid item xs={12} lg={7}>
-        <SoftwareInfoWidget software={software} />
+        {software && <SoftwareInfoWidget software={software} />}
       </Grid>
       <Grid item xs={12} lg={5}>
-        <SoftwareSettingsWidget software={software} />
+        {software && <SoftwareSettingsWidget software={software} />}
       </Grid>
     </Grid>
   )

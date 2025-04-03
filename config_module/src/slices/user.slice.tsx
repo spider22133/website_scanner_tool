@@ -53,7 +53,7 @@ export const createUser = createAsyncThunk<IUser, IUser, { rejectValue: httpErro
   }
 })
 
-export const deleteUser = createAsyncThunk<{ id: string }, string, { rejectValue: httpErrors }>(
+export const deleteUser = createAsyncThunk<{ id: number }, number, { rejectValue: httpErrors }>(
   'users/delete',
   async (id, { rejectWithValue, dispatch }) => {
     try {

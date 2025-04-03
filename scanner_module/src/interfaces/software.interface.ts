@@ -4,6 +4,7 @@ export interface Software {
   id: number
   name: string
   winget_id: string
+  user_id: number
   version: string
   bara_version: string
   source: string

@@ -21,7 +21,7 @@ const updateUser = (id: string, data: IUser) => {
   return http.put(`/users/${id}`, data)
 }
 
-const deleteUser = (id: string) => {
+const deleteUser = (id: number) => {
   return http.delete(`/users/${id}`)
 }
 
