@@ -11,6 +11,7 @@ import TimerController from '@controllers/timer.controller'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import { logger } from './utils/logger'
 import SoftwareUpdateNotifier from './classes/SoftwareUpdateNotifier'
+import { ActiveDirectoryAuth } from './classes/api/ActiveDirectoryAuth'
 
 // 1️⃣ Environment Setup
 process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
@@ -48,3 +49,18 @@ app.io.on('connection', socket => {
 app.webexBot.initialize().then(() => {
   logger.info('📢 Bot is ready to send messages.')
 })
+
+// const ad = new ActiveDirectoryAuth({
+//   url: 'ldap://sv-inf-dc1.med.tu-dresden.de',
+//   baseDN: 'DC=med,DC=tu-dresden,DC=de',
+//   bindDN: process.env.AD_SERVICE_USER_NAME,
+//   bindPassword: process.env.AD_SERVICE_USER_PASSWORD,
+// })
+
+// ;(async () => {
+//   const isAuthenticated = await ad.authenticate('SCHLOSSEU@med.tu-dresden.de', 'Nokia#060')
+//   console.log('Authenticated?', isAuthenticated)
+
+//   const user = await ad.findUser('SCHLOSSEU@med.tu-dresden.de')
+//   console.log('User info:', user)
+// })()

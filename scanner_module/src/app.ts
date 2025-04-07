@@ -18,8 +18,8 @@ import DB from '@databases'
 import Routes from '@/interfaces/route.interface'
 import errorMiddleware from '@middlewares/error.middleware'
 import { logger, stream } from '@utils/logger'
-import { BaramundiApi } from './classes/BaramundiApi'
-import WebexBot from './classes/WebexNodeBotFramework'
+import { BaramundiApi } from './classes/api/BaramundiApi'
+import WebexBot from './classes/api/WebexNodeBotFramework'
 
 class App {
   public app: express.Application

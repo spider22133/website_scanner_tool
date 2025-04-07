@@ -4,13 +4,17 @@ import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, Accor
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { CopyToClipboard } from '../../utilities/CopyToClipboard'
+import { setMessage } from '../../../slices/message.slice'
+import { useDispatch } from 'react-redux'
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 
 interface SoftwareInfoWidgetProps {
   software: SoftwareEntry
 }
 
 const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => {
-  console.log('software', software)
+  const dispatch = useDispatch()
 
   const { version, bara_version, details, is_current } = software
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
@@ -29,14 +33,24 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
             Information
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} />
-            <Chip
-              label={`Baramundi: ${bara_version}`}
-              color={is_current ? (software.bara_version !== null ? 'primary' : 'error') : 'warning'}
-              size="small"
-              sx={{ px: 1 }}
-              icon={is_current ? <TaskAltIcon /> : <ErrorOutlineIcon />}
-            />
+            <CopyToClipboard
+              textToCopy={version}
+              onCopySuccess={() => dispatch(setMessage({ message: 'WinGet version copied successfully', variant: 'success' }))}
+            >
+              <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} icon={<ContentCopyOutlinedIcon />} />
+            </CopyToClipboard>
+            <CopyToClipboard
+              textToCopy={bara_version || ''}
+              onCopySuccess={() => dispatch(setMessage({ message: 'Baramundi version copied successfully', variant: 'success' }))}
+            >
+              <Chip
+                label={`Baramundi: ${bara_version}`}
+                color={is_current ? (software.bara_version !== null ? 'primary' : 'error') : 'warning'}
+                size="small"
+                sx={{ px: 1 }}
+                icon={<ContentCopyOutlinedIcon />}
+              />
+            </CopyToClipboard>
           </Stack>
         </Stack>
       </AccordionSummary>

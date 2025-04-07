@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import WebexBot from './WebexNodeBotFramework'
+import WebexBot from './api/WebexNodeBotFramework'
 import { SoftwareModel } from '@/models/software.model'
 import SoftwareService from '@/services/software.service'
 import { logger } from '@/utils/logger'

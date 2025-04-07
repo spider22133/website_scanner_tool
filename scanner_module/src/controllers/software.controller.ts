@@ -5,7 +5,7 @@ import SoftwareVersionService from '@services/software_versions.service'
 import { SoftwareEntry } from '../../../types/common'
 import CreateSoftwareDto from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
-import { WingetUtils } from '@/classes/WingetApi'
+import { WingetUtils } from '@/classes/api/WingetApi'
 import { logger } from '@/utils/logger'
 import { SoftwareModel } from '@/models/software.model'
 import { SoftwareRepresentative } from '@/models/software_representative.model'
@@ -93,7 +93,7 @@ class SoftwareController {
     try {
       const websiteId = req.params.id
       const findOne = await this.softwareService.findSoftwareById(websiteId)
-      const { software, message } = await this.softwareVersionChecker.checkSoftwareVersion(findOne)
+      const { software, message } = await this.softwareVersionChecker.checkSoftwareVersion(findOne, true)
 
       res.status(200).json({ software, message })
     } catch (error) {

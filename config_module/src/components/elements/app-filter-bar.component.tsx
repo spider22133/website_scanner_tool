@@ -93,12 +93,14 @@ const AppFilterBar: React.FC = () => {
         placeholder="Nach Namen filtern..."
         value={filterState.searchTerm}
         onChange={handleSearchTermChange}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <FilterListIcon />
-            </InputAdornment>
-          ),
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <FilterListIcon color="disabled" />
+              </InputAdornment>
+            ),
+          },
         }}
         size="small"
         fullWidth

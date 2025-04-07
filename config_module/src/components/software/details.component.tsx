@@ -16,21 +16,25 @@ const SoftwareDetails: React.FC<PackageDetailsProps> = ({ software }) => {
     <Grid container spacing={2} alignItems="stretch">
       <Grid size={12}>
         {software && (software?.bara_version === null || software?.bara_version === undefined) && (
-          <Alert severity="warning">
+          <Alert severity="warning" sx={{ p: 2 }}>
             <AlertTitle>
               <b>Fehlerbehandlung bei der Baramundi App-Ermittlung</b>
             </AlertTitle>
-            <Typography variant="body2">
-              1) Softwarename stimmt nicht überein: Überprüfung: Stellen Sie sicher, dass der Name der Software im Versionskontroll-Dashboard exakt
-              dem Namen entspricht, der in Baramundi verwendet wird.
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              <b>1) Softwarename stimmt nicht überein:</b>
+              <br />
+              Überprüfung: Stellen Sie sicher, dass der Name der Software im Versionskontroll-Dashboard exakt dem Namen entspricht, der in Baramundi
+              verwendet wird.
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              <b>2) Versionsformat stimmt nicht überein:</b>
+              <br />
+              Überprüfung: In vielen Fällen verwendet Baramundi ein anderes Versionsmuster als WinGet (z.B. 1.0.0.0 statt 1.0).
             </Typography>
             <Typography variant="body2">
-              2) Versionsformat stimmt nicht überein: Überprüfung: In vielen Fällen verwendet Baramundi ein anderes Versionsmuster als WinGet (z.B.
-              1.0.0.0 statt 1.0).
-            </Typography>
-            <Typography variant="body2">
-              3) Software nicht gefunden (Zugriffsprobleme): Überprüfung: Fehlende Zugriffsberechtigungen auf den Installationsordner können
-              verhindern, dass Baramundi die Software erkennt.
+              <b>3) Software nicht gefunden (Zugriffsprobleme):</b>
+              <br />
+              Überprüfung: Fehlende Zugriffsberechtigungen auf den Installationsordner können verhindern, dass Baramundi die Software erkennt.
             </Typography>
           </Alert>
         )}
