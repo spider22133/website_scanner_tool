@@ -23,7 +23,6 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public firstName: string
   public lastName: string
   public email: string
-  public password: string
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -61,10 +60,6 @@ export default function (sequelize: Sequelize): typeof UserModel {
       email: {
         allowNull: false,
         type: DataTypes.STRING(45),
-      },
-      password: {
-        allowNull: false,
-        type: DataTypes.STRING(255),
       },
     },
     {

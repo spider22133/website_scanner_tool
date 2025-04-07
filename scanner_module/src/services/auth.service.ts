@@ -9,48 +9,62 @@ import { User } from '@/interfaces/user.interface'
 import { isEmpty } from '@utils/util'
 import { RoleModel } from '@/models/role.model'
 import { UserModel } from '@/models/user.model'
+import { ActiveDirectoryAuth } from '@/classes/api/ActiveDirectoryAuth'
 
 class AuthService {
   public users = DB.Users
+  private activeDirectory: ActiveDirectoryAuth
 
-  public async signup(userData: CreateUserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData")
-
-    const findUser: User = await this.users.findOne({ where: { email: userData.email } })
-    if (findUser) throw new HttpException(409, `Email ${userData.email} already exists`)
-
-    const hashedPassword = await bcrypt.hash(userData.password, 10)
-    const createUserData: User = await this.users.create({ ...userData, password: hashedPassword })
-
-    return createUserData
+  constructor(activeDirectory: ActiveDirectoryAuth) {
+    this.activeDirectory = activeDirectory
   }
 
   public async login(userData: CreateUserDto): Promise<{ cookie: string; findUser: User; roles: RoleModel[]; token: string }> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData")
 
-    const findUser: UserModel = await this.users.findOne({ where: { email: userData.email } })
-    if (!findUser) throw new HttpException(409, `Email ${userData.email} not found`)
+    const { email, password } = userData
 
-    const isPasswordMatching: boolean = await bcrypt.compare(userData.password, findUser.password)
-    if (!isPasswordMatching) throw new HttpException(409, 'Password not matching')
+    // Authenticate against Active Directory
+    const isAuthenticated = await this.activeDirectory.authenticate(email, password)
+    if (!isAuthenticated) throw new HttpException(401, 'Invalid credentials')
 
-    const roles: RoleModel[] = await findUser.getRoles()
-    const authorities = []
+    // Retrieve user data from AD
+    const adUser = await this.activeDirectory.findUser(email)
+    if (!adUser) throw new HttpException(404, 'User not found in Active Directory')
 
-    for (let i = 0; i < roles.length; i++) {
-      authorities.push('ROLE_' + roles[i].name.toUpperCase())
+    // Map AD user data to your database schema
+    const userInfo = {
+      email: adUser.mail,
+      firstName: adUser.givenName || '',
+      lastName: adUser.sn || '',
+      // Add other fields as needed (e.g., password is not stored since AD handles authentication)
     }
 
+    // Check if user exists in the database, update or create
+    let findUser: UserModel = await this.users.findOne({ where: { email: userInfo.email } })
+    if (findUser) {
+      // Update existing user with AD data
+      await findUser.update(userInfo)
+    } else {
+      // Create a new user in the database
+      findUser = await this.users.create(userInfo)
+    }
+
+    // Generate token and cookie
     const tokenData = this.createToken(findUser)
     const cookie = this.createCookie(tokenData)
 
-    return { cookie, findUser, roles: authorities, token: tokenData.token }
+    // Get user roles
+    const roles: RoleModel[] = await findUser.getRoles()
+    const authorities = roles.map(role => 'ROLE_' + role.name.toUpperCase())
+
+    return { cookie, findUser, roles: authorities as any[], token: tokenData.token }
   }
 
   public async logout(userData: User): Promise<User> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData")
 
-    const findUser: User = await this.users.findOne({ where: { email: userData.email, password: userData.password } })
+    const findUser: User = await this.users.findOne({ where: { email: userData.email } })
     if (!findUser) throw new HttpException(409, "You're not user")
 
     return findUser

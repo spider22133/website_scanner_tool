@@ -3,19 +3,13 @@ import { CreateUserDto } from '@dtos/users.dto'
 import { User } from '@/interfaces/user.interface'
 import { RequestWithUser } from '@interfaces/auth.interface'
 import AuthService from '@services/auth.service'
+import { ActiveDirectoryAuth } from '@/classes/api/ActiveDirectoryAuth'
 
 class AuthController {
-  public authService = new AuthService()
+  public authService: AuthService
 
-  public signUp = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userData: CreateUserDto = req.body
-      const signUpUserData: User = await this.authService.signup(userData)
-
-      res.status(201).json({ data: signUpUserData, message: 'signup' })
-    } catch (error) {
-      next(error)
-    }
+  constructor(activeDirectory: ActiveDirectoryAuth) {
+    this.authService = new AuthService(activeDirectory)
   }
 
   public logIn = async (req: Request, res: Response, next: NextFunction) => {

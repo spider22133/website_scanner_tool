@@ -16,7 +16,7 @@ export class ActiveDirectoryAuth {
     this.client = new Client({ url: config.url })
   }
 
-  async authenticate(userPrincipalName: string, password: string): Promise<boolean> {
+  async authenticate(mail: string, password: string): Promise<boolean> {
     try {
       // 1. Bind with a service account
       await this.client.bind(this.config.bindDN, this.config.bindPassword)
@@ -24,14 +24,14 @@ export class ActiveDirectoryAuth {
       // 2. Search for the user's DN
       const searchOptions: SearchOptions = {
         scope: 'sub',
-        filter: `(userPrincipalName=${userPrincipalName})`,
+        filter: `(mail=${mail})`,
         attributes: ['dn'],
       }
 
       const { searchEntries } = await this.client.search(this.config.baseDN, searchOptions)
 
       if (searchEntries.length === 0) {
-        console.warn(`User ${userPrincipalName} not found`)
+        console.warn(`User ${mail} not found`)
         return false
       }
 
@@ -41,25 +41,25 @@ export class ActiveDirectoryAuth {
       await this.client.bind(userDN, password)
       return true
     } catch (error) {
-      console.error(`AD Auth failed for ${userPrincipalName}:`, error)
+      console.error(`AD Auth failed for ${mail}:`, error)
       return false
     } finally {
       await this.client.unbind().catch(() => {})
     }
   }
 
-  async findUser(userPrincipalName: string): Promise<Record<string, any> | null> {
+  async findUser(mail: string): Promise<Record<string, any> | null> {
     try {
       await this.client.bind(this.config.bindDN, this.config.bindPassword)
 
       const { searchEntries } = await this.client.search(this.config.baseDN, {
         scope: 'sub',
-        filter: `(userPrincipalName=${userPrincipalName})`,
+        filter: `(mail=${mail})`,
       })
 
       return searchEntries.length > 0 ? searchEntries[0] : null
     } catch (error) {
-      console.error(`Error finding user ${userPrincipalName}:`, error)
+      console.error(`Error finding user ${mail}:`, error)
       return null
     } finally {
       await this.client.unbind().catch(() => {})

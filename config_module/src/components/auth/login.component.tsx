@@ -59,17 +59,9 @@ export default function LogIn() {
                   />
                   <div className="invalid-feedback">{errors.password?.message}</div>
                 </div>
-                {/*<div className="mb-4 form-check w-100">
-                   <a href="#" className="float-end">
-                    Reset Password
-                  </a>
-                </div> */}
                 <button type="submit" className="btn btn-primary w-100 my-3 shadow" disabled={loading}>
                   {loading ? 'Loading...' : 'Login'}
                 </button>
-                <p className="text-center m-0">
-                  No account yet, <a href="/signup">Please Signup</a>
-                </p>
               </form>
               <APIErrorNotification messages={messages} websiteId="login" />
             </div>

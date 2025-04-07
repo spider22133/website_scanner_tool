@@ -58,7 +58,7 @@ app.webexBot.initialize().then(() => {
 // })
 
 // ;(async () => {
-//   const isAuthenticated = await ad.authenticate('SCHLOSSEU@med.tu-dresden.de', 'Nokia#060')
+//   const isAuthenticated = await ad.authenticate('Eugen.Schlosser@ukdd.de', 'Nokia#060')
 //   console.log('Authenticated?', isAuthenticated)
 
 //   const user = await ad.findUser('SCHLOSSEU@med.tu-dresden.de')

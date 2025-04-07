@@ -20,6 +20,8 @@ import errorMiddleware from '@middlewares/error.middleware'
 import { logger, stream } from '@utils/logger'
 import { BaramundiApi } from './classes/api/BaramundiApi'
 import WebexBot from './classes/api/WebexNodeBotFramework'
+import AuthRoute from './routes/auth.route'
+import Route from '@/interfaces/route.interface'
 
 class App {
   public app: express.Application
@@ -42,7 +44,6 @@ class App {
     this.httpServer = createServer(this.app)
     this.io = new Server(this.httpServer, { cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] } })
 
-    // Load Baramundi credentials from env variables
     this.baraUrl = process.env.BARAMUNDI_URL
     this.baraUsername = process.env.BARAMUNDI_USERNAME
     this.baraSecret = process.env.BARAMUNDI_SECRET
@@ -113,7 +114,7 @@ class App {
   }
 
   private initializeRoutes(routes: Routes[]) {
-    routes.forEach(route => {
+    routes.forEach((route: Route) => {
       this.app.use('/', route.router)
     })
   }

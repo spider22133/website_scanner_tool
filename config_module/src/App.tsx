@@ -4,7 +4,6 @@ import { PublicRoute, PrivateRoute } from './helpers/routing.helper'
 
 import Header from './components/layout/header.component'
 import LogIn from './components/auth/login.component'
-import SignUp from './components/auth/signup.component'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -37,7 +36,6 @@ function App() {
       <Header />
       <Switch>
         <PublicRoute exact path={['/', '/login']} component={LogIn} />
-        <PublicRoute exact path={['/signup']} component={SignUp} />
         <PrivateRoute exact path={'/dashboard'} component={DashboardComponent} />
       </Switch>
     </ThemeProvider>
