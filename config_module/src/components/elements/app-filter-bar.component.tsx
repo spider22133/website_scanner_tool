@@ -102,7 +102,7 @@ const AppFilterBar: React.FC = () => {
   }, [allSoftwareEntries, hasLoadedStorage])
 
   const staticOptions = ['all', 'none'] as const
-  const responsibleOptions = [...staticOptions, ...users]
+  const responsibleOptions = [...staticOptions, ...users.filter(user => !user.roles?.some(role => role.name === 'admin'))]
 
   return (
     <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>

@@ -5,18 +5,33 @@ import HttpException from '@exceptions/HttpException'
 import { User } from '@/interfaces/user.interface'
 import { isEmpty } from '@utils/util'
 import { Role } from '@/interfaces/role.interface'
+import { RoleModel } from '@/models/role.model'
 
 class UserService {
   public users = DB.Users
 
   public async findAllUser(): Promise<User[]> {
-    return await this.users.findAll()
+    return await this.users.findAll({
+      include: [
+        {
+          model: RoleModel,
+          as: 'roles',
+        },
+      ],
+    })
   }
 
   public async findUserById(userId: number): Promise<User> {
     if (isEmpty(userId)) throw new HttpException(400, "You're not userId")
 
-    const findUser: User = await this.users.findByPk(userId)
+    const findUser: User = await this.users.findByPk(userId, {
+      include: [
+        {
+          model: RoleModel,
+          as: 'roles',
+        },
+      ],
+    })
     if (!findUser) throw new HttpException(409, "User doesn't exist")
 
     return findUser

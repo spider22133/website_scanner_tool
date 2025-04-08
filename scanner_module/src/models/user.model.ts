@@ -24,6 +24,7 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public firstName: string
   public lastName: string
   public email: string
+  public roles?: RoleModel[]
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date

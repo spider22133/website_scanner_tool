@@ -15,6 +15,7 @@ import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutli
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import { useSelector } from 'react-redux'
+import { Role } from '../../../../scanner_module/dist/scanner_module/src/interfaces/role.interface'
 
 TimeAgo.addDefaultLocale(en)
 
@@ -38,6 +39,8 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
   const timeAgo = new TimeAgo('de-DE')
   const dispatch = useAppDispatch()
   const theme = useTheme()
+
+  const isAdmin = user?.roles?.some((role: Role) => role.name === 'admin')
 
   const handleRemove = (id: string) => {
     dispatch(deleteWebsite({ id }))
@@ -118,7 +121,7 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                     </IconButton>
                   </Tooltip>
                 )} */}
-                {user?.roles && user?.roles.includes('ROLE_ADMIN') && (
+                {isAdmin && (
                   <Tooltip title="Löschen" arrow>
                     <IconButton
                       aria-label="löschen"

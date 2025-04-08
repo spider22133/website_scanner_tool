@@ -38,10 +38,18 @@ class AuthService {
 
       const roleData = {
         id: adUser.employeeID.includes('#ADMIN') ? 3 : 1,
-        name: adUser.employeeID.includes('#ADMIN') ? 'admin' : 'user',
       }
 
-      let findUser: UserModel = await this.users.findOne({ where: { email: userInfo.email } })
+      let findUser: UserModel = await this.users.findOne({
+        where: { email: userInfo.email },
+        include: [
+          {
+            model: RoleModel,
+            as: 'roles',
+          },
+        ],
+      })
+
       if (findUser) {
         await findUser.update(userInfo)
         await findUser.setRoles([roleData.id])
@@ -49,17 +57,26 @@ class AuthService {
         findUser = await this.users.create(userInfo)
         const roleExists = await RoleModel.findByPk(roleData.id)
         if (!roleExists) {
-          await RoleModel.create({ id: roleData.id, name: roleData.name })
+          await RoleModel.create({ id: roleData.id, name: adUser.employeeID.includes('#ADMIN') ? 'admin' : 'user' })
         }
         await findUser.setRoles([roleData.id])
       }
 
+      // Fetch the updated user with roles
+      findUser = await this.users.findByPk(findUser.id, {
+        include: [
+          {
+            model: RoleModel,
+            as: 'roles',
+          },
+        ],
+      })
+
       const tokenData = this.createToken(findUser)
       const cookie = this.createCookie(tokenData)
-      const roles: RoleModel[] = await findUser.getRoles()
-      const authorities = roles.map(role => 'ROLE_' + role.name.toUpperCase())
+      const roles = findUser.roles || [] // Ensure roles is always an array
 
-      return { cookie, findUser, roles: authorities as any[], token: tokenData.token }
+      return { cookie, findUser, roles, token: tokenData.token }
     } catch (error) {
       console.error('Login error:', error)
       throw error instanceof HttpException ? error : new HttpException(500, 'Interner Serverfehler')
