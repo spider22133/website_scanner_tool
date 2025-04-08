@@ -1,25 +1,26 @@
-import { useForm, SubmitHandler, FieldValues } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom' // Changed from useHistory
 import * as Yup from 'yup'
 import IUser from '../../interfaces/user.interface'
 import { RootState, useAppDispatch } from '../../store'
 import { login } from '../../slices/auth.slice'
 import { useSelector } from 'react-redux'
 import { APIErrorNotification } from '../elements/error-notification.component'
+import { Button, TextField, Box, Container, Paper, Typography } from '@mui/material'
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required('Email is required').email('Email is invalid'),
+  email: Yup.string().required('E-Mail ist erforderlich').email('E-Mail ist ungültig'),
   password: Yup.string()
-    .required('Password is required')
-    .min(6, 'Password must be at least 6 characters')
-    .max(40, 'Password must not exceed 40 characters'),
+    .required('Passwort ist erforderlich')
+    .min(6, 'Passwort muss mindestens 6 Zeichen lang sein')
+    .max(40, 'Passwort darf 40 Zeichen nicht überschreiten'),
 })
 
 export default function LogIn() {
   const { loading } = useSelector((state: RootState) => state.auth)
   const messages = useSelector((state: RootState) => state.messages)
-  const history = useHistory()
+  const navigate = useNavigate() // Changed from useHistory
   const dispatch = useAppDispatch()
 
   const {
@@ -31,43 +32,64 @@ export default function LogIn() {
   })
 
   const onSubmit: SubmitHandler<IUser> = data => {
-    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/dashboard'))
+    dispatch(login({ data, id: 'login' })).then(
+      response => login.fulfilled.match(response) && navigate('/dashboard'), // Changed from history.push
+    )
   }
 
   return (
-    <section className="vh-100-c" style={{ backgroundColor: '#508bfc' }}>
-      <div className="container py-5 h-100">
-        <div className="row d-flex justify-content-center align-items-center h-100">
-          <div className="col-12 col-md-8 col-lg-6 col-xl-4">
-            <div className="bg-light p-5 border shadow" style={{ borderRadius: '1rem' }}>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="form-group mb-4">
-                  <input
-                    type="text"
-                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                    placeholder="Enter Email"
-                    {...register('email')}
-                  />
-                  <div className="invalid-feedback">{errors.email?.message}</div>
-                </div>
-                <div className="form-group mb-4">
-                  <input
-                    type="password"
-                    placeholder="Enter Password"
-                    {...register('password')}
-                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  />
-                  <div className="invalid-feedback">{errors.password?.message}</div>
-                </div>
-                <button type="submit" className="btn btn-primary w-100 my-3 shadow" disabled={loading}>
-                  {loading ? 'Loading...' : 'Login'}
-                </button>
-              </form>
-              <APIErrorNotification messages={messages} websiteId="login" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#508bfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper
+          elevation={3}
+          sx={{
+            padding: 4,
+            borderRadius: '1rem',
+            backgroundColor: '#fff',
+          }}
+        >
+          <Typography variant="h5" align="center" gutterBottom>
+            Anmeldung
+          </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                label="E-Mail eingeben"
+                variant="outlined"
+                autoComplete="email"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                {...register('email')}
+              />
+            </Box>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                label="Passwort eingeben"
+                type="password"
+                variant="outlined"
+                autoComplete="current-password"
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                {...register('password')}
+              />
+            </Box>
+            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading} sx={{ my: 2, boxShadow: 2 }}>
+              {loading ? 'Wird geladen...' : 'Anmelden'}
+            </Button>
+          </form>
+          <APIErrorNotification messages={messages} websiteId="login" />
+        </Paper>
+      </Container>
+    </Box>
   )
 }

@@ -2,43 +2,46 @@ import React, { useEffect } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
-
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Chip, IconButton, Paper, Stack, TextField, Typography } from '@mui/material'
-import LoadingButton from '@mui/lab/LoadingButton'
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, Chip, Stack, TextField, Typography } from '@mui/material'
 import SaveIcon from '@mui/icons-material/SaveOutlined'
-
-import { RootState } from '../../../store'
-import { useSelector, useDispatch } from 'react-redux'
+import { RootState, useAppDispatch } from '../../../store'
+import { useSelector } from 'react-redux'
 import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives } from '../../../slices/software.slice'
 import IUser from '../../../interfaces/user.interface'
 import { SoftwareEntry } from '../../../../../types/common'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-interface SoftwareSettingsWidgetProps {
-  software: SoftwareEntry
+// Define the form data type
+interface FormData {
+  mainResponsible: IUser | null
+  mainRepresentatives: IUser[]
 }
 
-const validationSchema = Yup.object().shape({
-  mainResponsible: Yup.object().nullable().required('Hauptverantwortlicher ist erforderlich'),
-  representatives: Yup.array().of(Yup.object()).min(1, 'Mindestens ein Vertreter ist erforderlich'),
+// Define a Yup schema for IUser
+const userSchema = Yup.object().shape({
+  id: Yup.number().required(),
+  email: Yup.string().required(),
+  password: Yup.string().required(),
 })
+
+// Validation schema with explicit typing
+const validationSchema = Yup.object().shape({
+  mainResponsible: userSchema.nullable().required('Hauptverantwortlicher ist erforderlich'),
+  mainRepresentatives: Yup.array().of(userSchema).min(1, 'Mindestens ein Vertreter ist erforderlich'),
+}) as Yup.ObjectSchema<FormData>
 
 const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ software }) => {
   const { users } = useSelector((state: RootState) => state.users)
   const { representatives } = useSelector((state: RootState) => state.software)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const {
-    register,
     handleSubmit,
     setValue,
     reset,
     watch,
     formState: { errors, isDirty },
-  } = useForm<{
-    mainResponsible: IUser | null
-    mainRepresentatives: IUser[]
-  }>({
+  } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       mainResponsible: null,
@@ -51,14 +54,14 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
   useEffect(() => {
     dispatch(fetchSoftwareRepresentatives(software.winget_id))
-  }, [software])
+  }, [software, dispatch])
 
   useEffect(() => {
     const initialResponsible = users.find(user => user.id === software.user_id) || null
 
     const initialRepresentatives = representatives
       .map(repr => users.find(user => user.email === repr.email))
-      .filter((user): user is IUser => user !== undefined) // Filter out undefined values
+      .filter((user): user is IUser => user !== undefined)
 
     reset({
       mainResponsible: initialResponsible,
@@ -66,7 +69,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
     })
   }, [software, representatives, users, reset])
 
-  const onSubmit: SubmitHandler<{ mainResponsible: IUser | null; mainRepresentatives: IUser[] }> = data => {
+  const onSubmit: SubmitHandler<FormData> = data => {
     if (!isDirty) return
     const updatedSoftware = {
       version: software.version,
@@ -78,19 +81,18 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
     dispatch(updateSoftware(updatedSoftware))
 
     if (mainRepresentatives && mainRepresentatives.length > 0) {
-      dispatch(updateSoftwareRepresentatives({ id: software.winget_id, data: mainRepresentatives.map(user => user.id || 0) }))
+      dispatch(
+        updateSoftwareRepresentatives({
+          id: software.winget_id,
+          data: mainRepresentatives.map(user => user.id || 0),
+        }),
+      )
     }
   }
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }}>
-      <AccordionSummary
-        expandIcon={
-          <IconButton sx={{ mx: 2 }}>
-            <ExpandMoreIcon />
-          </IconButton>
-        }
-      >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h5" fontWeight={600}>
           Einstellungen
         </Typography>
@@ -139,14 +141,18 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
               />
             </Stack>
 
-            <LoadingButton type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
+            <Button type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
               Speichern
-            </LoadingButton>
+            </Button>
           </Stack>
         </form>
       </AccordionDetails>
     </Accordion>
   )
+}
+
+interface SoftwareSettingsWidgetProps {
+  software: SoftwareEntry
 }
 
 export default SoftwareSettingsWidget

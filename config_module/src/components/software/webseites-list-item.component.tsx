@@ -1,13 +1,12 @@
 import { SoftwareEntry } from '../../../../types/common'
-import { RootState, useAppDispatch } from '../../store'
-import { checkSoftware, deleteWebsite, updateSoftware } from '../../slices/software.slice'
+import { useAppDispatch } from '../../store'
+import { checkSoftware, updateSoftware } from '../../slices/software.slice'
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { useSelector } from 'react-redux'
+// import { motion } from 'framer-motion'
 import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress } from '@mui/material'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
+// import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined'
 import TimeAgo from 'javascript-time-ago'
@@ -25,23 +24,23 @@ type Props = {
   setActiveWebsite: (software: SoftwareEntry, index: number) => void
 }
 
-const variants = {
-  open: { opacity: 1 },
-  closed: { opacity: 0 },
-}
+// const variants = {
+//   open: { opacity: 1 },
+//   closed: { opacity: 0 },
+// }
 
 export default function WebsitesListItem({ software, index, currentIndex, setActiveWebsite }: Props) {
-  const { user } = useSelector((state: RootState) => state.auth)
-  const [showAddForm, setShowAddForm] = useState(false)
+  // const { user } = useSelector((state: RootState) => state.auth)
+  // const [showAddForm, setShowAddForm] = useState(false)
   const [isChecking, setIsChecking] = useState(false) // Local state to track loading for this item
 
   const timeAgo = new TimeAgo('de-DE')
   const dispatch = useAppDispatch()
   const theme = useTheme()
 
-  const handleRemove = (id: string) => {
-    dispatch(deleteWebsite({ id }))
-  }
+  // const handleRemove = (id: string) => {
+  //   dispatch(deleteWebsite({ id }))
+  // }
 
   const checkStatus = async (id: string) => {
     setIsChecking(true)
@@ -118,19 +117,19 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                     </IconButton>
                   </Tooltip>
                 )} */}
-                {user.roles && user.roles.includes('ROLE_ADMIN') && (
+                {/* {user.roles && user.roles.includes('ROLE_ADMIN') && (
                   <Tooltip title="Löschen" arrow>
                     <IconButton
                       aria-label="löschen"
                       color="error"
                       onClick={() => {
-                        window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?') ? handleRemove(software.winget_id) : ''
+                        return window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?') ? handleRemove(software.winget_id) : ''
                       }}
                     >
                       <DeleteIcon />
                     </IconButton>
                   </Tooltip>
-                )}
+                )} */}
               </Stack>
               {software.updatedAt && (
                 <Chip
@@ -145,15 +144,15 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
           </div>
         </div>
 
-        <motion.div
+        {/* <motion.div
           className="w-100"
           animate={showAddForm ? 'open' : 'closed'}
           variants={variants}
           initial="closed"
           transition={{ ease: 'easeOut', duration: '0.5' }}
         >
-          {/*<EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} software={software} />*/}
-        </motion.div>
+          <EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} software={software} />
+        </motion.div> */}
       </ListItem>
     )
   }

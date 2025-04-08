@@ -14,11 +14,6 @@ const initialState = {
   createSoftwareLoading: false,
 }
 
-type setErrorType = {
-  data: SoftwareEntry
-  id: string
-}
-
 // export const createWebsite = createAsyncThunk<
 //   WinGetSoftwareEntry,
 //   setErrorType,
@@ -318,7 +313,7 @@ const websiteSlice = createSlice({
         state.representatives = action.payload
         state.loading = false
       })
-      .addCase(fetchSoftwareRepresentatives.rejected, (state, action) => {
+      .addCase(fetchSoftwareRepresentatives.rejected, state => {
         state.loading = false
       })
 
@@ -329,7 +324,7 @@ const websiteSlice = createSlice({
       .addCase(updateSoftwareRepresentatives.fulfilled, state => {
         state.loading = false
       })
-      .addCase(updateSoftwareRepresentatives.rejected, (state, action) => {
+      .addCase(updateSoftwareRepresentatives.rejected, state => {
         state.loading = false
       })
   },

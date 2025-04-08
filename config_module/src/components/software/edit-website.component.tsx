@@ -13,7 +13,6 @@ import { updateSoftware } from '../../slices/software.slice'
 import { sleep } from '../../helpers/animation.helper'
 import { APIErrorNotification } from '../elements/error-notification.component'
 import { Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Stack } from '@mui/material'
-import LoadingButton from '@mui/lab/LoadingButton'
 import SendIcon from '@mui/icons-material/Send'
 
 const validationSchema = Yup.object().shape({
@@ -45,7 +44,10 @@ export default function EditWebsite({ software, setShowAddForm, showAddForm }: P
     reset(software)
   }, [software])
 
-  const onSubmit: SubmitHandler<IWebsite> = data => {
+  const onSubmit: SubmitHandler<{
+    name: string
+    url: string
+  }> = data => {
     const { name } = data
     dispatch(
       updateSoftware({
@@ -81,9 +83,17 @@ export default function EditWebsite({ software, setShowAddForm, showAddForm }: P
             </FormControl>
           </Stack>
           <Stack spacing={2} mt={2} direction="row">
-            <LoadingButton variant="contained" type="submit" color="primary" endIcon={<SendIcon />} loading={loading} loadingPosition="end">
-              {loading ? 'Loading...' : 'Submit'}
-            </LoadingButton>
+            <Button
+              variant="contained"
+              type="submit"
+              color="primary"
+              endIcon={<SendIcon />}
+              loading={loading}
+              loadingIndicator="Loading..."
+              loadingPosition="end"
+            >
+              Submit
+            </Button>
             <Button variant="outlined" type="submit" color="primary" onClick={() => reset()}>
               Reset
             </Button>

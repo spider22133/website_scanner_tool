@@ -31,7 +31,7 @@ const messageSlice = createSlice({
       const index = state.findIndex(item => item.id === payload)
       if (index !== -1) state.splice(index, 1)
     },
-    clearAllMessages: state => {
+    clearAllMessages: () => {
       return [] // Reset state to empty array
     },
   },

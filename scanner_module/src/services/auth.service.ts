@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt'
 import config from 'config'
 import jwt from 'jsonwebtoken'
 import DB from '@databases'
@@ -20,17 +19,17 @@ class AuthService {
   }
 
   public async login(userData: CreateUserDto): Promise<{ cookie: string; findUser: User; roles: RoleModel[]; token: string }> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData")
+    if (isEmpty(userData)) throw new HttpException(400, 'Sie haben keine Benutzerdaten angegeben')
 
     const { email, password } = userData
 
     // Authenticate against Active Directory
     const isAuthenticated = await this.activeDirectory.authenticate(email, password)
-    if (!isAuthenticated) throw new HttpException(401, 'Invalid credentials')
+    if (!isAuthenticated) throw new HttpException(401, 'Ungültige Anmeldeinformationen')
 
     // Retrieve user data from AD
     const adUser = await this.activeDirectory.findUser(email)
-    if (!adUser) throw new HttpException(404, 'User not found in Active Directory')
+    if (!adUser) throw new HttpException(404, 'Benutzer im Active Directory nicht gefunden')
 
     // Map AD user data to your database schema
     const userInfo = {
@@ -62,10 +61,10 @@ class AuthService {
   }
 
   public async logout(userData: User): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData")
+    if (isEmpty(userData)) throw new HttpException(400, 'Sie haben keine Benutzerdaten angegeben')
 
     const findUser: User = await this.users.findOne({ where: { email: userData.email } })
-    if (!findUser) throw new HttpException(409, "You're not user")
+    if (!findUser) throw new HttpException(409, 'Sie sind kein Benutzer')
 
     return findUser
   }

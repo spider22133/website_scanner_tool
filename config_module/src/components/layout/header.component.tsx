@@ -28,7 +28,7 @@ export default function Header() {
           <div className={`collapse navbar-collapse ${toogle ? 'show' : ''}`} id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <NavLink className="nav-link" activeClassName="active" aria-current="page" to={'/dashboard'}>
+                <NavLink className={({ isActive }) => ['nav-link', isActive ? 'active' : ''].join(' ')} aria-current="page" to={'/dashboard'}>
                   Versionskontroll-Dashboard
                 </NavLink>
               </li>
@@ -51,9 +51,6 @@ export default function Header() {
               <div>
                 <Link className="btn btn-outline-success" to="/login">
                   Anmelden
-                </Link>
-                <Link className="btn btn-outline" to="/signup">
-                  Registrieren
                 </Link>
               </div>
             )}

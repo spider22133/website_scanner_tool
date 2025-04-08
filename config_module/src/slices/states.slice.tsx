@@ -35,7 +35,7 @@ export const getStatesByWebsiteId = createAsyncThunk<
   }
 })
 
-export const statesAdapter = createEntityAdapter<IState>({
+export const statesAdapter = createEntityAdapter<IState, number>({
   selectId: state => state.id,
 })
 

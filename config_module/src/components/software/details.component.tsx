@@ -10,8 +10,6 @@ interface PackageDetailsProps {
 }
 
 const SoftwareDetails: React.FC<PackageDetailsProps> = ({ software }) => {
-  const heights = [520, 330]
-
   return (
     <Grid container spacing={2} alignItems="stretch">
       <Grid size={12}>

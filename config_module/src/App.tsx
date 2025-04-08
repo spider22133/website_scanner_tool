@@ -1,18 +1,15 @@
 import './App.css'
-import { Switch } from 'react-router-dom'
-import { PublicRoute, PrivateRoute } from './helpers/routing.helper'
-
+import { Routes, Route } from 'react-router-dom'
 import Header from './components/layout/header.component'
 import LogIn from './components/auth/login.component'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-
-import 'bootstrap/dist/css/bootstrap.css'
 import DashboardComponent from './components/dashboard.component'
-
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { useDispatch, useSelector } from 'react-redux'
 import { useSnackbar } from 'notistack'
 import { RootState } from './store'
-import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
+import 'bootstrap/dist/css/bootstrap.css'
+import { RedirectIfLogged, RequireAuth } from './helpers/routing.helper'
 
 const theme = createTheme()
 
@@ -23,7 +20,6 @@ function App() {
 
   useEffect(() => {
     if (messages.length > 0) {
-      // Only show the latest message (last in array) to avoid showing all
       const latestMessage = messages[messages.length - 1]
       enqueueSnackbar(latestMessage.message, {
         variant: latestMessage.variant,
@@ -34,10 +30,32 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Header />
-      <Switch>
-        <PublicRoute exact path={['/', '/login']} component={LogIn} />
-        <PrivateRoute exact path={'/dashboard'} component={DashboardComponent} />
-      </Switch>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <RedirectIfLogged>
+              <LogIn />
+            </RedirectIfLogged>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <RedirectIfLogged>
+              <LogIn />
+            </RedirectIfLogged>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardComponent />
+            </RequireAuth>
+          }
+        />
+      </Routes>
     </ThemeProvider>
   )
 }

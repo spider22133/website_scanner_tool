@@ -47,10 +47,6 @@ const deleteWebsite = (id: string) => {
   return http.delete(`/software/${id}`)
 }
 
-const searchInsoftware = (query: string) => {
-  return query ? http.get(`/software/q=${query}`) : getAll()
-}
-
 const searchWithWinGet = (query: string) => {
   return http.get(`/software/q=${query}`)
 }

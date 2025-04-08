@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import PaginationContainer from './elements/pagination-container.component'
 import { retrieveWebsites } from '../slices/software.slice'
 import { RootState, useAppDispatch } from '../store'
 import { useSelector } from 'react-redux'
@@ -24,7 +23,7 @@ const DashboardComponent: React.FC = () => {
   const { software, softwareFilteredList } = useSelector((state: RootState) => state.software)
 
   const [displayedSoftware, setDisplayedSoftware] = useState<SoftwareEntry[]>([])
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  // const [currentPage, setCurrentPage] = useState<number>(1)
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
@@ -58,7 +57,7 @@ const DashboardComponent: React.FC = () => {
 
   const setActiveWebsite = (website: SoftwareEntry, index: number) => {
     setCurrentIndex(index)
-    setCurrentPage(1)
+    // setCurrentPage(1)
     // getAggrStates(website.winget_id)
     // getWebsiteMainStepStates(website.winget_id)
     // dispatch(getStepsByWebsiteId(website.winget_id))
@@ -69,10 +68,6 @@ const DashboardComponent: React.FC = () => {
     const startItem = (page - 1) * itemsPerPage
     const endItem = page * itemsPerPage
     setDisplayedSoftware(software.slice(startItem, endItem))
-  }
-
-  const onFilterChange = (filteredSoftware: SoftwareEntry[]) => {
-    console.log(filteredSoftware)
   }
 
   const tabs: CustomTabProps[] = [

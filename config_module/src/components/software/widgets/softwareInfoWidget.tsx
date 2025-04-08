@@ -1,8 +1,6 @@
 import React from 'react'
 import { SoftwareEntry } from '../../../../../types/common'
-import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary, IconButton } from '@mui/material'
-import TaskAltIcon from '@mui/icons-material/TaskAlt'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { CopyToClipboard } from '../../utilities/CopyToClipboard'
 import { setMessage } from '../../../slices/message.slice'
@@ -21,18 +19,12 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }}>
-      <AccordionSummary
-        expandIcon={
-          <IconButton sx={{ mx: 2 }}>
-            <ExpandMoreIcon />
-          </IconButton>
-        }
-      >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
           <Typography variant="h5" fontWeight={600}>
             Information
           </Typography>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 3 }}>
             <CopyToClipboard
               textToCopy={version}
               onCopySuccess={() => dispatch(setMessage({ message: 'WinGet version copied successfully', variant: 'success' }))}

@@ -63,19 +63,19 @@ const AppFilterBar: React.FC = () => {
     })
   }
 
-  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
-    updateFilterState({ searchTerm: event.target.value })
-  }
-
   const toggleVisibilityFilter = () => {
     updateFilterState({ showHidden: !filterState.showHidden })
   }
 
-  const handleStatusChange = (_: ChangeEvent<{}>, value: string | null) => {
+  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateFilterState({ searchTerm: event.target.value })
+  }
+
+  const handleStatusChange = (_event: ChangeEvent<object>, value: string | null) => {
     updateFilterState({ status: value || 'all' })
   }
 
-  const handleResponsibleChange = (_: ChangeEvent<{}>, value: IUser | string | null) => {
+  const handleResponsibleChange = (_event: ChangeEvent<object>, value: IUser | string | null) => {
     updateFilterState({ responsible: value || 'all' })
   }
 
