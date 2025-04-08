@@ -240,7 +240,6 @@ const websiteSlice = createSlice({
       })
       .addCase(updateSoftware.fulfilled, (state, { payload }) => {
         const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
-        console.log(payload)
 
         state.loading = false
         state.software[index] = {

@@ -19,45 +19,51 @@ class AuthService {
   }
 
   public async login(userData: CreateUserDto): Promise<{ cookie: string; findUser: User; roles: RoleModel[]; token: string }> {
-    if (isEmpty(userData)) throw new HttpException(400, 'Sie haben keine Benutzerdaten angegeben')
+    try {
+      if (isEmpty(userData)) throw new HttpException(400, 'Sie haben keine Benutzerdaten angegeben')
 
-    const { email, password } = userData
+      const { email, password } = userData
 
-    // Authenticate against Active Directory
-    const isAuthenticated = await this.activeDirectory.authenticate(email, password)
-    if (!isAuthenticated) throw new HttpException(401, 'Ungültige Anmeldeinformationen')
+      const isAuthenticated = await this.activeDirectory.authenticate(email, password)
+      if (!isAuthenticated) throw new HttpException(401, 'Ungültige Anmeldeinformationen')
 
-    // Retrieve user data from AD
-    const adUser = await this.activeDirectory.findUser(email)
-    if (!adUser) throw new HttpException(404, 'Benutzer im Active Directory nicht gefunden')
+      const adUser = await this.activeDirectory.findUser(email)
+      if (!adUser) throw new HttpException(404, 'Benutzer im Active Directory nicht gefunden')
 
-    // Map AD user data to your database schema
-    const userInfo = {
-      email: adUser.mail,
-      firstName: adUser.givenName || '',
-      lastName: adUser.sn || '',
-      // Add other fields as needed (e.g., password is not stored since AD handles authentication)
+      const userInfo = {
+        email: adUser.mail || adUser.userPrincipalName.toLowerCase(),
+        firstName: adUser.givenName || '',
+        lastName: adUser.sn || '',
+      }
+
+      const roleData = {
+        id: adUser.employeeID.includes('#ADMIN') ? 3 : 1,
+        name: adUser.employeeID.includes('#ADMIN') ? 'admin' : 'user',
+      }
+
+      let findUser: UserModel = await this.users.findOne({ where: { email: userInfo.email } })
+      if (findUser) {
+        await findUser.update(userInfo)
+        await findUser.setRoles([roleData.id])
+      } else {
+        findUser = await this.users.create(userInfo)
+        const roleExists = await RoleModel.findByPk(roleData.id)
+        if (!roleExists) {
+          await RoleModel.create({ id: roleData.id, name: roleData.name })
+        }
+        await findUser.setRoles([roleData.id])
+      }
+
+      const tokenData = this.createToken(findUser)
+      const cookie = this.createCookie(tokenData)
+      const roles: RoleModel[] = await findUser.getRoles()
+      const authorities = roles.map(role => 'ROLE_' + role.name.toUpperCase())
+
+      return { cookie, findUser, roles: authorities as any[], token: tokenData.token }
+    } catch (error) {
+      console.error('Login error:', error)
+      throw error instanceof HttpException ? error : new HttpException(500, 'Interner Serverfehler')
     }
-
-    // Check if user exists in the database, update or create
-    let findUser: UserModel = await this.users.findOne({ where: { email: userInfo.email } })
-    if (findUser) {
-      // Update existing user with AD data
-      await findUser.update(userInfo)
-    } else {
-      // Create a new user in the database
-      findUser = await this.users.create(userInfo)
-    }
-
-    // Generate token and cookie
-    const tokenData = this.createToken(findUser)
-    const cookie = this.createCookie(tokenData)
-
-    // Get user roles
-    const roles: RoleModel[] = await findUser.getRoles()
-    const authorities = roles.map(role => 'ROLE_' + role.name.toUpperCase())
-
-    return { cookie, findUser, roles: authorities as any[], token: tokenData.token }
   }
 
   public async logout(userData: User): Promise<User> {

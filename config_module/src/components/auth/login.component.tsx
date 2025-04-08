@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useNavigate } from 'react-router-dom' // Changed from useHistory
+import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import IUser from '../../interfaces/user.interface'
 import { RootState, useAppDispatch } from '../../store'
@@ -10,7 +10,7 @@ import { APIErrorNotification } from '../elements/error-notification.component'
 import { Button, TextField, Box, Container, Paper, Typography } from '@mui/material'
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required('E-Mail ist erforderlich').email('E-Mail ist ungültig'),
+  email: Yup.string().required('E-Mail oder Benutzername ist erforderlich'),
   password: Yup.string()
     .required('Passwort ist erforderlich')
     .min(6, 'Passwort muss mindestens 6 Zeichen lang sein')
@@ -20,7 +20,7 @@ const validationSchema = Yup.object().shape({
 export default function LogIn() {
   const { loading } = useSelector((state: RootState) => state.auth)
   const messages = useSelector((state: RootState) => state.messages)
-  const navigate = useNavigate() // Changed from useHistory
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const {
@@ -32,9 +32,7 @@ export default function LogIn() {
   })
 
   const onSubmit: SubmitHandler<IUser> = data => {
-    dispatch(login({ data, id: 'login' })).then(
-      response => login.fulfilled.match(response) && navigate('/dashboard'), // Changed from history.push
-    )
+    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && navigate('/dashboard'))
   }
 
   return (
@@ -63,7 +61,7 @@ export default function LogIn() {
             <Box sx={{ mb: 3 }}>
               <TextField
                 fullWidth
-                label="E-Mail eingeben"
+                label="E-Mail oder Benutzername eingeben"
                 variant="outlined"
                 autoComplete="email"
                 error={!!errors.email}

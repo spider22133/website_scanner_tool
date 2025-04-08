@@ -79,7 +79,6 @@ const AppFilterBar: React.FC = () => {
   const handleResponsibleChange = (_event: ChangeEvent<object>, value: IUser | string | null) => {
     updateFilterState({ responsible: value || 'all' })
   }
-  console.log(filterState)
 
   useEffect(() => {
     const savedFilterState = sessionStorage.getItem('filters')

@@ -11,6 +11,7 @@ import {
   HasManySetAssociationsMixin,
   HasManyRemoveAssociationMixin,
   HasManyCountAssociationsMixin,
+  BelongsToManySetAssociationsMixin,
 } from 'sequelize'
 import { User } from '@/interfaces/user.interface'
 import { RoleModel } from './role.model'
@@ -27,8 +28,9 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
 
-  public getRoles!: BelongsToManyGetAssociationsMixin<RoleModel> // Note the null assertions!
+  public getRoles!: BelongsToManyGetAssociationsMixin<RoleModel>
   public hasRole!: BelongsToManyHasAssociationMixin<RoleModel, number>
+  public setRoles!: BelongsToManySetAssociationsMixin<RoleModel, number>
   public countRoles!: BelongsToManyCountAssociationsMixin
 
   public getSoftware!: HasManyGetAssociationsMixin<SoftwareModel>
@@ -84,17 +86,3 @@ export default function (sequelize: Sequelize): typeof UserModel {
 
   return UserModel
 }
-
-// async function initUser() {
-//   try {
-//     await UserModel.create({
-//       id: 1,
-//       firstName: 'Eugen',
-//       lastName: 'Schlosser',
-//       email: 'e.schlosser.de@gmail.com',
-//       password: '',
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }

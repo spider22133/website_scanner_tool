@@ -20,7 +20,6 @@ import errorMiddleware from '@middlewares/error.middleware'
 import { logger, stream } from '@utils/logger'
 import { BaramundiApi } from './classes/api/BaramundiApi'
 import WebexBot from './classes/api/WebexNodeBotFramework'
-import AuthRoute from './routes/auth.route'
 import Route from '@/interfaces/route.interface'
 
 class App {
