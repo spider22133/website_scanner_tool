@@ -25,6 +25,7 @@ const AppFilterBar: React.FC = () => {
   const dispatch = useAppDispatch()
   const allSoftwareEntries = useSelector((state: RootState) => state.software.software)
   const { users } = useSelector((state: RootState) => state.users)
+  const [hasLoadedStorage, setHasLoadedStorage] = useState(false)
   const [filterState, setFilterState] = useState<FilterState>({
     searchTerm: '',
     showHidden: false,
@@ -78,10 +79,28 @@ const AppFilterBar: React.FC = () => {
   const handleResponsibleChange = (_event: ChangeEvent<object>, value: IUser | string | null) => {
     updateFilterState({ responsible: value || 'all' })
   }
+  console.log(filterState)
 
   useEffect(() => {
-    updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
-  }, [allSoftwareEntries])
+    const savedFilterState = sessionStorage.getItem('filters')
+    if (savedFilterState) {
+      setFilterState(JSON.parse(savedFilterState))
+    }
+    setHasLoadedStorage(true)
+  }, [])
+
+  useEffect(() => {
+    if (hasLoadedStorage) {
+      sessionStorage.setItem('filters', JSON.stringify(filterState))
+      updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
+    }
+  }, [filterState, hasLoadedStorage])
+
+  useEffect(() => {
+    if (hasLoadedStorage) {
+      updateFilteredSoftwareList(getFilteredSoftwareList(filterState))
+    }
+  }, [allSoftwareEntries, hasLoadedStorage])
 
   const staticOptions = ['all', 'none'] as const
   const responsibleOptions = [...staticOptions, ...users]
