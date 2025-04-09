@@ -1,8 +1,8 @@
 import React from 'react'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import ViewListOutlinedIcon from '@mui/icons-material/ViewListOutlined'
-import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined'
+import TableRowsIcon from '@mui/icons-material/TableRows'
+import MenuIcon from '@mui/icons-material/Menu'
 import { ListViewType } from '../../interfaces/common'
 import { Box } from '@mui/system'
 
@@ -23,8 +23,8 @@ const ViewSelectorTabs: React.FC<ListGridViewTabsProps> = ({ handleActiveTab, cu
   return (
     <Box className="view-toggle">
       <Tabs value={value} onChange={handleChange} aria-label="Switch presentation view between list and grid layout">
-        <Tab icon={<ViewListOutlinedIcon />} value={ListViewType.ListView} aria-label="List view" />
-        <Tab icon={<GridViewOutlinedIcon />} value={ListViewType.TableView} aria-label="Table view" />
+        <Tab icon={<TableRowsIcon />} value={ListViewType.ListView} aria-label="List view" />
+        <Tab icon={<MenuIcon />} value={ListViewType.TableView} aria-label="Table view" />
       </Tabs>
     </Box>
   )

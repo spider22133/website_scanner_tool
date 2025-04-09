@@ -2,15 +2,11 @@ import { configureStore } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 import messageReducer from './slices/message.slice'
 import websiteReducer from './slices/software.slice'
-import websiteControlStepReducer from './slices/websites_control_steps.slice'
-import statesReducer from './slices/states.slice'
 import authReducer from './slices/auth.slice'
 import userReducer from './slices/user.slice'
 
 const reducer = {
   software: websiteReducer,
-  steps: websiteControlStepReducer,
-  states: statesReducer,
   messages: messageReducer,
   auth: authReducer,
   users: userReducer,

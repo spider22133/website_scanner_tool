@@ -6,7 +6,7 @@ import { SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
-import FilterListIcon from '@mui/icons-material/FilterList'
+import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined'
 import IUser from '../../interfaces/user.interface'
 
 interface FilterState {
@@ -115,7 +115,7 @@ const AppFilterBar: React.FC = () => {
           input: {
             startAdornment: (
               <InputAdornment position="start">
-                <FilterListIcon color="disabled" />
+                <DriveFileRenameOutlineOutlinedIcon />
               </InputAdornment>
             ),
           },

@@ -2,10 +2,9 @@ import { ApexOptions } from 'apexcharts'
 import { useEffect, useState } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { addZero } from '../../helpers/chart.helper'
-import IState from '../../interfaces/website-state.interface'
 import { useTheme } from '@mui/material'
 type Props = {
-  states: IState[]
+  states: any
   aggrStates: { avg: number; min: number; max: number } | undefined
 }
 export default function Chart({ states, aggrStates }: Props) {
@@ -74,7 +73,7 @@ export default function Chart({ states, aggrStates }: Props) {
     const answerTimes: number[] = []
     const createdTimes: string[] = []
 
-    states.forEach(e => {
+    states.forEach((e: any) => {
       if (e.response_time) {
         const date = new Date(e.createdAt)
         const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`
