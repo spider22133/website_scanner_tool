@@ -52,25 +52,21 @@ class SoftwareUpdateNotifier {
   }
 
   private async getTodaysUpdates(updates: SoftwareModel[]): Promise<SoftwareModel[]> {
-    const today = dayjs().format(DATE_FORMAT)
+    const twentyFourHoursAgo = dayjs().subtract(24, 'hours')
     const results: SoftwareModel[] = updates.filter(item => !item.is_current)
-    let hasUpdate = false
+    const updatedItems: SoftwareModel[] = []
 
     await Promise.all(
       results.map(async software => {
         const latestVersion = await software.getLastVersion()
 
-        if (latestVersion && dayjs(latestVersion.updatedAt).format(DATE_FORMAT) === today) {
-          hasUpdate = true
+        if (latestVersion && dayjs(latestVersion.updatedAt).isAfter(twentyFourHoursAgo)) {
+          updatedItems.push(software)
         }
       }),
     )
 
-    if (hasUpdate) {
-      return results.filter((software): software is SoftwareModel => software !== null)
-    }
-
-    return []
+    return updatedItems
   }
 
   private async formatSoftwareUpdateMessage(updates: SoftwareModel[]): Promise<string | null> {

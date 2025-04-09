@@ -1,6 +1,6 @@
 import { SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
-import { checkSoftware, deleteWebsite, updateSoftware } from '../../slices/software.slice'
+import { checkSoftware, deleteSoftware, updateSoftware } from '../../slices/software.slice'
 import { useState } from 'react'
 // import { motion } from 'framer-motion'
 import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress } from '@mui/material'
@@ -10,17 +10,15 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined'
 import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/de.json'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import { useSelector } from 'react-redux'
 import { Role } from '../../../../scanner_module/dist/scanner_module/src/interfaces/role.interface'
 
-TimeAgo.addDefaultLocale(en)
-
 type Props = {
   index: number
+  timeAgo: TimeAgo
   software: SoftwareEntry
   currentIndex: number
   setActiveWebsite: (software: SoftwareEntry, index: number) => void
@@ -31,19 +29,18 @@ type Props = {
 //   closed: { opacity: 0 },
 // }
 
-export default function WebsitesListItem({ software, index, currentIndex, setActiveWebsite }: Props) {
+export default function WebsitesListItem({ timeAgo, software, index, currentIndex, setActiveWebsite }: Props) {
   const { user } = useSelector((state: RootState) => state.auth)
   // const [showAddForm, setShowAddForm] = useState(false)
   const [isChecking, setIsChecking] = useState(false) // Local state to track loading for this item
 
-  const timeAgo = new TimeAgo('de-DE')
   const dispatch = useAppDispatch()
   const theme = useTheme()
 
   const isAdmin = user?.roles?.some((role: Role) => role.name === 'admin')
 
   const handleRemove = (id: string) => {
-    dispatch(deleteWebsite({ id }))
+    dispatch(deleteSoftware({ id }))
   }
 
   const checkStatus = async (id: string) => {
@@ -58,7 +55,7 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
         className={`d-flex flex-column`}
         sx={{
           my: 0.5,
-          border: `2px solid ${index === currentIndex ? theme.palette.info.main : theme.palette.grey.A200}`,
+          border: `1px solid ${index === currentIndex ? theme.palette.grey.A700 : theme.palette.grey.A200}`,
           borderRadius: 1,
         }}
         onClick={() => setActiveWebsite(software, index)}
@@ -108,7 +105,8 @@ export default function WebsitesListItem({ software, index, currentIndex, setAct
                     aria-label="Sichtbarkeit umschalten"
                     onClick={e => {
                       e.stopPropagation()
-                      dispatch(updateSoftware({ ...software, is_hidden: !software.is_hidden }))
+                      const { id, updatedAt, createdAt, details, ...rest } = software
+                      dispatch(updateSoftware({ ...rest, is_hidden: !software.is_hidden }))
                     }}
                   >
                     {software.is_hidden ? <VisibilityOff /> : <Visibility />}

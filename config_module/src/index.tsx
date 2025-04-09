@@ -8,6 +8,11 @@ import store from './store'
 import { StyledEngineProvider } from '@mui/system'
 import { CssBaseline } from '@mui/material'
 import { SnackbarProvider } from 'notistack'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { deDE } from '@mui/material/locale'
+import { deDE as dataGridDE } from '@mui/x-data-grid/locales'
+
+const theme = createTheme(deDE, dataGridDE)
 
 // Get the root DOM element
 const container = document.getElementById('root')
@@ -22,8 +27,10 @@ root.render(
       <Provider store={store}>
         <SnackbarProvider maxSnack={3}>
           <BrowserRouter>
-            <CssBaseline />
-            <App />
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <App />
+            </ThemeProvider>
           </BrowserRouter>
         </SnackbarProvider>
       </Provider>

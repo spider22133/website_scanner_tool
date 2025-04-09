@@ -113,3 +113,52 @@ h2,
 .tabs-container {
   position: relative;
 }
+
+.view-toggle {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 80px;
+}
+
+.view-toggle .MuiTabs-flexContainer {
+  gap: 8px;
+}
+
+.view-toggle .MuiTabs-root {
+  height: 36px;
+  min-height: 36px;
+  border-bottom: transparent;
+}
+
+.view-toggle .MuiTab-root {
+  color: #9e9e9e;
+  height: 36px;
+  min-width: 36px;
+  max-width: 36px;
+  min-height: 36px;
+}
+
+.view-toggle .MuiTab-root:hover {
+  color: #616161;
+}
+
+.view-toggle .MuiTabs-indicator {
+  height: 36px;
+  border: 1px solid #616161;
+  border-radius: 3px;
+  background-color: transparent;
+}
+
+.view-toggle .MuiTab-root.Mui-selected {
+  color: #616161;
+}
+
+p {
+  margin-top: inherit !important;
+  margin-bottom: inherit !important;
+}
+
+.tabpanel {
+  display: contents;
+}

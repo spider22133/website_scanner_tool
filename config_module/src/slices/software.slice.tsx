@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { WingetPackageDetails, SoftwareEntry, IRepresentative } from '../../../types/common'
-import WebsiteDataService from '../services/software.service'
+import SoftwareDataService from '../services/software.service'
 import { AxiosError } from 'axios'
 import { setMessage } from './message.slice'
 import httpErrors from '../interfaces/api.error.interface'
@@ -42,7 +42,7 @@ export const createSoftware = createAsyncThunk<
   }
 >('software/create', async (data, { rejectWithValue, dispatch }) => {
   try {
-    const res = await WebsiteDataService.createSoftware(data)
+    const res = await SoftwareDataService.createSoftware(data)
     return res.data.data
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err
@@ -62,7 +62,7 @@ export const updateSoftware = createAsyncThunk<
   }
 >('software/update', async (data, { rejectWithValue, dispatch }) => {
   try {
-    const response = await WebsiteDataService.update(data)
+    const response = await SoftwareDataService.update(data)
     return response.data.data
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err
@@ -83,7 +83,7 @@ export const checkSoftware = createAsyncThunk<
   }
 >('software/check', async (id, { rejectWithValue, dispatch }) => {
   try {
-    const res = await WebsiteDataService.checkStatus(id)
+    const res = await SoftwareDataService.checkStatus(id)
     const { software, message } = res.data
 
     if (software) {
@@ -114,7 +114,7 @@ export const retrieveWebsites = createAsyncThunk<
   }
 >('software/retrieve', async (_, { rejectWithValue, dispatch }) => {
   try {
-    const res = await WebsiteDataService.getAll()
+    const res = await SoftwareDataService.getAll()
     return res.data.data
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err
@@ -146,7 +146,7 @@ export const retrieveWebsites = createAsyncThunk<
   }
 })*/
 
-export const deleteWebsite = createAsyncThunk<
+export const deleteSoftware = createAsyncThunk<
   { id: string },
   { id: string },
   {
@@ -154,7 +154,7 @@ export const deleteWebsite = createAsyncThunk<
   }
 >('websites/delete', async ({ id }, { rejectWithValue, dispatch }) => {
   try {
-    await WebsiteDataService.deleteWebsite(id)
+    await SoftwareDataService.deleteWebsite(id)
     return { id }
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err
@@ -174,7 +174,7 @@ export const queryWinGetSoftware = createAsyncThunk<
   }
 >('software/query', async (query, { rejectWithValue, dispatch }) => {
   try {
-    const res = await WebsiteDataService.searchWithWinGet(query)
+    const res = await SoftwareDataService.searchWithWinGet(query)
     return res.data.data
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err
@@ -188,7 +188,7 @@ export const queryWinGetSoftware = createAsyncThunk<
 
 export const fetchSoftwareRepresentatives = createAsyncThunk('softwareRepresentatives/fetch', async (id: string, { rejectWithValue }) => {
   try {
-    const response = await WebsiteDataService.getSoftwareRepresentatives(id)
+    const response = await SoftwareDataService.getSoftwareRepresentatives(id)
     return response.data.data
   } catch (error: any) {
     return rejectWithValue(error.message)
@@ -200,7 +200,7 @@ export const updateSoftwareRepresentatives = createAsyncThunk(
   'softwareRepresentatives/update',
   async ({ id, data }: { id: string; data: number[] }, { rejectWithValue }) => {
     try {
-      await WebsiteDataService.setSoftwareRepresentatives(id, data)
+      await SoftwareDataService.setSoftwareRepresentatives(id, data)
       return data
     } catch (error: any) {
       return rejectWithValue(error.message)
@@ -300,7 +300,7 @@ const websiteSlice = createSlice({
 
       // Delete website
 
-      .addCase(deleteWebsite.fulfilled, (state, { payload }) => {
+      .addCase(deleteSoftware.fulfilled, (state, { payload }) => {
         state.software = state.software.filter(item => item.winget_id !== payload.id)
       })
 

@@ -1,0 +1,144 @@
+import React from 'react'
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
+import { IconButton, Tooltip, Stack, Box } from '@mui/material'
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
+import Visibility from '@mui/icons-material/VisibilityOutlined'
+import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
+import DeleteIcon from '@mui/icons-material/DeleteOutlined'
+import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
+import { useSelector } from 'react-redux'
+import { SoftwareEntry } from '../../../../types/common'
+import { RootState, useAppDispatch } from '../../store'
+import { checkSoftware, deleteSoftware, updateSoftware } from '../../slices/software.slice'
+import TimeAgo from 'javascript-time-ago'
+
+interface SoftwareTableProps {
+  timeAgo: TimeAgo
+  softwareFilteredList: SoftwareEntry[]
+  createSoftwareLoading: boolean
+  setActiveWebsite: (software: SoftwareEntry, index: number) => void
+}
+
+const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilteredList, createSoftwareLoading, setActiveWebsite }) => {
+  const dispatch = useAppDispatch()
+  const { user } = useSelector((state: RootState) => state.auth)
+  const isAdmin = user?.roles?.some(role => role.name === 'admin')
+
+  const handleCheck = async (id: string) => {
+    await dispatch(checkSoftware(id))
+  }
+
+  const handleToggleVisibility = (software: SoftwareEntry) => {
+    const { id, updatedAt, createdAt, details, ...rest } = software
+    dispatch(updateSoftware({ ...rest, is_hidden: !software.is_hidden }))
+  }
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?')) {
+      dispatch(deleteSoftware({ id }))
+    }
+  }
+
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 1,
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
+        <Stack direction="row" alignItems="center" spacing={2}>
+          {params.row?.is_current ? (
+            params.row?.bara_version !== null ? (
+              <CheckCircleOutlineOutlinedIcon color="success" fontSize="small" />
+            ) : (
+              <ErrorOutlineOutlinedIcon color="error" fontSize="small" />
+            )
+          ) : (
+            <CheckCircleOutlineOutlinedIcon color="warning" fontSize="small" />
+          )}
+          <Box>{params.value}</Box>
+        </Stack>
+      ),
+    },
+    {
+      field: 'publisher',
+      headerName: 'Publisher',
+      flex: 1,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.details?.publisher || '',
+    },
+    {
+      field: 'version',
+      headerName: 'WinGet',
+      flex: 1,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.version || '',
+    },
+    {
+      field: 'bara_version',
+      headerName: 'Baramundi',
+      flex: 1,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.bara_version || '',
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Aktualisiert',
+      width: 160,
+      renderCell: (params: GridRenderCellParams) => (params.value ? timeAgo.format(new Date(params.value)) : null),
+    },
+    {
+      field: 'actions',
+      headerName: '',
+      width: 140,
+      sortable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Box>
+            <Tooltip title="Prüfen">
+              <IconButton size="small" onClick={() => handleCheck(params.row.winget_id)}>
+                <SensorsOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          <Box>
+            <Tooltip title={params.row.is_hidden ? 'Anzeigen' : 'Ausblenden'}>
+              <IconButton size="small" onClick={() => handleToggleVisibility(params.row)}>
+                {params.row.is_hidden ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          {isAdmin && (
+            <Box>
+              <Tooltip title="Löschen">
+                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.winget_id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
+        </Stack>
+      ),
+    },
+  ]
+
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      <DataGrid<SoftwareEntry>
+        rows={softwareFilteredList}
+        columns={columns}
+        loading={createSoftwareLoading}
+        getRowId={row => row.winget_id}
+        onRowClick={params => {
+          const index = softwareFilteredList.findIndex(s => s.winget_id === params.row.winget_id)
+          setActiveWebsite(params.row, index)
+        }}
+        sx={{ border: 'none' }}
+        autoPageSize
+      />
+    </div>
+  )
+}
+
+export default SoftwareTableView

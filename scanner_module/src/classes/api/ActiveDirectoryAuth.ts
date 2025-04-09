@@ -29,12 +29,8 @@ export class ActiveDirectoryAuth {
       }
 
       if (!login.includes('@')) {
-        console.log('TEST')
-
         searchOptions.filter = `(sAMAccountName=${login.toLocaleUpperCase()})`
       }
-
-      console.log('searchOptions', searchOptions)
 
       const { searchEntries } = await this.client.search(this.config.baseDN, searchOptions)
 

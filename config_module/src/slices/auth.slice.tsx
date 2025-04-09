@@ -36,7 +36,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   await AuthService.logout()
 })
 
-const user = getUser()
+const user: IUser = getUser()
 const initialState = user ? { isLoggedIn: true, user, loading: false } : { isLoggedIn: false, user: null, loading: false }
 
 const authSlice = createSlice({

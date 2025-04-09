@@ -4,3 +4,8 @@ export interface CustomTabProps {
   tabLabel: string
   tabContent: React.ReactElement
 }
+
+export enum ListViewType {
+  ListView = 'ListView',
+  TableView = 'TableView',
+}

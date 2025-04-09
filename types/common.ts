@@ -23,6 +23,7 @@ export interface WingetPackageDetails {
 }
 
 export interface SoftwareEntry {
+  id?: number;
   name: string;
   winget_id: string;
   user_id?: number;
@@ -33,6 +34,7 @@ export interface SoftwareEntry {
   is_hidden?: boolean;
   is_current?: boolean;
   updatedAt?: string;
+  createdAt?: string;
 }
 
 export interface ISoftwareRepresentative {

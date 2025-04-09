@@ -38,7 +38,7 @@ export default function Header() {
               <ul className="navbar-nav">
                 <li className="nav-item">
                   <div className="nav-link">
-                    Hallo, {user.firstName} {user.lastName}
+                    Hallo, {user?.firstName} {user?.lastName}
                   </div>
                 </li>
                 <li className="nav-item">

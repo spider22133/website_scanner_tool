@@ -51,7 +51,7 @@ const searchWithWinGet = (query: string) => {
   return http.get(`/software/q=${query}`)
 }
 
-const WebsiteDataService = {
+const SoftwareDataService = {
   getAll,
   getWebsiteById: getSoftwareById,
   update,
@@ -65,4 +65,4 @@ const WebsiteDataService = {
   setSoftwareRepresentatives,
 }
 
-export default WebsiteDataService
+export default SoftwareDataService
