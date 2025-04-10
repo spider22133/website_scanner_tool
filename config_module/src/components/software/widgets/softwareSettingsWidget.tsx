@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, Chip, Stack, TextField, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, Chip, Stack, TextField, Typography, Box, Avatar } from '@mui/material'
 import SaveIcon from '@mui/icons-material/SaveOutlined'
 import { RootState, useAppDispatch } from '../../../store'
 import { useSelector } from 'react-redux'
-import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives } from '../../../slices/software.slice'
+import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives, uploadSoftwareIcon } from '../../../slices/software.slice'
 import IUser from '../../../interfaces/user.interface'
 import { SoftwareEntry } from '../../../../../types/common'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -15,19 +15,28 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 interface FormData {
   mainResponsible: IUser | null
   mainRepresentatives: IUser[]
+  icon: FileList
 }
 
 // Define a Yup schema for IUser
 const userSchema = Yup.object().shape({
   id: Yup.number().required(),
   email: Yup.string().required(),
-  password: Yup.string().required(),
 })
 
 // Validation schema with explicit typing
 const validationSchema = Yup.object().shape({
   mainResponsible: userSchema.nullable().required('Hauptverantwortlicher ist erforderlich'),
-  mainRepresentatives: Yup.array().of(userSchema).min(1, 'Mindestens ein Vertreter ist erforderlich'),
+  icon: Yup.mixed()
+    .test('fileSize', 'Zu große Datei', (value: any) => {
+      if (!value || value.length === 0) return true // optional
+      return value[0].size <= 1024 * 1024 * 2 // 2MB limit
+    })
+    .test('fileType', 'Nur PNG, JPG oder SVG erlaubt', (value: any) => {
+      if (!value || value.length === 0) return true // optional
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml']
+      return allowedTypes.includes(value[0].type)
+    }),
 }) as Yup.ObjectSchema<FormData>
 
 const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ software }) => {
@@ -46,11 +55,13 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
     defaultValues: {
       mainResponsible: null,
       mainRepresentatives: [],
+      icon: undefined,
     },
   })
 
   const mainResponsible = watch('mainResponsible')
   const mainRepresentatives = watch('mainRepresentatives')
+  const iconFiles = watch('icon')
 
   useEffect(() => {
     dispatch(fetchSoftwareRepresentatives(software.winget_id))
@@ -58,7 +69,6 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
   useEffect(() => {
     const initialResponsible = users.find(user => user.id === software.user_id) || null
-
     const initialRepresentatives = representatives
       .map(repr => users.find(user => user.email === repr.email))
       .filter((user): user is IUser => user !== undefined)
@@ -71,14 +81,30 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
   const onSubmit: SubmitHandler<FormData> = data => {
     if (!isDirty) return
-    const updatedSoftware = {
+
+    const updatedSoftware: SoftwareEntry = {
       version: software.version,
       winget_id: software.winget_id,
       name: software.name,
       user_id: data.mainResponsible?.id,
     }
 
-    dispatch(updateSoftware(updatedSoftware))
+    if (data.icon?.[0]) {
+      const originalExt = data.icon[0].name.split('.').pop()?.toLowerCase()
+      const renamedFile = new File([data.icon[0]], `${software.winget_id}.${originalExt}`, {
+        type: data.icon[0].type,
+      })
+
+      const formData = new FormData()
+      formData.append('icon', renamedFile)
+
+      dispatch(
+        uploadSoftwareIcon({
+          id: updatedSoftware.winget_id,
+          formData: formData,
+        }),
+      )
+    }
 
     if (mainRepresentatives && mainRepresentatives.length > 0) {
       dispatch(
@@ -102,7 +128,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
           <Stack spacing={3} sx={{ width: '100%' }}>
             <Stack direction="row" alignItems="center" spacing={2}>
               <Autocomplete
-                options={users}
+                options={users.filter(user => !user.roles?.some(role => role.name === 'admin'))}
                 getOptionLabel={option => option.email}
                 value={mainResponsible}
                 onChange={(_, value) => setValue('mainResponsible', value, { shouldDirty: true })}
@@ -121,7 +147,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
             <Stack direction="row" alignItems="center" spacing={2}>
               <Autocomplete
                 multiple
-                options={users}
+                options={users.filter(user => !user.roles?.some(role => role.name === 'admin'))}
                 getOptionLabel={option => option.email}
                 value={mainRepresentatives}
                 onChange={(_, value) => setValue('mainRepresentatives', value, { shouldDirty: true })}
@@ -140,7 +166,41 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                 sx={{ flexGrow: 1 }}
               />
             </Stack>
+            <Box>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Button variant="outlined" component="label" sx={{ textTransform: 'none' }}>
+                  {software.icon ? 'Icon ändern' : 'Icon hochladen'}
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml" // Specify supported types
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const files = e.target.files
+                      if (files?.length) {
+                        setValue('icon', files, { shouldDirty: true })
+                      }
+                    }}
+                  />
+                </Button>
+                {software.icon && <Avatar src={`http://localhost:3001${software.icon}`} alt="Software Icon" sx={{ width: 32, height: 32 }} />}
 
+                {iconFiles?.[0] && (
+                  <Box>
+                    <Typography variant="body2" noWrap>
+                      {iconFiles[0].name}
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
+              <Typography variant="caption" color="text.secondary">
+                Unterstützte Formate: PNG, JPG, SVG (max. 2 MB)
+              </Typography>
+              {errors.icon && (
+                <Typography variant="caption" color="error">
+                  {errors.icon.message}
+                </Typography>
+              )}
+            </Box>
             <Button type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
               Speichern
             </Button>

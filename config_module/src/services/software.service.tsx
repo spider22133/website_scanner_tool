@@ -51,6 +51,14 @@ const searchWithWinGet = (query: string) => {
   return http.get(`/software/q=${query}`)
 }
 
+const updateSoftwareIcon = (id: string, formData: FormData) => {
+  return http.post(`/software/${id}/icon`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
 const SoftwareDataService = {
   getAll,
   getWebsiteById: getSoftwareById,
@@ -63,6 +71,7 @@ const SoftwareDataService = {
   getWebsiteMainStepStates,
   getSoftwareRepresentatives,
   setSoftwareRepresentatives,
+  updateSoftwareIcon,
 }
 
 export default SoftwareDataService

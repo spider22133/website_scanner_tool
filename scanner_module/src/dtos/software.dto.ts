@@ -16,6 +16,9 @@ export default class CreateSoftwareDto {
   @IsString()
   public winget_id: string
 
+  @IsString()
+  public icon: string
+
   @IsNumber()
   public user_id: number
 

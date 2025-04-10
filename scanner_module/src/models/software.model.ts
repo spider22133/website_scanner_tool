@@ -16,7 +16,7 @@ import { SoftwareVersionModel } from './software_version.model'
 import { UserModel } from './user.model'
 import { SoftwareRepresentative } from './software_representative.model'
 
-export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source'>
+export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source' | 'icon'>
 
 export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public id: number
@@ -25,6 +25,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public user_id: number
   public version: string
   public bara_version: string
+  public icon: string
   public source: string
   public details: string
   public is_hidden: boolean
@@ -81,6 +82,10 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       },
       bara_version: {
         type: DataTypes.STRING,
+      },
+      icon: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       source: {
         type: DataTypes.STRING,

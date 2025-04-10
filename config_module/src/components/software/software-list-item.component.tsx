@@ -3,7 +3,7 @@ import { RootState, useAppDispatch } from '../../store'
 import { checkSoftware, deleteSoftware, updateSoftware } from '../../slices/software.slice'
 import { useState } from 'react'
 // import { motion } from 'framer-motion'
-import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress } from '@mui/material'
+import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress, Avatar } from '@mui/material'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import DeleteIcon from '@mui/icons-material/DeleteOutlined'
@@ -62,7 +62,7 @@ export default function WebsitesListItem({ timeAgo, software, index, currentInde
       >
         <div className="d-flex justify-content-between align-items-center w-100">
           <Stack direction="row" alignItems="center" spacing={2}>
-            <Inventory2OutlinedIcon />
+            {software.icon ? <Avatar src={`http://localhost:3001${software.icon}`} /> : <Inventory2OutlinedIcon />}
             <div className="me-auto">
               <div className="d-flex align-items-center fw-bold">
                 {software.name}

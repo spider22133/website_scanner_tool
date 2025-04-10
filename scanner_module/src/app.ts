@@ -21,6 +21,7 @@ import { logger, stream } from '@utils/logger'
 import { BaramundiApi } from './classes/api/BaramundiApi'
 import WebexBot from './classes/api/WebexNodeBotFramework'
 import Route from '@/interfaces/route.interface'
+import path from 'path'
 
 class App {
   public app: express.Application
@@ -97,6 +98,7 @@ class App {
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true }))
     this.app.use(cookieParser())
+    this.app.use('/icons', express.static(path.join(__dirname, '..', 'public', 'icons')))
   }
 
   private configureLogging() {

@@ -9,6 +9,10 @@ import { WingetUtils } from '@/classes/api/WingetApi'
 import { logger } from '@/utils/logger'
 import { SoftwareModel } from '@/models/software.model'
 import { SoftwareRepresentative } from '@/models/software_representative.model'
+import multer from 'multer'
+import HttpException from '@/exceptions/HttpException'
+import fs from 'fs'
+import path from 'path'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
@@ -156,6 +160,66 @@ class SoftwareController {
       const searchSoftwareData: SoftwareEntry[] = await WingetUtils.searchSoftware(searchString)
 
       res.status(200).json({ data: searchSoftwareData })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public saveSoftwareIcon = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const wingetId = req.params.id
+
+      const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+          const dir = 'public/icons'
+
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true })
+          }
+          cb(null, dir)
+        },
+        filename: (req, file, cb) => {
+          // Preserve the original file extension
+          const ext = path.extname(file.originalname).toLowerCase()
+          cb(null, `${wingetId}${ext}`)
+        },
+      })
+
+      const upload = multer({
+        storage,
+        fileFilter: (req, file, cb) => {
+          const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml']
+          if (!allowedTypes.includes(file.mimetype)) {
+            return cb(new HttpException(400, 'Only PNG, JPG, and SVG files are allowed'))
+          }
+          cb(null, true)
+        },
+      }).single('icon')
+
+      await new Promise<void>((resolve, reject) => {
+        upload(req, res, err => {
+          if (err) {
+            reject(new HttpException(400, err.message))
+          } else if (!req.file) {
+            reject(new HttpException(400, 'No icon file provided'))
+          } else {
+            resolve()
+          }
+        })
+      })
+
+      // Use the uploaded file's extension in the icon path
+      const ext = path.extname(req.file.originalname).toLowerCase()
+      const iconPath = `/icons/${wingetId}${ext}`
+
+      // Update software with the icon path
+      const findOne = await this.softwareService.findSoftwareById(wingetId)
+      const updatedSoftware = await this.softwareService.updateSoftware(wingetId, { ...findOne, icon: iconPath })
+
+      res.status(200).json({
+        data: updatedSoftware,
+        message: 'Icon uploaded and software updated successfully',
+      })
     } catch (error) {
       next(error)
     }

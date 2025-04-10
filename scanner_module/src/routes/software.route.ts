@@ -37,6 +37,7 @@ class SoftwareRoute implements Route {
     )
     this.router.put(`${this.path}/:id`, validationMiddleware(CreateSoftwareDto, 'body', true), this.softwareController.updateSoftware)
     this.router.delete(`${this.path}/:id`, authMiddleware, this.softwareController.deleteSoftware)
+    this.router.post(`${this.path}/:id/icon`, authMiddleware, this.softwareController.saveSoftwareIcon)
   }
 }
 

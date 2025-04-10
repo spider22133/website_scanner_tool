@@ -7,6 +7,7 @@ export interface Software {
   user_id: number
   version: string
   bara_version: string
+  icon: string
   source: string
   details: string
   is_hidden: boolean

@@ -208,6 +208,29 @@ export const updateSoftwareRepresentatives = createAsyncThunk(
   },
 )
 
+export const uploadSoftwareIcon = createAsyncThunk<SoftwareEntry, { id: string; formData: FormData }, { rejectValue: httpErrors }>(
+  'software/uploadIcon',
+  async ({ id, formData }, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await SoftwareDataService.updateSoftwareIcon(id, formData)
+      return response.data.data
+    } catch (err: any) {
+      const error: AxiosError<httpErrors> = err
+      if (!error.response) {
+        throw err
+      }
+
+      dispatch(
+        setMessage({
+          id: id,
+          message: error.response.data.message,
+        }),
+      )
+      return rejectWithValue(error.response.data)
+    }
+  },
+)
+
 const websiteSlice = createSlice({
   name: 'website',
   initialState,
@@ -324,6 +347,26 @@ const websiteSlice = createSlice({
         state.loading = false
       })
       .addCase(updateSoftwareRepresentatives.rejected, state => {
+        state.loading = false
+      })
+
+      // Update icon data
+      .addCase(uploadSoftwareIcon.pending, state => {
+        state.loading = true
+      })
+      .addCase(uploadSoftwareIcon.fulfilled, (state, { payload }) => {
+        const index = state.software.findIndex(item => item.winget_id === payload.winget_id)
+
+        state.loading = false
+        if (index !== -1) {
+          state.software[index] = {
+            ...state.software[index],
+            ...payload,
+            details: JSON.parse(payload.details as string) as WingetPackageDetails,
+          }
+        }
+      })
+      .addCase(uploadSoftwareIcon.rejected, (state, { payload }) => {
         state.loading = false
       })
   },

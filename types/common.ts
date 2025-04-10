@@ -29,6 +29,7 @@ export interface SoftwareEntry {
   user_id?: number;
   version: string;
   bara_version?: string;
+  icon?: string;
   source?: string;
   details?: WingetPackageDetails;
   is_hidden?: boolean;
