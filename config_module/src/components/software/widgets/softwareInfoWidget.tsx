@@ -14,7 +14,7 @@ interface SoftwareInfoWidgetProps {
 const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => {
   const dispatch = useDispatch()
 
-  const { version, bara_version, details, is_current } = software
+  const { version, bara_version, details, is_current, name } = software
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
 
   return (
@@ -22,7 +22,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
           <Typography variant="h5" fontWeight={600}>
-            Information
+            {name}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 3 }}>
             <CopyToClipboard

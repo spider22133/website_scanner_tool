@@ -29,11 +29,11 @@ const validationSchema = Yup.object().shape({
   mainResponsible: userSchema.nullable().required('Hauptverantwortlicher ist erforderlich'),
   icon: Yup.mixed()
     .test('fileSize', 'Zu große Datei', (value: any) => {
-      if (!value || value.length === 0) return true // optional
+      if (!value || value.length === 0) return true
       return value[0].size <= 1024 * 1024 * 2 // 2MB limit
     })
     .test('fileType', 'Nur PNG, JPG oder SVG erlaubt', (value: any) => {
-      if (!value || value.length === 0) return true // optional
+      if (!value || value.length === 0) return true
       const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml']
       return allowedTypes.includes(value[0].type)
     }),
@@ -80,7 +80,10 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   }, [software, representatives, users, reset])
 
   const onSubmit: SubmitHandler<FormData> = data => {
-    if (!isDirty) return
+    console.log(errors)
+    console.log(isDirty, data)
+
+    // if (!isDirty) return
 
     const updatedSoftware: SoftwareEntry = {
       version: software.version,
@@ -88,6 +91,8 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
       name: software.name,
       user_id: data.mainResponsible?.id,
     }
+
+    dispatch(updateSoftware(updatedSoftware))
 
     if (data.icon?.[0]) {
       const originalExt = data.icon[0].name.split('.').pop()?.toLowerCase()
@@ -191,15 +196,17 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                     </Typography>
                   </Box>
                 )}
+                <Box>
+                  {errors.icon && (
+                    <Typography variant="caption" color="error">
+                      {errors.icon.message}
+                    </Typography>
+                  )}
+                </Box>
               </Stack>
               <Typography variant="caption" color="text.secondary">
                 Unterstützte Formate: PNG, JPG, SVG (max. 2 MB)
               </Typography>
-              {errors.icon && (
-                <Typography variant="caption" color="error">
-                  {errors.icon.message}
-                </Typography>
-              )}
             </Box>
             <Button type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
               Speichern

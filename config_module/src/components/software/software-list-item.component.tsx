@@ -1,22 +1,22 @@
-import { SoftwareEntry } from '../../../../types/common'
-import { RootState, useAppDispatch } from '../../store'
-import { checkSoftware, deleteSoftware, updateSoftware } from '../../slices/software.slice'
-import { useState } from 'react'
-// import { motion } from 'framer-motion'
-import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress, Avatar } from '@mui/material'
-import Visibility from '@mui/icons-material/VisibilityOutlined'
-import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
+import React, { useState, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, CircularProgress, Avatar, Badge } from '@mui/material'
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined'
-import TimeAgo from 'javascript-time-ago'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
-import { useSelector } from 'react-redux'
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import TimeAgo from 'javascript-time-ago'
+import { SoftwareEntry } from '../../../../types/common'
+import { RootState, AppDispatch } from '../../store'
+import { checkSoftware, deleteSoftware, updateSoftware } from '../../slices/software.slice'
 import { Role } from '../../../../scanner_module/dist/scanner_module/src/interfaces/role.interface'
+import { API_URL } from '../../http-connection'
 
-type Props = {
+interface WebsitesListItemProps {
   index: number
   timeAgo: TimeAgo
   software: SoftwareEntry
@@ -24,140 +24,144 @@ type Props = {
   setActiveWebsite: (software: SoftwareEntry, index: number) => void
 }
 
-// const variants = {
-//   open: { opacity: 1 },
-//   closed: { opacity: 0 },
-// }
+const isAdminUser = (roles?: Role[]): boolean => roles?.some(role => role.name === 'admin') ?? false
 
-export default function WebsitesListItem({ timeAgo, software, index, currentIndex, setActiveWebsite }: Props) {
-  const { user } = useSelector((state: RootState) => state.auth)
-  // const [showAddForm, setShowAddForm] = useState(false)
-  const [isChecking, setIsChecking] = useState(false) // Local state to track loading for this item
-
-  const dispatch = useAppDispatch()
+const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, index, currentIndex, setActiveWebsite }) => {
   const theme = useTheme()
+  const dispatch = useDispatch<AppDispatch>()
+  const { user } = useSelector((state: RootState) => state.auth)
+  const [isChecking, setIsChecking] = useState(false)
 
-  const isAdmin = user?.roles?.some((role: Role) => role.name === 'admin')
+  const isAdmin = isAdminUser(user?.roles)
 
-  const handleRemove = (id: string) => {
-    dispatch(deleteSoftware({ id }))
+  const handleCheckStatus = useCallback(
+    async (id: string) => {
+      setIsChecking(true)
+      try {
+        await dispatch(checkSoftware(id)).unwrap()
+      } finally {
+        setIsChecking(false)
+      }
+    },
+    [dispatch],
+  )
+
+  const handleToggleVisibility = useCallback(() => {
+    const { id, updatedAt, createdAt, details, ...rest } = software
+    dispatch(updateSoftware({ ...rest, is_hidden: !software.is_hidden }))
+  }, [dispatch, software])
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      if (window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?')) {
+        dispatch(deleteSoftware({ id }))
+      }
+    },
+    [dispatch],
+  )
+
+  const handleClick = useCallback(() => {
+    setActiveWebsite(software, index)
+  }, [setActiveWebsite, software, index])
+
+  const renderBadgeContent = () => {
+    if (!software.is_current) {
+      return <CheckCircleOutlineOutlinedIcon fontSize="small" />
+    }
+    return software.bara_version !== null ? <CheckCircleOutlineOutlinedIcon fontSize="small" /> : <ErrorOutlineOutlinedIcon fontSize="small" />
   }
 
-  const checkStatus = async (id: string) => {
-    setIsChecking(true)
-    await dispatch(checkSoftware(id))
-    setIsChecking(false)
-  }
+  const renderIcon = () => (
+    <Badge
+      color={software.is_current ? (software.bara_version !== null ? 'success' : 'error') : 'warning'}
+      overlap="circular"
+      anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+      badgeContent={renderBadgeContent()}
+      sx={{ '.MuiBadge-badge': { padding: 0 } }}
+    >
+      {software.icon ? (
+        <Avatar src={`${API_URL}${software.icon}`} sx={{ width: 36, height: 36 }} />
+      ) : (
+        <Inventory2OutlinedIcon sx={{ width: 36, height: 36 }} />
+      )}
+    </Badge>
+  )
 
-  const listItem = () => {
-    return (
-      <ListItem
-        className={`d-flex flex-column`}
-        sx={{
-          my: 0.5,
-          border: `1px solid ${index === currentIndex ? theme.palette.grey.A700 : theme.palette.grey.A200}`,
-          borderRadius: 1,
-        }}
-        onClick={() => setActiveWebsite(software, index)}
-      >
-        <div className="d-flex justify-content-between align-items-center w-100">
-          <Stack direction="row" alignItems="center" spacing={2}>
-            {software.icon ? <Avatar src={`http://localhost:3001${software.icon}`} /> : <Inventory2OutlinedIcon />}
-            <div className="me-auto">
-              <div className="d-flex align-items-center fw-bold">
-                {software.name}
-                {software.is_current ? (
-                  <>
-                    {software.bara_version !== null ? (
-                      <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'success.main', fontSize: 20 }} />
-                    ) : (
-                      <ErrorOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'error.main', fontSize: 20 }} />
-                    )}
-                  </>
-                ) : (
-                  <CheckCircleOutlineOutlinedIcon className={`ms-2`} sx={{ color: 'warning.main', fontSize: 20 }} />
-                )}
-              </div>
-              <Typography variant="body2">{software.details?.publisher}</Typography>
-            </div>
-          </Stack>
-
-          <div className="">
-            <Stack direction="column" alignItems="flex-end">
-              <Stack direction="row" alignItems="center">
-                <Tooltip title="Prüfen" arrow>
-                  {isChecking ? (
-                    <CircularProgress color="inherit" size="16px" sx={{ m: '12px' }} />
-                  ) : (
-                    <IconButton
-                      aria-label="prüfen"
-                      onClick={e => {
-                        e.stopPropagation()
-                        checkStatus(software.winget_id)
-                      }}
-                    >
-                      <SensorsOutlinedIcon />
-                    </IconButton>
-                  )}
-                </Tooltip>
-                <Tooltip title={software.is_hidden ? 'Anzeigen' : 'Ausblenden'} arrow>
-                  <IconButton
-                    aria-label="Sichtbarkeit umschalten"
-                    onClick={e => {
-                      e.stopPropagation()
-                      const { id, updatedAt, createdAt, details, ...rest } = software
-                      dispatch(updateSoftware({ ...rest, is_hidden: !software.is_hidden }))
-                    }}
-                  >
-                    {software.is_hidden ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </Tooltip>
-                {/* {user.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) && (
-                  <Tooltip title="Bearbeiten" arrow>
-                    <IconButton aria-label="bearbeiten" onClick={() => setShowAddForm(showAddForm => !showAddForm)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                )} */}
-                {isAdmin && (
-                  <Tooltip title="Löschen" arrow>
-                    <IconButton
-                      aria-label="löschen"
-                      color="error"
-                      onClick={() => {
-                        return window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?') ? handleRemove(software.winget_id) : ''
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Stack>
-              {software.updatedAt && (
-                <Chip
-                  icon={<DoneAllOutlinedIcon />}
-                  sx={{ '& .MuiChip-iconSmall': { ml: '5px' } }}
-                  variant="outlined"
-                  size="small"
-                  label={timeAgo.format(new Date(software.updatedAt))}
-                />
-              )}
-            </Stack>
+  return (
+    <ListItem
+      sx={{
+        my: 0.5,
+        border: `1px solid ${index === currentIndex ? theme.palette.grey.A700 : theme.palette.grey.A200}`,
+        borderRadius: 1,
+        flexDirection: 'column',
+      }}
+      onClick={handleClick}
+    >
+      <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
+        <Stack direction="row" alignItems="center" spacing={2}>
+          {renderIcon()}
+          <div>
+            <Typography fontWeight="bold">{software.name}</Typography>
+            <Typography variant="body2">{software.details?.publisher}</Typography>
           </div>
-        </div>
+        </Stack>
 
-        {/* <motion.div
-          className="w-100"
-          animate={showAddForm ? 'open' : 'closed'}
-          variants={variants}
-          initial="closed"
-          transition={{ ease: 'easeOut', duration: '0.5' }}
-        >
-          <EditWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} software={software} />
-        </motion.div> */}
-      </ListItem>
-    )
-  }
-
-  return <>{listItem()}</>
+        <Stack direction="column" alignItems="flex-end">
+          <Stack direction="row" alignItems="center">
+            <Tooltip title="Prüfen" arrow>
+              {isChecking ? (
+                <CircularProgress color="inherit" size={16} sx={{ m: '12px' }} />
+              ) : (
+                <IconButton
+                  aria-label="prüfen"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleCheckStatus(software.winget_id)
+                  }}
+                >
+                  <SensorsOutlinedIcon />
+                </IconButton>
+              )}
+            </Tooltip>
+            <Tooltip title={software.is_hidden ? 'Anzeigen' : 'Ausblenden'} arrow>
+              <IconButton
+                aria-label="Sichtbarkeit umschalten"
+                onClick={e => {
+                  e.stopPropagation()
+                  handleToggleVisibility()
+                }}
+              >
+                {software.is_hidden ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+              </IconButton>
+            </Tooltip>
+            {isAdmin && (
+              <Tooltip title="Löschen" arrow>
+                <IconButton
+                  aria-label="löschen"
+                  color="error"
+                  onClick={e => {
+                    e.stopPropagation()
+                    handleDelete(software.winget_id)
+                  }}
+                >
+                  <DeleteOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
+          {software.updatedAt && (
+            <Chip
+              icon={<DoneAllOutlinedIcon />}
+              variant="outlined"
+              size="small"
+              label={timeAgo.format(new Date(software.updatedAt))}
+              sx={{ '& .MuiChip-iconSmall': { ml: '5px' } }}
+            />
+          )}
+        </Stack>
+      </Stack>
+    </ListItem>
+  )
 }
+
+export default WebsitesListItem
