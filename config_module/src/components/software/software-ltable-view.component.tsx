@@ -69,28 +69,28 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
     },
     {
       field: 'version',
-      headerName: 'WinGet',
+      headerName: 'Neue Version',
       flex: 1,
       sortable: false,
       renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.version || '',
     },
     {
       field: 'bara_version',
-      headerName: 'Baramundi',
+      headerName: 'Version',
       flex: 1,
       sortable: false,
       renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.bara_version || '',
     },
     {
       field: 'updatedAt',
-      headerName: 'Aktualisiert',
-      width: 160,
+      headerName: 'Kontrolliert',
+      width: 150,
       renderCell: (params: GridRenderCellParams) => (params.value ? timeAgo.format(new Date(params.value)) : null),
     },
     {
       field: 'actions',
       headerName: '',
-      width: 140,
+      flex: 1,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Stack direction="row" alignItems="center" spacing={1}>

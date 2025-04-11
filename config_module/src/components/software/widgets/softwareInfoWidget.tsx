@@ -20,7 +20,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
+        <Stack direction={{ xs: 'column', xl: 'row' }} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
           <Typography variant="h5" fontWeight={600}>
             {name}
           </Typography>

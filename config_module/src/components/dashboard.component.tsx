@@ -23,7 +23,6 @@ const DashboardComponent: React.FC = () => {
   const { software, softwareFilteredList } = useSelector((state: RootState) => state.software)
 
   const [displayedSoftware, setDisplayedSoftware] = useState<SoftwareEntry[]>([])
-  // const [currentPage, setCurrentPage] = useState<number>(1)
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
@@ -42,13 +41,6 @@ const DashboardComponent: React.FC = () => {
 
   useEffect(() => {
     const firstWebsiteId = software[0]?.winget_id
-
-    if (firstWebsiteId) {
-      //dispatch(getStatesByWebsiteId(firstWebsiteId))
-      //dispatch(getStepsByWebsiteId(firstWebsiteId))
-      // getAggrStates(firstWebsiteId)
-      // getWebsiteMainStepStates(firstWebsiteId)
-    }
   }, [dispatch, software])
 
   useEffect(() => {
@@ -57,11 +49,6 @@ const DashboardComponent: React.FC = () => {
 
   const setActiveWebsite = (website: SoftwareEntry, index: number) => {
     setCurrentIndex(index)
-    // setCurrentPage(1)
-    // getAggrStates(website.winget_id)
-    // getWebsiteMainStepStates(website.winget_id)
-    // dispatch(getStepsByWebsiteId(website.winget_id))
-    // dispatch(getStatesByWebsiteId(website.winget_id))
   }
 
   const onPageChange = (page = 1) => {
@@ -95,38 +82,15 @@ const DashboardComponent: React.FC = () => {
     <Box className="dashboard-container">
       <Container maxWidth={false} sx={{ pt: 2 }}>
         <Grid container spacing={2}>
-          <Grid
-            className="left-column"
-            size={{
-              xs: 12,
-              lg: 5,
-            }}
-          >
+          <Grid className="left-column" size={{ xs: 12, lg: 7, xl: 5 }}>
             <Paper className="search-bar-container">
               <AppSearchBar />
             </Paper>
             <Paper className="websites-list-container">
               <SoftwareList software={displayedSoftware} currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
-              {/* <Box className="pagination" sx={{ mt: 'auto', pt: 2 }}>
-                {software.length > 0 && (
-                  <PaginationContainer
-                    totalItems={software.length}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    pageChange={onPageChange}
-                    setCurrentPage={setCurrentPage}
-                  />
-                )}
-              </Box> */}
             </Paper>
           </Grid>
-          <Grid
-            className="tabs-container"
-            size={{
-              xs: 12,
-              lg: 7,
-            }}
-          >
+          <Grid className="tabs-container" size={{ xs: 12, lg: 5, xl: 7 }}>
             <TabsComponent tabs={tabs} />
           </Grid>
         </Grid>

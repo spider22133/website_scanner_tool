@@ -105,7 +105,7 @@ const AppFilterBar: React.FC = () => {
   const responsibleOptions = [...staticOptions, ...users.filter(user => !user.roles?.some(role => role.name === 'admin'))]
 
   return (
-    <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
+    <Stack direction={{ xs: 'column', md: 'row' }} alignItems="center" spacing={2} sx={{ width: '100%' }}>
       <TextField
         label="Name"
         placeholder="Nach Namen filtern..."
@@ -124,33 +124,35 @@ const AppFilterBar: React.FC = () => {
         fullWidth
         aria-label="Software filter input"
       />
-      <Autocomplete
-        options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen']}
-        value={filterState.status}
-        getOptionLabel={option => optionLabelMap[option] || option}
-        onChange={handleStatusChange}
-        renderInput={params => <TextField {...params} label="Gültigkeit" size="small" />}
-        disableClearable
-        sx={{ minWidth: 180 }}
-      />
-      <Autocomplete
-        options={responsibleOptions}
-        value={
-          responsibleOptions.find(option =>
-            typeof option === 'string' ? option === filterState.responsible : option.id === (filterState.responsible as IUser)?.id,
-          ) || 'none'
-        }
-        getOptionLabel={option => optionLabelMap[option as string] || (option as IUser).email}
-        onChange={handleResponsibleChange}
-        renderInput={params => <TextField {...params} label="Hauptverantwortlicher" size="small" />}
-        disableClearable
-        sx={{ minWidth: 250 }}
-      />
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Tooltip title={filterState.showHidden ? 'Ausblenden' : 'Anzeigen'}>
-          <IconButton onClick={toggleVisibilityFilter}>{filterState.showHidden ? <VisibilityOff /> : <Visibility />}</IconButton>
-        </Tooltip>
-      </Box>
+      <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
+        <Autocomplete
+          options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen']}
+          value={filterState.status}
+          getOptionLabel={option => optionLabelMap[option] || option}
+          onChange={handleStatusChange}
+          renderInput={params => <TextField {...params} label="Gültigkeit" size="small" />}
+          disableClearable
+          sx={{ minWidth: 180 }}
+        />
+        <Autocomplete
+          options={responsibleOptions}
+          value={
+            responsibleOptions.find(option =>
+              typeof option === 'string' ? option === filterState.responsible : option.id === (filterState.responsible as IUser)?.id,
+            ) || 'none'
+          }
+          getOptionLabel={option => optionLabelMap[option as string] || (option as IUser).email}
+          onChange={handleResponsibleChange}
+          renderInput={params => <TextField {...params} label="Hauptverantwortlicher" size="small" />}
+          disableClearable
+          sx={{ minWidth: 220 }}
+        />
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Tooltip title={filterState.showHidden ? 'Ausblenden' : 'Anzeigen'}>
+            <IconButton onClick={toggleVisibilityFilter}>{filterState.showHidden ? <VisibilityOff /> : <Visibility />}</IconButton>
+          </Tooltip>
+        </Box>
+      </Stack>
     </Stack>
   )
 }

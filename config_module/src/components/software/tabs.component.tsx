@@ -10,9 +10,9 @@ type Props = {
 const TabsComponent: React.FC<Props> = ({ tabs }) => {
   const [value, setValue] = React.useState('MAIN')
   return (
-    <>
-      <TabContext value={value}>
-        <Box>
+    <TabContext value={value}>
+      <Box className="tabs-container">
+        <Box className="tab-list-wrapper">
           <TabList onChange={(e, newValue) => setValue(newValue)} variant="scrollable">
             {tabs.map(({ tabType, tabLabel, tabIcon }, index) => (
               <Tab
@@ -27,12 +27,12 @@ const TabsComponent: React.FC<Props> = ({ tabs }) => {
           </TabList>
         </Box>
         {tabs.map(({ tabType, tabContent }, index) => (
-          <TabPanel key={index} value={tabType} sx={{ px: 0, pt: 2, pb: 0 }}>
+          <TabPanel key={index} value={tabType} className="tab-panel" sx={{ px: 0, pt: 2, pb: 0 }}>
             {tabContent}
           </TabPanel>
         ))}
-      </TabContext>
-    </>
+      </Box>
+    </TabContext>
   )
 }
 

@@ -80,7 +80,7 @@ h2,
 }
 
 .dashboard-container {
-  background-color: #f2f2f2;
+  background-color: #eceff1;
   min-height: calc(100vh - 76px);
 }
 
@@ -105,13 +105,35 @@ h2,
   height: calc(100vh - 230px);
 }
 
+.tabs-container {
+  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-list-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.tab-panel {
+  flex-grow: 1;
+  overflow-y: auto;
+  
+  /* Hide scrollbar for Chrome, Safari, Edge */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari, Edge */
+.tab-panel::-webkit-scrollbar {
+  display: none;
+}
+
 .search-bar-container {
   padding: 24px;
   margin-bottom: 16px;
-}
-
-.tabs-container {
-  position: relative;
 }
 
 .view-toggle {

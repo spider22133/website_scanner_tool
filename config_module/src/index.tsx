@@ -12,7 +12,21 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { deDE } from '@mui/material/locale'
 import { deDE as dataGridDE } from '@mui/x-data-grid/locales'
 
-const theme = createTheme(deDE, dataGridDE)
+const theme = createTheme(
+  {
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 600,
+        md: 900,
+        lg: 1200,
+        xl: 1921,
+      },
+    },
+  },
+  deDE,
+  dataGridDE,
+)
 
 // Get the root DOM element
 const container = document.getElementById('root')

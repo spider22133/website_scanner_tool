@@ -39,7 +39,7 @@ const SoftwareDetails: React.FC<PackageDetailsProps> = ({ software }) => {
       </Grid>
       <Grid size={12}>
         <Box width={'100%'}>
-          <Masonry component={'div'} columns={2} spacing={2} defaultHeight={450} defaultColumns={2} defaultSpacing={2} sequential>
+          <Masonry component={'div'} columns={{ xs: 1, xl: 2 }} spacing={2} defaultHeight={450} defaultColumns={2} defaultSpacing={2} sequential>
             <Paper>{software && <SoftwareInfoWidget software={software} />}</Paper>
             <Paper> {software && <SoftwareSettingsWidget software={software} />}</Paper>
           </Masonry>
