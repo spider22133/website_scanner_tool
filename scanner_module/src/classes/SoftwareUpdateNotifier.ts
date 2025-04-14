@@ -53,16 +53,20 @@ class SoftwareUpdateNotifier {
 
   private async getTodaysUpdates(updates: SoftwareModel[]): Promise<SoftwareModel[]> {
     const twentyFourHoursAgo = dayjs().subtract(24, 'hours')
-    const outdatedItems = updates.filter(item => !item.is_current)
+    const results: SoftwareModel[] = updates.filter(item => !item.is_current)
+    const updatedItems: SoftwareModel[] = []
 
-    const recentUpdateExists = await Promise.any(
-      outdatedItems.map(async software => {
+    await Promise.all(
+      results.map(async software => {
         const latestVersion = await software.getLastVersion()
-        return latestVersion && dayjs(latestVersion.updatedAt).isAfter(twentyFourHoursAgo)
-      }),
-    ).catch(() => false) // If no Promise resolves true, catch will return false
 
-    return recentUpdateExists ? outdatedItems : []
+        if (latestVersion && dayjs(latestVersion.updatedAt).isAfter(twentyFourHoursAgo)) {
+          updatedItems.push(software)
+        }
+      }),
+    )
+
+    return updatedItems
   }
 
   private async formatSoftwareUpdateMessage(updates: SoftwareModel[]): Promise<string | null> {
