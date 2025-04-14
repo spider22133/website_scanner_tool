@@ -50,14 +50,16 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
       flex: 1,
       renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
         <Stack direction="row" alignItems="center" spacing={2}>
-          {params.row?.is_current ? (
-            params.row?.bara_version !== null ? (
-              <CheckCircleOutlineOutlinedIcon color="success" fontSize="small" />
-            ) : (
-              <ErrorOutlineOutlinedIcon color="error" fontSize="small" />
-            )
+          {params.row?.bara_version !== null && params.row?.bara_version !== undefined ? (
+            <>
+              {params.row?.is_current ? (
+                <CheckCircleOutlineOutlinedIcon color="success" fontSize="small" />
+              ) : (
+                <CheckCircleOutlineOutlinedIcon color="warning" fontSize="small" />
+              )}
+            </>
           ) : (
-            <CheckCircleOutlineOutlinedIcon color="warning" fontSize="small" />
+            <ErrorOutlineOutlinedIcon color="error" fontSize="small" />
           )}
           <Box>{params.value}</Box>
         </Stack>
@@ -89,7 +91,9 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
       sortable: false,
       renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
         <Stack direction="row" alignItems="center" spacing={1}>
-          <DeviceHubOutlinedIcon fontSize="small" />
+          <Box>
+            <DeviceHubOutlinedIcon fontSize="small" />
+          </Box>
           <span>{params.row.bara_version || ''}</span>
         </Stack>
       ),

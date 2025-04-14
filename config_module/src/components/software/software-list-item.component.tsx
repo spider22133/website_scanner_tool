@@ -67,15 +67,19 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
   }, [setActiveWebsite, software, index])
 
   const renderBadgeContent = () => {
-    if (!software.is_current) {
+    if (software.is_current) {
       return <CheckCircleOutlineOutlinedIcon fontSize="small" />
     }
-    return software.bara_version !== null ? <CheckCircleOutlineOutlinedIcon fontSize="small" /> : <ErrorOutlineOutlinedIcon fontSize="small" />
+    return software.bara_version !== null && software.bara_version !== undefined ? (
+      <CheckCircleOutlineOutlinedIcon fontSize="small" />
+    ) : (
+      <ErrorOutlineOutlinedIcon fontSize="small" />
+    )
   }
 
   const renderIcon = () => (
     <Badge
-      color={software.bara_version !== null && software.bara_version !== undefined ? (software.is_current ? 'primary' : 'warning') : 'error'}
+      color={software.bara_version !== null && software.bara_version !== undefined ? (software.is_current ? 'success' : 'warning') : 'error'}
       overlap="circular"
       anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
       badgeContent={renderBadgeContent()}
