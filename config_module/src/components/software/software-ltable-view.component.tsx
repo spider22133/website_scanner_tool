@@ -1,12 +1,15 @@
 import React from 'react'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { IconButton, Tooltip, Stack, Box } from '@mui/material'
-import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import DeleteIcon from '@mui/icons-material/DeleteOutlined'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
+import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
+import DeviceHubOutlinedIcon from '@mui/icons-material/DeviceHubOutlined'
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
+
 import { useSelector } from 'react-redux'
 import { SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store'
@@ -72,14 +75,24 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
       headerName: 'Neue Version',
       flex: 1,
       sortable: false,
-      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.version || '',
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <CloudDownloadOutlinedIcon fontSize="small" />
+          <span>{params.row.version || ''}</span>
+        </Stack>
+      ),
     },
     {
       field: 'bara_version',
       headerName: 'Version',
       flex: 1,
       sortable: false,
-      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.bara_version || '',
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <DeviceHubOutlinedIcon fontSize="small" />
+          <span>{params.row.bara_version || ''}</span>
+        </Stack>
+      ),
     },
     {
       field: 'updatedAt',
@@ -93,11 +106,11 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
       flex: 1,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack direction="row" alignItems="center">
           <Box>
             <Tooltip title="Prüfen">
               <IconButton size="small" onClick={() => handleCheck(params.row.winget_id)}>
-                <SensorsOutlinedIcon />
+                <CachedOutlinedIcon />
               </IconButton>
             </Tooltip>
           </Box>
@@ -135,6 +148,8 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
           setActiveWebsite(params.row, index)
         }}
         sx={{ border: 'none' }}
+        checkboxSelection
+        disableRowSelectionOnClick
         autoPageSize
       />
     </div>

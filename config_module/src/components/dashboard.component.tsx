@@ -79,23 +79,21 @@ const DashboardComponent: React.FC = () => {
   ]
 
   return (
-    <Box className="dashboard-container">
-      <Container maxWidth={false} sx={{ pt: 2 }}>
-        <Grid container spacing={2}>
-          <Grid className="left-column" size={{ xs: 12, lg: 7, xl: 5 }}>
-            <Paper className="search-bar-container">
-              <AppSearchBar />
-            </Paper>
-            <Paper className="websites-list-container">
-              <SoftwareList software={displayedSoftware} currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
-            </Paper>
-          </Grid>
-          <Grid className="tabs-container" size={{ xs: 12, lg: 5, xl: 7 }}>
-            <TabsComponent tabs={tabs} />
-          </Grid>
+    <Container maxWidth={false} className="dashboard-container" sx={{ pt: 2 }}>
+      <Grid container spacing={2}>
+        <Grid className="left-column" size={{ xs: 12, lg: 7, xl: 5 }}>
+          <Paper className="search-bar-container">
+            <AppSearchBar />
+          </Paper>
+          <Paper className="websites-list-container">
+            <SoftwareList software={displayedSoftware} currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
+          </Paper>
         </Grid>
-      </Container>
-    </Box>
+        <Grid className="tabs-container" size={{ xs: 12, lg: 5, xl: 7 }}>
+          <TabsComponent tabs={tabs} />
+        </Grid>
+      </Grid>
+    </Container>
   )
 }
 

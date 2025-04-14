@@ -16,6 +16,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
 
   const { version, bara_version, details, is_current, name } = software
   const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
+  console.log(software.bara_version)
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }}>
@@ -37,7 +38,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
             >
               <Chip
                 label={`Baramundi: ${bara_version}`}
-                color={is_current ? (software.bara_version !== null ? 'primary' : 'error') : 'warning'}
+                color={software.bara_version !== null && software.bara_version !== undefined ? (is_current ? 'primary' : 'warning') : 'error'}
                 size="small"
                 sx={{ px: 1 }}
                 icon={<ContentCopyOutlinedIcon />}

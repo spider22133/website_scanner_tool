@@ -4,11 +4,13 @@ import { Chip, IconButton, ListItem, Stack, Tooltip, Typography, useTheme, Circu
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
-import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined'
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
+import DeviceHubOutlinedIcon from '@mui/icons-material/DeviceHubOutlined'
+import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import TimeAgo from 'javascript-time-ago'
 import { SoftwareEntry } from '../../../../types/common'
 import { RootState, AppDispatch } from '../../store'
@@ -73,7 +75,7 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
 
   const renderIcon = () => (
     <Badge
-      color={software.is_current ? (software.bara_version !== null ? 'success' : 'error') : 'warning'}
+      color={software.bara_version !== null && software.bara_version !== undefined ? (software.is_current ? 'primary' : 'warning') : 'error'}
       overlap="circular"
       anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
       badgeContent={renderBadgeContent()}
@@ -97,15 +99,25 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
       }}
       onClick={handleClick}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
-        <Stack direction="row" alignItems="center" spacing={2}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%" spacing={4}>
+        <Stack direction="row" alignItems="center" spacing={2} marginRight={'auto !important'}>
           {renderIcon()}
           <div>
             <Typography fontWeight="bold">{software.name}</Typography>
             <Typography variant="body2">{software.details?.publisher}</Typography>
           </div>
         </Stack>
+        <Stack direction="column" spacing={1}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <CloudDownloadOutlinedIcon fontSize="small" />
+            <span>{software.version || ''}</span>
+          </Stack>
 
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <DeviceHubOutlinedIcon fontSize="small" />
+            <span>{software.bara_version || ''}</span>
+          </Stack>
+        </Stack>
         <Stack direction="column" alignItems="flex-end">
           <Stack direction="row" alignItems="center">
             <Tooltip title="Prüfen" arrow>
@@ -119,7 +131,7 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
                     handleCheckStatus(software.winget_id)
                   }}
                 >
-                  <SensorsOutlinedIcon />
+                  <CachedOutlinedIcon />
                 </IconButton>
               )}
             </Tooltip>

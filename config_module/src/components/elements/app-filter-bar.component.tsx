@@ -45,7 +45,7 @@ const AppFilterBar: React.FC = () => {
         filter.status === 'all' ||
         (filter.status === 'Aktuell' && software.is_current && software.bara_version !== null) ||
         (filter.status === 'Ungültig' && !software.is_current) ||
-        (filter.status === 'Fehlgeschlagen' && software.is_current && software.bara_version === null)
+        (filter.status === 'Fehlgeschlagen' && !software.is_current && (software.bara_version === null || software.bara_version === undefined))
 
       const matchesResponsible =
         filter.responsible === 'all' ||
@@ -124,7 +124,7 @@ const AppFilterBar: React.FC = () => {
         fullWidth
         aria-label="Software filter input"
       />
-      <Stack direction="row" alignItems="center" spacing={2} sx={{ width: '100%' }}>
+      <Stack direction="row" alignItems="center" spacing={2}>
         <Autocomplete
           options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen']}
           value={filterState.status}
