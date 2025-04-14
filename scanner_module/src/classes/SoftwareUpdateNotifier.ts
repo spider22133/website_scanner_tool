@@ -53,20 +53,16 @@ class SoftwareUpdateNotifier {
 
   private async getTodaysUpdates(updates: SoftwareModel[]): Promise<SoftwareModel[]> {
     const twentyFourHoursAgo = dayjs().subtract(24, 'hours')
-    const results: SoftwareModel[] = updates.filter(item => !item.is_current)
-    const updatedItems: SoftwareModel[] = []
+    const outdatedItems = updates.filter(item => !item.is_current)
 
-    await Promise.all(
-      results.map(async software => {
+    const recentUpdateExists = await Promise.any(
+      outdatedItems.map(async software => {
         const latestVersion = await software.getLastVersion()
-
-        if (latestVersion && dayjs(latestVersion.updatedAt).isAfter(twentyFourHoursAgo)) {
-          updatedItems.push(software)
-        }
+        return latestVersion && dayjs(latestVersion.updatedAt).isAfter(twentyFourHoursAgo)
       }),
-    )
+    ).catch(() => false) // If no Promise resolves true, catch will return false
 
-    return updatedItems
+    return recentUpdateExists ? outdatedItems : []
   }
 
   private async formatSoftwareUpdateMessage(updates: SoftwareModel[]): Promise<string | null> {
@@ -77,7 +73,7 @@ class SoftwareUpdateNotifier {
     const header = `**🆕 NON-MSW Changelog**`
     const tableHeader = [
       '| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version | Verantwortlich |',
-      '|----|-------|----------------|---------|---------|----------------|',
+      '|----|-------|----------------|---------|---------|---------------|',
     ].join('\n')
 
     // Fetch all versions and process them

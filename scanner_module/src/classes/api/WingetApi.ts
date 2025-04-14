@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { WingetPackageDetails, SoftwareEntry } from '../../../../types/common'
+import { WingetPackageDetails, SoftwareEntry, InstallerDetails } from '../../../../types/common'
 import { logger } from '@utils/logger'
 
 const execAsync = promisify(exec)
@@ -21,7 +21,7 @@ export class WingetUtils {
   public static async showSoftware(packageId: string): Promise<WingetPackageDetails | null> {
     try {
       const stdout = await this.execWingetCommand(`winget show --id ${packageId}`)
-      return this.parseShowOutput(stdout)
+      return this.parsePackageDetailsFromMultilineOutput(stdout)
     } catch (error) {
       return null
     }
@@ -74,97 +74,100 @@ export class WingetUtils {
     return entries
   }
 
-  private static parseShowOutput(output: string): WingetPackageDetails {
-    const lines = output
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
-
-    const entry: WingetPackageDetails = {
+  private static parsePackageDetailsFromMultilineOutput(multilineOutput: string): any {
+    const lines = multilineOutput.split('\n')
+    const packageDetails: any = {
       installer: {},
     }
 
-    let currentSection = ''
-    let isDescription = false
-    let descriptionLines: string[] = []
-
-    const mapping: Record<string, keyof WingetPackageDetails> = {
-      version: 'version',
-      publisher: 'publisher',
-      'publisher url': 'publisherUrl',
-      'publisher support url': 'publisherSupportUrl',
-      author: 'author',
-      description: 'description',
-      homepage: 'homepage',
-      license: 'license',
-      'license url': 'licenseUrl',
-      'privacy url': 'privacyUrl',
-      copyright: 'copyright',
-      'copyright url': 'copyrightUrl',
-      'release notes': 'releaseNotes',
-    }
-
-    const installerMapping: Record<string, keyof WingetPackageDetails['installer']> = {
-      'installer type': 'type',
-      'installer locale': 'locale',
-      'installer url': 'url',
-      'installer sha256': 'sha256',
-      'release date': 'releaseDate',
-      'offline distribution supported': 'offlineSupported',
-    }
+    let isParsingMultiLine = false
+    let multiLineField = ''
+    let multiLineContent: string[] = []
 
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
+      const line = lines[i].replace(/^PUSH MULTILINE:\s*/, '').trim()
+      if (line === '') continue
 
-      if (line.startsWith('Installer:')) {
-        currentSection = 'installer'
-        isDescription = false
+      const colonIndex = line.indexOf(':')
+      const key = colonIndex !== -1 ? line.slice(0, colonIndex).trim() : ''
+      const value = colonIndex !== -1 ? line.slice(colonIndex + 1).trim() : ''
+
+      // === Skip "Release Notes" completely ===
+      if (key === 'Release Notes') {
+        isParsingMultiLine = false
+        multiLineField = ''
+        multiLineContent = []
         continue
       }
 
-      if (isDescription) {
-        // Check if we've hit the next section header
-        if (lines[i + 1]?.includes(':')) {
-          isDescription = false
-          entry.description = descriptionLines.join('\n')
-        } else {
-          descriptionLines.push(line)
-          continue
-        }
-      }
-
-      const [key, ...valueParts] = line.split(':')
-      if (!key || valueParts.length === 0) continue
-
-      const value = valueParts.join(':').trim()
-      const keyFormatted = key.trim().toLowerCase()
-
-      if (keyFormatted === 'description') {
-        isDescription = true
-        descriptionLines = [value]
+      // === Handle Release Notes Url safely ===
+      if (key === 'Release Notes Url') {
+        packageDetails.releaseNotesUrl = value
+        isParsingMultiLine = false
         continue
       }
 
-      if (currentSection === 'installer') {
-        const installerKey = installerMapping[keyFormatted]
-        if (installerKey) {
-          Object.assign(entry.installer, {
-            [installerKey]: installerKey === 'offlineSupported' ? value.toLowerCase() === 'true' : value,
-          })
+      // === Multiline Top-level fields ===
+      const knownTopLevelFields = [
+        'Version',
+        'Publisher',
+        'Publisher Url',
+        'Publisher Support Url',
+        'Author',
+        'Moniker',
+        'Description',
+        'Homepage',
+        'License',
+        'License Url',
+        'Privacy Url',
+        'Copyright',
+        'Copyright Url',
+        'Purchase Url',
+        'Documentation',
+      ]
+
+      const knownInstallerFields = ['Installer Type', 'Installer Url', 'Installer SHA256', 'Release Date', 'Offline Distribution Supported']
+
+      if (knownTopLevelFields.includes(key)) {
+        if (isParsingMultiLine && multiLineField && multiLineContent.length > 0) {
+          packageDetails[multiLineField] = multiLineContent.join('\n').trim()
         }
-      } else {
-        const entryKey = mapping[keyFormatted]
-        if (entryKey) {
-          Object.assign(entry, { [entryKey]: value })
+
+        isParsingMultiLine = true
+        multiLineField = key.replace(/ /g, '').replace(/^./, c => c.toLowerCase())
+        multiLineContent = value ? [value] : []
+        continue
+      }
+
+      if (knownInstallerFields.includes(key)) {
+        if (isParsingMultiLine && multiLineField && multiLineContent.length > 0) {
+          packageDetails[multiLineField] = multiLineContent.join('\n').trim()
+          isParsingMultiLine = false
+          multiLineField = ''
+          multiLineContent = []
         }
+
+        const installerKey = key
+          .replace(/Installer /, '')
+          .replace(/ /g, '')
+          .replace(/^./, c => c.toLowerCase())
+        let parsedValue: any = value
+        if (installerKey === 'offlineSupported') parsedValue = value.toLowerCase() === 'true'
+        packageDetails.installer[installerKey] = parsedValue
+        continue
+      }
+
+      // === Collect multiline content ===
+      if (isParsingMultiLine) {
+        multiLineContent.push(line)
       }
     }
 
-    // Handle case where description is the last field
-    if (isDescription) {
-      entry.description = descriptionLines.join('\n')
+    // === Final flush ===
+    if (isParsingMultiLine && multiLineField && multiLineContent.length > 0) {
+      packageDetails[multiLineField] = multiLineContent.join('\n').trim()
     }
 
-    return entry
+    return packageDetails
   }
 }

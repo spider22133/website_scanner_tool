@@ -1,3 +1,12 @@
+export interface InstallerDetails {
+  type?: string;
+  locale?: string;
+  url?: string;
+  sha256?: string;
+  releaseDate?: string;
+  offlineSupported?: boolean;
+}
+
 export interface WingetPackageDetails {
   version?: string;
   publisher?: string;
@@ -12,14 +21,8 @@ export interface WingetPackageDetails {
   copyright?: string;
   copyrightUrl?: string;
   releaseNotes?: string;
-  installer?: {
-    type?: string;
-    locale?: string;
-    url?: string;
-    sha256?: string;
-    releaseDate?: string;
-    offlineSupported?: boolean;
-  };
+  releaseNotesUrl?: string;
+  installer?: InstallerDetails;
 }
 
 export interface SoftwareEntry {

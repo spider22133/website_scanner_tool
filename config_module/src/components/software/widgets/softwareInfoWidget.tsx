@@ -15,8 +15,8 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
   const dispatch = useDispatch()
 
   const { version, bara_version, details, is_current, name } = software
-  const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description } = details || {}
-  console.log(software.bara_version)
+  const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description, releaseNotesUrl } =
+    details || {}
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }}>
@@ -50,8 +50,9 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
       <AccordionDetails>
         <Divider sx={{ mb: 2 }} />
 
-        {description && (
-          <Grid container spacing={2}>
+        {/* Publisher Information */}
+        <Grid container spacing={2}>
+          {description && (
             <Grid size={12}>
               <Typography className="fw-bold" color="text.secondary">
                 Beschreibung
@@ -60,11 +61,8 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
                 {description}
               </Typography>
             </Grid>
-          </Grid>
-        )}
+          )}
 
-        {/* Publisher Information */}
-        <Grid container spacing={2}>
           <Grid size={12}>
             <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
               Herausgeber
@@ -140,6 +138,17 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
               </Typography>
             )}
           </Grid>
+
+          {releaseNotesUrl && (
+            <Grid size={12}>
+              <Typography className="fw-bold" color="text.secondary">
+                Versionshinweise
+              </Typography>
+              <Link href={releaseNotesUrl} target="_blank" rel="noopener">
+                {releaseNotesUrl}
+              </Link>
+            </Grid>
+          )}
         </Grid>
       </AccordionDetails>
     </Accordion>
