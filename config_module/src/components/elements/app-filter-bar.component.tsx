@@ -7,6 +7,7 @@ import { RootState, useAppDispatch } from '../../store'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined'
+import ClearIcon from '@mui/icons-material/Clear'
 import IUser from '../../interfaces/user.interface'
 
 interface FilterState {
@@ -117,6 +118,15 @@ const AppFilterBar: React.FC = () => {
               <InputAdornment position="start">
                 <DriveFileRenameOutlineOutlinedIcon />
               </InputAdornment>
+            ),
+            endAdornment: filterState.searchTerm ? (
+              <InputAdornment position="end">
+                <IconButton edge="end" onClick={() => updateFilterState({ searchTerm: '' })}>
+                  <ClearIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+              </InputAdornment>
+            ) : (
+              <></>
             ),
           },
         }}
