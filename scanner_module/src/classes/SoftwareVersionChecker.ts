@@ -4,7 +4,7 @@ import { SoftwareModel } from '@models/software.model'
 import SoftwareVersionService from '@services/software_versions.service'
 import { BaramundiApi } from './api/BaramundiApi'
 import { WingetUtils } from './api/WingetApi'
-import { SoftwareType } from '@/types/baramundi'
+import { OrgUnitType, SoftwareType } from '@/types/baramundi'
 import SoftwareUpdateNotifier from './SoftwareUpdateNotifier'
 import semver from 'semver'
 
@@ -37,7 +37,7 @@ class SoftwareVersionChecker {
         await this.checkSoftwareVersion(software)
       }
 
-      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID)
+      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV)
 
       this.socket.connected && this.socket.emit('updateSoftware', 'changed')
     } catch (error) {
@@ -64,7 +64,7 @@ class SoftwareVersionChecker {
       }
 
       // Single check should also send notification, if baramundi version is to be updated.
-      single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID))
+      single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV))
 
       return { software: updatedSoftware }
     } catch (error) {
@@ -151,6 +151,7 @@ class SoftwareVersionChecker {
    */
   public async updateSoftwareFromBaramundi(software: SoftwareModel, appId: string): Promise<SoftwareModel> {
     const resultAppByID: SoftwareType = await this.baramundi.getApplicationById(appId)
+    const result: OrgUnitType = await this.baramundi.getOrgUnitById(resultAppByID.ParentId)
     let updatedSoftware = software
 
     if (resultAppByID) {
@@ -158,6 +159,7 @@ class SoftwareVersionChecker {
         ...software,
         bara_version: resultAppByID.Version,
         is_current: software.version === resultAppByID.Version,
+        is_central_managed: result.HierarchyPath.includes('UKD\\APPS'),
       })
     }
 

@@ -28,6 +28,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public icon: string
   public source: string
   public details: string
+  public is_central_managed: boolean
   public is_hidden: boolean
   public is_current: boolean
 
@@ -92,6 +93,11 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       },
       details: {
         type: DataTypes.TEXT,
+      },
+      is_central_managed: {
+        allowNull: false,
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
       },
       is_hidden: {
         allowNull: false,

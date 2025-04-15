@@ -10,6 +10,7 @@ export interface Software {
   icon: string
   source: string
   details: string
+  is_central_managed: boolean
   is_hidden: boolean
   is_current: boolean
 }

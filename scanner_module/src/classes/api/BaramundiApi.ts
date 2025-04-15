@@ -8,7 +8,7 @@
 
 import util from 'util'
 import { exec } from 'child_process'
-import { BaramundiSearch, SoftwareType } from '@/types/baramundi'
+import { BaramundiSearch, OrgUnitType, SoftwareType } from '@/types/baramundi'
 import { str } from 'envalid'
 import { logger } from '@/utils/logger'
 
@@ -70,12 +70,8 @@ export class BaramundiApi {
     return await this.sendRequest(endpoint, 'GET')
   }
 
-  // $name ='shotcut'
-  // $searchResult = Invoke-RestMethod -Uri "$($api)/search?type=software&term=$($name)" -Method Get -Credential $cred
-
-  // Invoke-RestMethod -Uri "$($api)/applications?id=ED5F5823-A823-4492-9DA7-BDCC8EC30E44" -Method Get -Credential $cred
-
-  // 85C45562-51A7-4ED2-9153-CBFD75DF9CC9
-
-  // Invoke-RestMethod -Uri "$($api)/OrgUnits?id=5B88BA48-5D8F-4054-A852-16DCA5A422FB" -Method Get -Credential $cred
+  public async getOrgUnitById(id: string): Promise<OrgUnitType> {
+    const endpoint = `/bConnect/v1.1/OrgUnits?id=${id}`
+    return await this.sendRequest(endpoint, 'GET')
+  }
 }

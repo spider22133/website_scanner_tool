@@ -122,7 +122,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   }
 
   return (
-    <Accordion defaultExpanded sx={{ p: 2 }}>
+    <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h5" fontWeight={600}>
           Einstellungen

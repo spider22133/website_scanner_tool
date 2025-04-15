@@ -9,7 +9,7 @@ import socketIOClient from 'socket.io-client'
 import TabsComponent from './software/tabs.component'
 import { SoftwareEntry } from '../../../types/common'
 import { CustomTabProps } from '../interfaces/common'
-import SoftwareDetails from './software/details.component'
+import SoftwareWidgetsLayout from './software/widgets-layout.component'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import FlipOutlinedIcon from '@mui/icons-material/FlipOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
@@ -62,7 +62,7 @@ const DashboardComponent: React.FC = () => {
       tabType: 'MAIN',
       tabIcon: <ArticleOutlinedIcon />,
       tabLabel: 'Softwareprofil',
-      tabContent: <SoftwareDetails software={softwareFilteredList[currentIndex]} />,
+      tabContent: <SoftwareWidgetsLayout software={softwareFilteredList[currentIndex]} />,
     },
     {
       tabType: 'CREATE_BDS',

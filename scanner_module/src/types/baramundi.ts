@@ -38,3 +38,12 @@ export type SoftwareType = {
   Files: SoftwareFile[]
   SecurityContext: string
 }
+
+export type OrgUnitType = {
+  Id: string
+  ParentId: string
+  Name: string
+  GuidParent: string
+  Comment: string
+  HierarchyPath: string
+}

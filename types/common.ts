@@ -35,6 +35,7 @@ export interface SoftwareEntry {
   icon?: string;
   source?: string;
   details?: WingetPackageDetails;
+  is_central_managed?: boolean;
   is_hidden?: boolean;
   is_current?: boolean;
   updatedAt?: string;

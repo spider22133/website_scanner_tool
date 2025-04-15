@@ -19,11 +19,11 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
     details || {}
 
   return (
-    <Accordion defaultExpanded sx={{ p: 2 }}>
+    <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Stack direction={{ xs: 'column', xl: 'row' }} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
           <Typography variant="h5" fontWeight={600}>
-            {name}
+            Paket Information
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 3 }}>
             <CopyToClipboard
@@ -52,6 +52,7 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
 
         {/* Publisher Information */}
         <Grid container spacing={2}>
+          <Typography variant="h2">{name}</Typography>
           {description && (
             <Grid size={12}>
               <Typography className="fw-bold" color="text.secondary">

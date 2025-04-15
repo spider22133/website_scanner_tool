@@ -30,4 +30,7 @@ export default class CreateSoftwareDto {
 
   @IsBoolean()
   public is_current: boolean
+
+  @IsBoolean()
+  public is_central_managed: boolean
 }
