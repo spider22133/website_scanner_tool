@@ -9,11 +9,12 @@ import socketIOClient from 'socket.io-client'
 import TabsComponent from './software/tabs.component'
 import { SoftwareEntry } from '../../../types/common'
 import { CustomTabProps } from '../interfaces/common'
-import SoftwareWidgetsLayout from './software/widgets-layout.component'
+import SoftwareWidgetsLayout from './software/tabs/software-widgets-layout.'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import FlipOutlinedIcon from '@mui/icons-material/FlipOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import { retrieveUsers } from '../slices/user.slice'
+import SoftwareUpdateStepper from './software/tabs/software-update-steps-layout'
 
 const DashboardComponent: React.FC = () => {
   const ENDPOINT = 'http://localhost:3001/'
@@ -67,8 +68,8 @@ const DashboardComponent: React.FC = () => {
     {
       tabType: 'CREATE_BDS',
       tabIcon: <FlipOutlinedIcon />,
-      tabLabel: 'BDS erstellen',
-      tabContent: <div />,
+      tabLabel: 'Software paketieren',
+      tabContent: <SoftwareUpdateStepper />,
     },
     {
       tabType: 'STATUS_REPORTS',

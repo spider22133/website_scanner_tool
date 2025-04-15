@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { SoftwareEntry } from '../../../../types/common'
-import SoftwareInfoWidget from './widgets/softwareInfoWidget'
-import SoftwareSettingsWidget from './widgets/softwareSettingsWidget'
-import BaramundiInfoWidget from './widgets/BaramundiInfoWidget'
-import TicketsWidget from './widgets/TicketsWidget'
+import { SoftwareEntry } from '../../../../../types/common'
+import SoftwareInfoWidget from '../widgets/softwareInfoWidget'
+import SoftwareSettingsWidget from '../widgets/softwareSettingsWidget'
+import BaramundiInfoWidget from '../widgets/BaramundiInfoWidget'
+import TicketsWidget from '../widgets/TicketsWidget'
 import { Alert, AlertTitle, Box, CircularProgress, Grid, Paper, Stack, Typography } from '@mui/material'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
-import { reorder } from '../utilities/ReorderDnD'
+import { reorder } from '../../utilities/ReorderDnD'
 
 interface PackageDetailsProps {
   software?: SoftwareEntry
