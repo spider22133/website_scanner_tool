@@ -1,79 +1,50 @@
 import * as React from 'react'
-import Box from '@mui/material/Box'
-import Stepper from '@mui/material/Stepper'
-import Step from '@mui/material/Step'
-import StepLabel from '@mui/material/StepLabel'
-import Button from '@mui/material/Button'
+import { Box, Button, Stepper, Step, StepLabel, Stack, Paper, StepConnector, stepConnectorClasses, IconButton, Tooltip } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import Stack from '@mui/material/Stack'
-import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector'
 import { StepIconProps } from '@mui/material/StepIcon'
 import EditDocumentIcon from '@mui/icons-material/EditDocument'
 import DownloadIcon from '@mui/icons-material/Download'
 import ViewInArIcon from '@mui/icons-material/ViewInAr'
 import PostAddIcon from '@mui/icons-material/PostAdd'
-import { Paper } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
-const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
+const CustomConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 24,
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundColor: '#1976d2',
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundColor: '#1976d2',
-    },
   },
   [`& .${stepConnectorClasses.line}`]: {
     height: 3,
     border: 0,
-    backgroundColor: '#e5e5e5',
     borderRadius: 1,
-    ...theme.applyStyles('dark', {
-      backgroundColor: theme.palette.grey[700],
-    }),
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[700] : '#e5e5e5',
+  },
+  [`&.${stepConnectorClasses.active} .${stepConnectorClasses.line}`]: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  [`&.${stepConnectorClasses.completed} .${stepConnectorClasses.line}`]: {
+    backgroundColor: theme.palette.primary.main,
   },
 }))
 
-const ColorlibStepIconRoot = styled('div')<{
-  ownerState: { completed?: boolean; active?: boolean }
-}>(({ theme }) => ({
-  backgroundColor: '#ccc',
-  zIndex: 1,
+const StepIconWrapper = styled('div', {
+  shouldForwardProp: prop => prop !== 'active' && prop !== 'completed',
+})<{ active: boolean; completed: boolean }>(({ theme, active, completed }) => ({
+  backgroundColor: completed || active ? theme.palette.primary.main : theme.palette.grey[400],
   color: '#fff',
   width: 50,
   height: 50,
   display: 'flex',
-  borderRadius: '50%',
-  justifyContent: 'center',
   alignItems: 'center',
-  ...theme.applyStyles('dark', {
-    backgroundColor: theme.palette.grey[800],
-  }),
-  variants: [
-    {
-      props: ({ ownerState }) => ownerState.active,
-      style: {
-        backgroundColor: '#1976d2',
-      },
-    },
-    {
-      props: ({ ownerState }) => ownerState.completed,
-      style: {
-        backgroundColor: '#1976d2',
-      },
-    },
-  ],
+  justifyContent: 'center',
+  borderRadius: '15%',
+  zIndex: 1,
 }))
 
-function ColorlibStepIcon(props: StepIconProps) {
-  const { active, completed, className } = props
-
-  const icons: { [index: string]: React.ReactElement<unknown> } = {
+function CustomStepIcon({ icon, active, completed, className }: StepIconProps) {
+  const icons: Record<string, React.ReactElement> = {
     1: <EditDocumentIcon />,
     2: <DownloadIcon />,
     3: <ViewInArIcon />,
@@ -81,63 +52,85 @@ function ColorlibStepIcon(props: StepIconProps) {
   }
 
   return (
-    <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
-      {icons[String(props.icon)]}
-    </ColorlibStepIconRoot>
+    <StepIconWrapper active={!!active} completed={!!completed} className={className}>
+      {icons[String(icon)]}
+    </StepIconWrapper>
   )
 }
 
-const steps = ['BDS estellen', 'Paket herunterladen', 'Baramundi Software anlegen', 'Jobs & Gruppen anpassen']
+const stepLabels = ['BDS erstellen', 'Paket herunterladen', 'Baramundi Software anlegen', 'Jobs & Gruppen anpassen']
+
+// Step content components
+function StepBdsErstellen() {
+  return <Paper sx={{ p: 2 }}>BDS erstellen Inhalt</Paper>
+}
+
+function StepPaketHerunterladen() {
+  return <Paper sx={{ p: 2 }}>Paket herunterladen Inhalt</Paper>
+}
+
+function StepSoftwareAnlegen() {
+  return <Paper sx={{ p: 2 }}>Baramundi Software anlegen Inhalt</Paper>
+}
+
+function StepJobsAnpassen() {
+  return <Paper sx={{ p: 2 }}>Jobs & Gruppen anpassen Inhalt</Paper>
+}
+
+const renderStepContent = (step: number) => {
+  switch (step) {
+    case 0:
+      return <StepBdsErstellen />
+    case 1:
+      return <StepPaketHerunterladen />
+    case 2:
+      return <StepSoftwareAnlegen />
+    case 3:
+      return <StepJobsAnpassen />
+    default:
+      return null
+  }
+}
 
 export default function SoftwareUpdateStepper() {
   const [activeStep, setActiveStep] = React.useState(0)
 
-  const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1)
-  }
-
-  const handleReset = () => {
-    setActiveStep(0)
-  }
+  const handleNext = () => setActiveStep(prev => prev + 1)
+  const handleBack = () => setActiveStep(prev => prev - 1)
+  const handleReset = () => setActiveStep(0)
 
   return (
-    <Stack sx={{ width: '100%', px: 4, py: 2 }} spacing={4}>
-      <Stepper activeStep={activeStep} connector={<ColorlibConnector />} alternativeLabel>
-        {steps.map((label, index) => {
-          const stepProps: { completed?: boolean } = {}
-
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
-            </Step>
-          )
-        })}
+    <Stack spacing={4} sx={{ width: '100%', px: 4, py: 2 }}>
+      <Stepper activeStep={activeStep} connector={<CustomConnector />} alternativeLabel>
+        {stepLabels.map(label => (
+          <Step key={label}>
+            <StepLabel StepIconComponent={CustomStepIcon}>{label}</StepLabel>
+          </Step>
+        ))}
       </Stepper>
-      {activeStep === steps.length ? (
-        <React.Fragment>
+
+      {activeStep === stepLabels.length ? (
+        <>
           <Paper sx={{ p: 2, mt: 2, mb: 1 }}>Alle Schritte abgeschlossen - Sie sind fertig</Paper>
-
-          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset}>Zurücksetzen</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button onClick={handleReset} endIcon={<RestartAltIcon />}>
+              Zurücksetzen
+            </Button>
           </Box>
-        </React.Fragment>
+        </>
       ) : (
-        <React.Fragment>
-          <Paper sx={{ p: 2, mt: 2, mb: 1 }}>Step {activeStep + 1}</Paper>
-
-          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+        <>
+          {renderStepContent(activeStep)}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button onClick={handleBack} startIcon={<ArrowBackIcon />} disabled={activeStep === 0}>
               Zurück
             </Button>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Finish' : 'Next'}</Button>
+
+            <Button onClick={handleNext} endIcon={activeStep === stepLabels.length - 1 ? <CheckCircleIcon /> : <ArrowForwardIcon />}>
+              {activeStep === stepLabels.length - 1 ? 'Fertigstellen' : 'Weiter'}
+            </Button>
           </Box>
-        </React.Fragment>
+        </>
       )}
     </Stack>
   )
