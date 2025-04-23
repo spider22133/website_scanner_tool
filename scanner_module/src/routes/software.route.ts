@@ -5,6 +5,7 @@ import validationMiddleware from '@middlewares/validation.middleware'
 import authMiddleware from '@/middlewares/auth.middleware'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import CreateSoftwareDto from '@dtos/software.dto'
+import fs from 'fs'
 
 class SoftwareRoute implements Route {
   public path = '/software'
@@ -21,6 +22,18 @@ class SoftwareRoute implements Route {
     this.router.get(this.path, authMiddleware, this.softwareController.getSoftware)
     this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.softwareController.getSoftwareById)
     this.router.get(`${this.path}/q=:query`, authMiddleware, this.softwareController.searchWinGetSoftware)
+
+    // curl -X GET http://localhost:3001/software/load-xml
+    this.router.get(`${this.path}/load-xml`, (req, res) => {
+      const filePath = '\\\\med.tu-dresden.de\\app\\bara\\rep\\BaraProd\\APPS\\Blender Foundation\\Blender\\4.4.0\\Installation_Blender.bds'
+
+      fs.readFile(filePath, 'utf-8', (err, data) => {
+        if (err) {
+          return res.status(500).send('Could not read file: ' + err.message)
+        }
+        res.type('application/xml').send(data)
+      })
+    })
 
     // Software version checking
     this.router.get(`${this.path}/:id/check`, authMiddleware, this.softwareController.checkSoftware)

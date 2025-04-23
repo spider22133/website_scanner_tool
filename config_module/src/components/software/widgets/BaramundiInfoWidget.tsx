@@ -14,9 +14,7 @@ interface BaramundiInfoProps {
 const BaramundiInfoWidget: React.FC<BaramundiInfoProps> = ({ software }) => {
   const dispatch = useDispatch()
 
-  const { version, bara_version, details, is_current, name } = software
-  const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description, releaseNotesUrl } =
-    details || {}
+  const { is_central_managed, name } = software
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
@@ -27,6 +25,17 @@ const BaramundiInfoWidget: React.FC<BaramundiInfoProps> = ({ software }) => {
       </AccordionSummary>
       <AccordionDetails>
         <Divider sx={{ mb: 2 }} />
+
+        <Grid container spacing={2}>
+          <Grid size={12}>
+            <Typography>
+              UKD zentrale Applikationen:
+              <Typography component={'span'} variant="body2" fontWeight={700} paddingLeft={1}>
+                {is_central_managed ? 'Ja' : 'Nein'}
+              </Typography>
+            </Typography>
+          </Grid>
+        </Grid>
       </AccordionDetails>
     </Accordion>
   )

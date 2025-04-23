@@ -1,5 +1,19 @@
 import * as React from 'react'
-import { Box, Button, Stepper, Step, StepLabel, Stack, Paper, StepConnector, stepConnectorClasses, IconButton, Tooltip } from '@mui/material'
+import {
+  Box,
+  Button,
+  Stepper,
+  Step,
+  StepLabel,
+  Stack,
+  Paper,
+  StepConnector,
+  stepConnectorClasses,
+  IconButton,
+  Tooltip,
+  Typography,
+  TextField,
+} from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { StepIconProps } from '@mui/material/StepIcon'
 import EditDocumentIcon from '@mui/icons-material/EditDocument'
@@ -10,6 +24,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { Util, XmlEditor } from 'react-xml-editor'
+import { DocSpec } from 'react-xml-editor/lib/src/types'
+import http from '../../../http-connection'
+
+import 'react-xml-editor/css/xonomy.css'
 
 const CustomConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -60,9 +79,107 @@ function CustomStepIcon({ icon, active, completed, className }: StepIconProps) {
 
 const stepLabels = ['BDS erstellen', 'Paket herunterladen', 'Baramundi Software anlegen', 'Jobs & Gruppen anpassen']
 
+const docSpec: DocSpec = {
+  elements: {
+    data: {
+      attributes: {
+        label: {
+          asker: Util.askString,
+          menu: [
+            {
+              action: Util.deleteAttribute,
+              caption: 'Delete attribute',
+            },
+          ],
+        },
+        type: {
+          asker: Util.askPicklist([
+            {
+              value: 'short',
+              caption: 'short',
+            },
+            {
+              value: 'medium',
+              caption: 'medium',
+            },
+            'long',
+          ]),
+        },
+      },
+      menu: [
+        {
+          action: Util.newElementChild('<child />'),
+          caption: 'Append child <child />',
+        },
+        {
+          action: Util.newAttribute({
+            name: 'label',
+            value: 'default value',
+          }),
+          caption: 'Add attribute @label',
+          hideIf: (xml, id) => {
+            const element = Util.getXmlNode(xml, id)
+            return element && element.$ && typeof element.$.label !== 'undefined'
+          },
+        },
+        {
+          action: Util.deleteElement,
+          caption: 'Delete this <item />',
+          icon: 'exclamation.png',
+        },
+        {
+          action: Util.newElementBefore('<item />'),
+          caption: 'New <item /> before this',
+        },
+        {
+          action: Util.newElementAfter('<item />'),
+          caption: 'New <item /> after this',
+        },
+        {
+          action: Util.duplicateElement,
+          caption: 'Copy <item />',
+        },
+        {
+          action: Util.moveElementUp,
+          caption: 'Move <item /> up',
+          hideIf: (xml, id) => !Util.canMoveElementUp(xml, id),
+        },
+        {
+          action: Util.moveElementDown,
+          caption: 'Move <item /> down',
+          hideIf: (xml, id) => !Util.canMoveElementDown(xml, id),
+        },
+      ],
+    },
+  },
+}
+
+const xml = '<DATA><VARNAME>VersionAktuell</VARNAME><VALUE>4.4.0</VALUE><OPTIONS>0</OPTIONS></DATA>'
+
 // Step content components
 function StepBdsErstellen() {
-  return <Paper sx={{ p: 2 }}>BDS erstellen Inhalt</Paper>
+  const ref = React.useRef<XmlEditor | null>(null)
+  const dip = '\\\\med.tu-dresden.de\\app\\bara\\rep\\BaraProd\\APPS'
+
+  return (
+    <Paper sx={{ p: 4 }}>
+      <Typography variant="body2">Pfad zu BDS File anpassen:</Typography>
+      <Stack direction="row" alignItems="flex-end" spacing={1} sx={{ pb: 3 }}>
+        <Typography color="textDisabled" sx={{ fontFamily: 'monospace', pb: 0.5, flexShrink: 0 }}>
+          {dip}
+        </Typography>
+        <TextField
+          variant="standard"
+          sx={{
+            flexGrow: 1,
+            input: { fontFamily: 'monospace' },
+          }}
+          value="\Blender Foundation\Blender\4.4.0\Installation_Blender.bds"
+        />
+      </Stack>
+      <XmlEditor ref={ref} docSpec={{}} xml={xml} />
+    </Paper>
+  )
 }
 
 function StepPaketHerunterladen() {

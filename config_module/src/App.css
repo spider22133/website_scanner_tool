@@ -184,3 +184,8 @@ p {
 .tabpanel {
   display: contents;
 }
+
+.xonomy.nerd {
+  font-size: 0.8rem !important;
+  line-height: 1em !important;
+}

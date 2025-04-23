@@ -46,7 +46,9 @@ const AppFilterBar: React.FC = () => {
         filter.status === 'all' ||
         (filter.status === 'Aktuell' && software.is_current && software.bara_version !== null) ||
         (filter.status === 'Ungültig' && !software.is_current) ||
-        (filter.status === 'Fehlgeschlagen' && !software.is_current && (software.bara_version === null || software.bara_version === undefined))
+        (filter.status === 'Fehlgeschlagen' && !software.is_current && (software.bara_version === null || software.bara_version === undefined)) ||
+        (filter.status === 'EPM Team' && software.is_central_managed) ||
+        (filter.status === 'Nicht EPM Team' && !software.is_central_managed)
 
       const matchesResponsible =
         filter.responsible === 'all' ||
@@ -136,11 +138,11 @@ const AppFilterBar: React.FC = () => {
       />
       <Stack direction="row" alignItems="center" spacing={2}>
         <Autocomplete
-          options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen']}
+          options={['all', 'Aktuell', 'Ungültig', 'Fehlgeschlagen', 'EPM Team', 'Nicht EPM Team']}
           value={filterState.status}
           getOptionLabel={option => optionLabelMap[option] || option}
           onChange={handleStatusChange}
-          renderInput={params => <TextField {...params} label="Gültigkeit" size="small" />}
+          renderInput={params => <TextField {...params} label="Status" size="small" />}
           disableClearable
           sx={{ minWidth: 180 }}
         />
