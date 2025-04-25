@@ -41,7 +41,7 @@ const SoftwareListView: React.FC<SoftwareListProps> = ({ timeAgo, createSoftware
 
   return (
     <div ref={listRef} tabIndex={0} onKeyDown={handleKeyDown} style={{ outline: 'none', maxHeight: '100%', overflowY: 'auto' }}>
-      <List>
+      <List sx={{ pt: 0 }}>
         {createSoftwareLoading && <Skeleton variant="rectangular" width="100%" height={84} />}
         {softwareFilteredList?.map((software, index) => (
           <WebsitesListItem

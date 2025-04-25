@@ -9,8 +9,9 @@
 import util from 'util'
 import { exec } from 'child_process'
 import { BaramundiSearch, OrgUnitType, SoftwareType } from '@/types/baramundi'
-import { str } from 'envalid'
 import { logger } from '@/utils/logger'
+import fs from 'fs'
+import path from 'path'
 
 const execPromise = util.promisify(exec) // Promisify exec for async/await
 
@@ -73,5 +74,31 @@ export class BaramundiApi {
   public async getOrgUnitById(id: string): Promise<OrgUnitType> {
     const endpoint = `/bConnect/v1.1/OrgUnits?id=${id}`
     return await this.sendRequest(endpoint, 'GET')
+  }
+
+  public async downloadSoftwareScanRuleCountsXmlToFile(filename = 'software-scan-rule-counts.xml'): Promise<string | null> {
+    const endpoint = `/bConnect/v1.1/softwarescanrulecounts.xml`
+    const url = `${this.baseUrl}${endpoint}`
+    const filePath = path.resolve('downloads', filename)
+
+    // Sicherstellen, dass das downloads-Verzeichnis existiert
+    const dir = path.dirname(filePath)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+
+    const curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X GET "${url}" -o "${filePath}"`
+
+    try {
+      const { stdout, stderr } = await execPromise(curlCommand)
+      logger.info(`✅ XML file saved to ${filePath}`)
+      return filePath
+    } catch (error) {
+      logger.error('❌ Error downloading XML file:', error.message)
+      if (error.stderr) {
+        logger.error('curl stderr:', error.stderr)
+      }
+      return null
+    }
   }
 }

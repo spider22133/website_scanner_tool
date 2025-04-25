@@ -96,7 +96,7 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
   return (
     <ListItem
       sx={{
-        my: 0.5,
+        mb: 0.5,
         border: `1px solid ${index === currentIndex ? theme.palette.grey.A700 : theme.palette.grey.A200}`,
         borderRadius: 1,
         flexDirection: 'column',

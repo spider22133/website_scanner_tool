@@ -71,7 +71,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
   return (
     <>
       <AppFilterBar />
-      <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} sx={{ mt: 3 }}>
+      <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} sx={{ mt: 3, mb: 1 }}>
         <Stack direction={'row'} alignItems={'center'} spacing={3}>
           <ViewSelectorTabs handleActiveTab={handleActiveTab} currentViewPreference={currentViewPreference} />
           <Typography variant="body2">
