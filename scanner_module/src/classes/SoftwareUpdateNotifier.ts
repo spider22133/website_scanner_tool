@@ -4,8 +4,6 @@ import { SoftwareModel } from '@/models/software.model'
 import SoftwareService from '@/services/software.service'
 import { logger } from '@/utils/logger'
 import UserService from '@/services/users.service'
-import { UserModel } from '@/models/user.model'
-import { User } from '@/interfaces/user.interface'
 
 // Define constants for date formats to avoid repetition
 const DATE_FORMAT = 'YYYY-MM-DD'
@@ -52,7 +50,6 @@ class SoftwareUpdateNotifier {
   }
 
   private async getTodaysUpdates(updates: SoftwareModel[]): Promise<SoftwareModel[]> {
-    const twentyFourHoursAgo = dayjs().subtract(24, 'hours')
     const results: SoftwareModel[] = updates.filter(item => !item.is_current)
     const updatedItems: SoftwareModel[] = []
 
@@ -60,7 +57,7 @@ class SoftwareUpdateNotifier {
       results.map(async software => {
         const latestVersion = await software.getLastVersion()
 
-        if (latestVersion && dayjs(latestVersion.updatedAt).isAfter(twentyFourHoursAgo)) {
+        if (latestVersion) {
           updatedItems.push(software)
         }
       }),

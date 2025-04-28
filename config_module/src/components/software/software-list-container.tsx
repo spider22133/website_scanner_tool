@@ -75,7 +75,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
         <Stack direction={'row'} alignItems={'center'} spacing={3}>
           <ViewSelectorTabs handleActiveTab={handleActiveTab} currentViewPreference={currentViewPreference} />
           <Typography variant="body2">
-            Aktuell: {countByCurrentStatus(true)} / Ungültig: {countByCurrentStatus(false)}
+            Aktuell: {countByCurrentStatus(true)} / Nicht Aktuell: {countByCurrentStatus(false)}
           </Typography>
         </Stack>
         <Box>

@@ -11,6 +11,7 @@ import TimerController from '@controllers/timer.controller'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import { logger } from './utils/logger'
 import SoftwareUpdateNotifier from './classes/SoftwareUpdateNotifier'
+import JiraRoute from './routes/jira.route'
 
 // 1️⃣ Environment Setup
 process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
@@ -23,6 +24,7 @@ timerController.run()
 
 // 3️⃣ Application Setup
 const app = new App([
+  new JiraRoute(),
   new IndexRoute(),
   new UsersRoute(),
   new AuthRoute(),

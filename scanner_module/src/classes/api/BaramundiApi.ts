@@ -12,53 +12,13 @@ import { BaramundiSearch, OrgUnitType, SoftwareType } from '@/types/baramundi'
 import { logger } from '@/utils/logger'
 import fs from 'fs'
 import path from 'path'
+import { BaseCurlApi, BaseCurlApiConfig } from '../abstract/BaseCurlApi'
 
 const execPromise = util.promisify(exec) // Promisify exec for async/await
 
-export class BaramundiApi {
-  private baseUrl: string
-  private username: string
-  private password: string
-
-  constructor(url: string, username: string, password: string) {
-    this.baseUrl = url
-    this.username = username
-    this.password = password
-  }
-
-  private buildCurlCommand(endpoint: string, method: string = 'GET', data?: any): string {
-    const url = `${this.baseUrl}${endpoint}`
-    let curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X ${method} "${url}"`
-
-    if (data) {
-      const jsonData = JSON.stringify(data).replace(/"/g, '\\"') // Escape quotes for curl
-      curlCommand += ` -H "Content-Type: application/json" -d "${jsonData}"`
-    }
-
-    return curlCommand
-  }
-
-  private async sendRequest(endpoint: string, method: string = 'GET', data?: any): Promise<any> {
-    const curlCommand = this.buildCurlCommand(endpoint, method, data)
-
-    try {
-      const { stdout, stderr } = await execPromise(curlCommand, { maxBuffer: 1024 * 1024 * 1024 })
-      const responseData = stdout.trim()
-
-      try {
-        return JSON.parse(responseData)
-      } catch (parseError) {
-        logger.error('Error parsing JSON:', parseError.message)
-        return null
-      }
-    } catch (error) {
-      logger.error(`Error executing ${method} request:`, error.message)
-
-      if (error.stderr) {
-        logger.error('curl stderr:', error.stderr)
-      }
-      return null
-    }
+export class BaramundiApi extends BaseCurlApi {
+  constructor(config: BaseCurlApiConfig) {
+    super(config)
   }
 
   public async findApplicationByName(term: string): Promise<BaramundiSearch[]> {

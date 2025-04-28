@@ -46,7 +46,7 @@ const AppFilterBar: React.FC = () => {
         filter.status === 'all' ||
         (filter.status === 'Aktuell' && software.is_current && software.bara_version !== null) ||
         (filter.status === 'Nicht Aktuell' && !software.is_current && !(software.bara_version === null || software.bara_version === undefined)) ||
-        (filter.status === 'Fehlgeschlagen' && !software.is_current && (software.bara_version === null || software.bara_version === undefined)) ||
+        (filter.status === 'Fehlgeschlagen' && (software.bara_version === null || software.bara_version === undefined)) ||
         (filter.status === 'EPM Team' && software.is_central_managed) ||
         (filter.status === 'Nicht EPM Team' && !software.is_central_managed)
 
