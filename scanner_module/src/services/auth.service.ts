@@ -31,6 +31,7 @@ class AuthService {
       if (!adUser) throw new HttpException(404, 'Benutzer im Active Directory nicht gefunden')
 
       const userInfo = {
+        userName: adUser.sAMAccountName || '',
         email: adUser.mail || adUser.userPrincipalName.toLowerCase(),
         firstName: adUser.givenName || '',
         lastName: adUser.sn || '',

@@ -23,6 +23,7 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public id: number
   public firstName: string
   public lastName: string
+  public userName: string
   public email: string
   public roles?: RoleModel[]
 
@@ -57,6 +58,10 @@ export default function (sequelize: Sequelize): typeof UserModel {
         type: DataTypes.STRING(255),
       },
       lastName: {
+        allowNull: false,
+        type: DataTypes.STRING(255),
+      },
+      userName: {
         allowNull: false,
         type: DataTypes.STRING(255),
       },

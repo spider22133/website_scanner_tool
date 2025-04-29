@@ -30,6 +30,10 @@ export class JiraApi extends BaseCurlApi {
     return await this.sendRequest(`/project/${projectKey}/components`, 'GET')
   }
 
+  public async getUserByName(userName: string) {
+    return await this.sendRequest(`/user?username=${userName}`)
+  }
+
   public async updateIssue(issueKey: string, payload: Partial<JiraIssuePayload>) {
     const result = await this.sendRequest(`/issue/${issueKey}`, 'PUT', payload)
     // Jira returns no body and HTTP 204 on success, so we assume if no error -> success

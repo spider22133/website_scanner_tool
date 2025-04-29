@@ -55,7 +55,11 @@ class App {
     this.initializeErrorHandling()
 
     // Baramundi API initialization
-    this.baramundi = new BaramundiApi(this.baraUrl, this.baraUsername, this.baraSecret)
+    this.baramundi = new BaramundiApi({
+      baseUrl: this.baraUrl,
+      username: this.baraUsername,
+      password: this.baraSecret,
+    })
 
     // Webex Bot Initialization (Only if token is provided)
     if (process.env.WEBEX_BOT_TOKEN) {
