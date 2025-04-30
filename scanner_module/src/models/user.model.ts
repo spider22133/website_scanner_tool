@@ -76,19 +76,5 @@ export default function (sequelize: Sequelize): typeof UserModel {
     },
   )
 
-  UserModel.belongsToMany(RoleModel, {
-    as: 'roles',
-    through: 'user_roles',
-    foreignKey: 'user_id',
-    otherKey: 'role_id',
-  })
-
-  RoleModel.belongsToMany(UserModel, {
-    as: 'users',
-    through: 'user_roles',
-    foreignKey: 'role_id',
-    otherKey: 'user_id',
-  })
-
   return UserModel
 }

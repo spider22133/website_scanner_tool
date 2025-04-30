@@ -116,44 +116,5 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
     },
   )
 
-  // Software Version
-  SoftwareModel.hasMany(SoftwareVersionModel, {
-    sourceKey: 'id',
-    foreignKey: 'software_id',
-    as: 'versions',
-    onDelete: 'CASCADE',
-  })
-
-  SoftwareVersionModel.belongsTo(SoftwareModel, {
-    foreignKey: 'software_id',
-    as: 'software',
-  })
-
-  // Responsible for Software
-  UserModel.hasMany(SoftwareModel, {
-    foreignKey: 'user_id',
-    as: 'software',
-  })
-
-  SoftwareModel.belongsTo(UserModel, {
-    foreignKey: 'user_id',
-    as: 'user',
-  })
-
-  // Representatives for Software
-  SoftwareModel.belongsToMany(UserModel, {
-    through: SoftwareRepresentative,
-    foreignKey: 'software_id',
-    otherKey: 'user_id',
-    as: 'representatives',
-  })
-
-  UserModel.belongsToMany(SoftwareModel, {
-    through: SoftwareRepresentative,
-    foreignKey: 'user_id',
-    otherKey: 'software_id',
-    as: 'representedSoftware',
-  })
-
   return SoftwareModel
 }

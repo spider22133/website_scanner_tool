@@ -14,19 +14,7 @@ class JiraController {
 
   public createIssue = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payload = {
-        fields: {
-          assignee: { name: req.body.username },
-          project: { id: process.env.JIRA_PROJECT_HELFI_ID },
-          summary: `Aktualisierung von ${req.body.software.name} auf neue Version ${req.body.software.version} erforderlich`,
-          description: 'Created via API',
-          issuetype: { id: process.env.JIRA_ISSUETYPE_AUFGABE_ID },
-          priority: { id: req.body.priority || '1' },
-          labels: ['Software'],
-          components: [{ id: process.env.JIRA_COMPONENT_CLIENTMANAGEMENT0_ID }],
-        },
-      }
-
+      const payload = req.body
       const issue = await this.jira.createIssue(payload)
       res.status(201).json(issue)
     } catch (error: any) {

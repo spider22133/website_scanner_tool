@@ -73,8 +73,8 @@ class SoftwareUpdateNotifier {
 
     const header = `**🆕 NON-MSW Changelog**`
     const tableHeader = [
-      '| Nr. | Datum | Uhrzeit (MESZ) | Produkt | Version | Verantwortlich |',
-      '|----|-------|----------------|---------|---------|---------------|',
+      '| Nr. | Datum  Produkt | Version | Baramundi V. | Verantwortlich |',
+      '|----|-------|---------|---------|--------------|---------------|',
     ].join('\n')
 
     // Fetch all versions and process them
@@ -89,6 +89,7 @@ class SoftwareUpdateNotifier {
       sortedUpdates.reverse().map(async (item, index) => {
         const { software, date, time } = item
         const version = software.version || 'N/A'
+        const baraVersion = software.bara_version || 'N/A'
         const name = software.name || 'Unbekannt'
         const responsibleId = software.user_id
 
@@ -104,7 +105,7 @@ class SoftwareUpdateNotifier {
 
         return `| ${sortedUpdates.length - index} | ${dayjs(date).format(
           DISPLAY_DATE_FORMAT,
-        )} | ${time} | ${name} | ${version} | ${responsibleName} |`
+        )} | ${name} | ${version} | ${baraVersion} | ${responsibleName} |`
       }),
     )
 

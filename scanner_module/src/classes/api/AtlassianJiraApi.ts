@@ -1,7 +1,10 @@
+import { SoftwareModel } from '@/models/software.model'
 import { BaseCurlApi, BaseCurlApiConfig } from '../abstract/BaseCurlApi'
 
 export interface JiraIssuePayload {
-  fields: Record<string, any>
+  username: string
+  software: SoftwareModel
+  priority?: string
 }
 
 export class JiraApi extends BaseCurlApi {
@@ -11,7 +14,20 @@ export class JiraApi extends BaseCurlApi {
   }
 
   public async createIssue(payload: JiraIssuePayload) {
-    return await this.sendRequest('/issue', 'POST', payload)
+    const issue = {
+      fields: {
+        assignee: { name: payload.username },
+        project: { id: process.env.JIRA_PROJECT_HELFI_ID },
+        summary: `Aktualisierung von ${payload.software.name} auf neue Version ${payload.software.version} erforderlich`,
+        description: `Dieses Ticket wurde automatisiert über die API erstellt.\n\nEin Update der Software "${payload.software.name}" auf Version ${payload.software.version} steht an.\n\nBitte prüfen, ob die Aktualisierung notwendig ist, und ggf. die Installation einplanen.`,
+        issuetype: { id: process.env.JIRA_ISSUETYPE_AUFGABE_ID },
+        priority: { id: payload.priority || '1' },
+        labels: ['Software'],
+        components: [{ id: process.env.JIRA_COMPONENT_CLIENTMANAGEMENT0_ID }],
+      },
+    }
+
+    return await this.sendRequest('/issue', 'POST', issue)
   }
 
   public async getIssue(issueKey: string) {
