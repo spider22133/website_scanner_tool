@@ -12,6 +12,7 @@ import {
   HasManyRemoveAssociationMixin,
   HasManyCountAssociationsMixin,
   BelongsToManySetAssociationsMixin,
+  NonAttribute,
 } from 'sequelize'
 import { User } from '@/interfaces/user.interface'
 import { RoleModel } from './role.model'
@@ -25,7 +26,9 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public lastName: string
   public userName: string
   public email: string
-  public roles?: RoleModel[]
+
+  // inclusions
+  public roles?: NonAttribute<RoleModel[]>
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date

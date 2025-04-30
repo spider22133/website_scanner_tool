@@ -23,11 +23,11 @@ export abstract class BaseCurlApi {
 
   protected buildCurlCommand(endpoint: string, method: string = 'GET', data?: any): string {
     const url = `${this.baseUrl}${endpoint}`
-    let curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X ${method} "${url}" -H "Content-Type: application/json"`
+    let curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X ${method} "${url}" -H "Content-Type: application/json; charset=utf-8"`
 
     if (data) {
       const jsonData = JSON.stringify(data).replace(/"/g, '\\"') // Escape quotes
-      curlCommand += ` -d "${jsonData}"`
+      curlCommand += ` --data "${jsonData}"`
     }
 
     return curlCommand

@@ -1,11 +1,6 @@
 import { SoftwareModel } from '@/models/software.model'
 import { BaseCurlApi, BaseCurlApiConfig } from '../abstract/BaseCurlApi'
-
-export interface JiraIssuePayload {
-  username: string
-  software: SoftwareModel
-  priority?: string
-}
+import { JiraIssuePayload } from '@/types/jira'
 
 export class JiraApi extends BaseCurlApi {
   constructor(config: BaseCurlApiConfig) {
@@ -14,20 +9,7 @@ export class JiraApi extends BaseCurlApi {
   }
 
   public async createIssue(payload: JiraIssuePayload) {
-    const issue = {
-      fields: {
-        assignee: { name: payload.username },
-        project: { id: process.env.JIRA_PROJECT_HELFI_ID },
-        summary: `Aktualisierung von ${payload.software.name} auf neue Version ${payload.software.version} erforderlich`,
-        description: `Dieses Ticket wurde automatisiert über die API erstellt.\n\nEin Update der Software "${payload.software.name}" auf Version ${payload.software.version} steht an.\n\nBitte prüfen, ob die Aktualisierung notwendig ist, und ggf. die Installation einplanen.`,
-        issuetype: { id: process.env.JIRA_ISSUETYPE_AUFGABE_ID },
-        priority: { id: payload.priority || '1' },
-        labels: ['Software'],
-        components: [{ id: process.env.JIRA_COMPONENT_CLIENTMANAGEMENT0_ID }],
-      },
-    }
-
-    return await this.sendRequest('/issue', 'POST', issue)
+    return await this.sendRequest('/issue', 'POST', payload)
   }
 
   public async getIssue(issueKey: string) {
@@ -65,5 +47,21 @@ export class JiraApi extends BaseCurlApi {
     const payload = { jql, maxResults }
     const result = await this.sendRequest('/search', 'POST', payload)
     return result?.issues || []
+  }
+
+  public async getResolutions() {
+    return await this.sendRequest('/resolution', 'GET')
+  }
+
+  public async getResolutionById(id: string | number) {
+    return await this.sendRequest(`/resolution/${id}`, 'GET')
+  }
+
+  public async getPriorities() {
+    return await this.sendRequest('/priority', 'GET')
+  }
+
+  public async getPriorityById(id: string | number) {
+    return await this.sendRequest(`/priority/${id}`, 'GET')
   }
 }

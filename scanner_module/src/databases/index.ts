@@ -73,13 +73,13 @@ function initAssociations() {
 
   // Responsible for Software
   UserModel.hasMany(SoftwareModel, {
-    foreignKey: 'user_id',
     as: 'software',
+    foreignKey: 'user_id',
   })
 
   SoftwareModel.belongsTo(UserModel, {
-    foreignKey: 'user_id',
     as: 'user',
+    foreignKey: 'user_id',
   })
 
   // Representatives for Software

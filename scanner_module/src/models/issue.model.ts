@@ -9,10 +9,11 @@ export interface IssueAttributes {
   software_id: number
   jira_id?: string
   jira_key?: string
-  resolution?: string
+  resolutionName?: string
+  resolutionDesc?: string
 }
 
-export type IssueCreationAttributes = Optional<IssueAttributes, 'id' | 'jira_id' | 'jira_key' | 'resolution'>
+export type IssueCreationAttributes = Optional<IssueAttributes, 'id' | 'jira_id' | 'jira_key' | 'resolutionName' | 'resolutionDesc'>
 
 export class IssueModel extends Model<IssueAttributes, IssueCreationAttributes> {
   public id!: number
@@ -21,7 +22,8 @@ export class IssueModel extends Model<IssueAttributes, IssueCreationAttributes> 
   public software_id!: number
   public jira_id?: string
   public jira_key?: string
-  public resolution?: string
+  public resolutionName?: string
+  public resolutionDesc?: string
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -58,6 +60,14 @@ export default function (sequelize: Sequelize): typeof IssueModel {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: '1',
+      },
+      resolutionName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      resolutionDesc: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       user_id: {
         type: DataTypes.INTEGER,

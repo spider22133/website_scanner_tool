@@ -10,6 +10,7 @@ import {
   BelongsToSetAssociationMixin,
   BelongsToManyGetAssociationsMixin,
   BelongsToManySetAssociationsMixin,
+  NonAttribute,
 } from 'sequelize'
 import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
@@ -31,6 +32,10 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public is_central_managed: boolean
   public is_hidden: boolean
   public is_current: boolean
+
+  // inclusions
+  public user?: NonAttribute<UserModel>
+  public versions?: NonAttribute<SoftwareVersionModel[]>
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -56,7 +61,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
 
   public static associations: {
     versions: Association<SoftwareModel, SoftwareVersionModel>
-    users: Association<SoftwareModel, UserModel>
+    user: Association<SoftwareModel, UserModel>
     representatives: Association<SoftwareModel, SoftwareRepresentative>
   }
 }
@@ -76,7 +81,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
         type: DataTypes.STRING,
       },
       user_id: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
       },
       version: {
         type: DataTypes.STRING,

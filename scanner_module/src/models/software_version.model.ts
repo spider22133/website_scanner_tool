@@ -8,6 +8,7 @@ export class SoftwareVersionModel extends Model<SoftwareVersion, SoftwareVersion
   public id: number
   public software_id: number
   public version: string
+  public hasJiraIssue: boolean
 
   public setSoftware!: BelongsToSetAssociationMixin<SoftwareModel, number>
 
@@ -30,6 +31,11 @@ export default function (sequelize: Sequelize): typeof SoftwareVersionModel {
       version: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      hasJiraIssue: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
     {
