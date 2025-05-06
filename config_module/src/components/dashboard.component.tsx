@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { retrieveWebsites } from '../slices/software.slice'
+import React, { useEffect, useMemo, useState } from 'react'
+import { fetchAllSoftware } from '../slices/software.slice'
 import { RootState, useAppDispatch } from '../store'
 import { useSelector } from 'react-redux'
 import { Box, Container, Paper, Grid } from '@mui/material'
@@ -27,12 +27,12 @@ const DashboardComponent: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
-    dispatch(retrieveWebsites())
+    dispatch(fetchAllSoftware())
     dispatch(retrieveUsers())
 
     const socket = socketIOClient(ENDPOINT)
     socket.on('updateSoftware', (data: any) => {
-      if (data === 'changed') dispatch(retrieveWebsites())
+      if (data === 'changed') dispatch(fetchAllSoftware())
     })
 
     return () => {
@@ -63,19 +63,24 @@ const DashboardComponent: React.FC = () => {
       tabType: 'MAIN',
       tabIcon: <ArticleOutlinedIcon />,
       tabLabel: 'Softwareprofil',
-      tabContent: <SoftwareWidgetsLayout software={softwareFilteredList[currentIndex]} />,
+      tabContent: () =>
+        softwareFilteredList[currentIndex] ? (
+          <SoftwareWidgetsLayout software={softwareFilteredList[currentIndex]} />
+        ) : (
+          <div>No software selected</div>
+        ),
     },
     {
       tabType: 'CREATE_BDS',
       tabIcon: <FlipOutlinedIcon />,
       tabLabel: 'Software paketieren',
-      tabContent: <SoftwareUpdateStepper />,
+      tabContent: () => <SoftwareUpdateStepper />,
     },
     {
       tabType: 'STATUS_REPORTS',
       tabIcon: <AssessmentOutlinedIcon />,
       tabLabel: 'Status Berichte',
-      tabContent: <div />,
+      tabContent: () => <React.Fragment />,
     },
   ]
 

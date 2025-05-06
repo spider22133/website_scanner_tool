@@ -16,6 +16,7 @@ import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
 import { UserModel } from './user.model'
 import { SoftwareRepresentative } from './software_representative.model'
+import { IssueModel } from './issue.model'
 
 export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source' | 'icon'>
 
@@ -36,9 +37,12 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   // inclusions
   public user?: NonAttribute<UserModel>
   public versions?: NonAttribute<SoftwareVersionModel[]>
+  public readonly issues?: NonAttribute<IssueModel[]>
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
+
+  public getIssues!: HasManyGetAssociationsMixin<IssueModel>
 
   public getVersions!: HasManyGetAssociationsMixin<SoftwareVersionModel>
   public createVersion!: HasManyCreateAssociationMixin<SoftwareVersionModel>
@@ -55,7 +59,6 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
       limit: 1,
     })
 
-    // Return the first version if available, or null
     return versions.length > 0 ? versions[0] : null
   }
 
@@ -63,6 +66,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
     versions: Association<SoftwareModel, SoftwareVersionModel>
     user: Association<SoftwareModel, UserModel>
     representatives: Association<SoftwareModel, SoftwareRepresentative>
+    issues: Association<SoftwareModel, IssueModel>
   }
 }
 

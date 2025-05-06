@@ -15,7 +15,7 @@ interface PackageDetailsProps {
 
 interface WidgetItem {
   id: string
-  component: JSX.Element
+  component: (software: SoftwareEntry) => JSX.Element
 }
 
 const SoftwareWidgetsLayout: React.FC<PackageDetailsProps> = ({ software }) => {
@@ -33,30 +33,32 @@ const SoftwareWidgetsLayout: React.FC<PackageDetailsProps> = ({ software }) => {
 
   const widgets = useMemo<WidgetItem[]>(
     () => [
-      { id: 'software-info', component: <SoftwareInfoWidget software={software} /> },
-      { id: 'software-settings', component: <SoftwareSettingsWidget software={software} /> },
-      { id: 'baramundi-info', component: <BaramundiInfoWidget software={software} /> },
-      { id: 'tickets', component: <TicketsWidget software={software} /> },
+      { id: 'software-info', component: software => <SoftwareInfoWidget software={software} /> },
+      { id: 'software-settings', component: software => <SoftwareSettingsWidget software={software} /> },
+      { id: 'baramundi-info', component: software => <BaramundiInfoWidget software={software} /> },
+      { id: 'tickets', component: software => <TicketsWidget software={software} /> },
     ],
-    [software],
+    [],
   )
 
   const widgetMap = useMemo(() => {
     return new Map(widgets.map(w => [w.id, w.component]))
   }, [widgets])
 
-  // Initialize state from localStorage or default values
+  const validWidgetIds = widgets.map(w => w.id)
+
   const [leftWidgets, setLeftWidgets] = useState<string[]>(() => {
     const saved = localStorage.getItem('leftWidgets')
-    return saved ? JSON.parse(saved) : ['software-info', 'software-settings']
+    const parsed = saved ? JSON.parse(saved) : ['software-info', 'software-settings']
+    return parsed.filter((id: string) => validWidgetIds.includes(id))
   })
 
   const [rightWidgets, setRightWidgets] = useState<string[]>(() => {
     const saved = localStorage.getItem('rightWidgets')
-    return saved ? JSON.parse(saved) : ['baramundi-info', 'tickets']
+    const parsed = saved ? JSON.parse(saved) : ['baramundi-info', 'tickets']
+    return parsed.filter((id: string) => validWidgetIds.includes(id))
   })
 
-  // Save widget order to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('leftWidgets', JSON.stringify(leftWidgets))
   }, [leftWidgets])
@@ -103,8 +105,8 @@ const SoftwareWidgetsLayout: React.FC<PackageDetailsProps> = ({ software }) => {
         >
           <Stack spacing={2}>
             {widgetIds.map((id, index) => {
-              const component = widgetMap.get(id)
-              if (!component) return null
+              const componentFn = widgetMap.get(id)
+              if (!componentFn) return null
 
               return (
                 <Draggable key={id} draggableId={id} index={index}>
@@ -132,7 +134,7 @@ const SoftwareWidgetsLayout: React.FC<PackageDetailsProps> = ({ software }) => {
                       >
                         <DragIndicatorIcon fontSize="small" color="action" />
                       </Box>
-                      <Box sx={{ pointerEvents: snapshot.isDragging ? 'none' : 'auto' }}>{component}</Box>
+                      <Box sx={{ pointerEvents: snapshot.isDragging ? 'none' : 'auto' }}>{componentFn(software)}</Box>
                     </Paper>
                   )}
                 </Draggable>

@@ -38,6 +38,9 @@ class SoftwareRoute implements Route {
     // Software version checking
     this.router.get(`${this.path}/:id/check`, authMiddleware, this.softwareController.checkSoftware)
 
+    // Software Jira Issues
+    this.router.get(`${this.path}/:id/issues`, authMiddleware, this.softwareController.getSoftwareJiraIssues)
+
     // Representative management
     this.router.get(`${this.path}/:id/representatives`, authMiddleware, this.softwareController.getSoftwareRepresentatives)
     this.router.post(`${this.path}/:id/representatives`, authMiddleware, this.softwareController.setSoftwareRepresentatives)

@@ -28,7 +28,7 @@ const TabsComponent: React.FC<Props> = ({ tabs }) => {
         </Box>
         {tabs.map(({ tabType, tabContent }, index) => (
           <TabPanel key={index} value={tabType} className="tab-panel" sx={{ px: 0, pt: 2, pb: 2.1 }}>
-            {tabContent}
+            {tabContent()}
           </TabPanel>
         ))}
       </Box>

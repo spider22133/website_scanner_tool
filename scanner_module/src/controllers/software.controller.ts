@@ -13,6 +13,7 @@ import multer from 'multer'
 import HttpException from '@/exceptions/HttpException'
 import fs from 'fs'
 import path from 'path'
+import { IssueModel } from '@/models/issue.model'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
@@ -40,6 +41,18 @@ class SoftwareController {
       const representatives: SoftwareRepresentative[] = await findOne.getRepresentatives()
 
       res.status(200).json({ data: representatives, message: 'findAll' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public getSoftwareJiraIssues = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = req.params.id
+      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
+      const issues: IssueModel[] = await findOne.getIssues()
+
+      res.status(200).json({ data: issues, message: 'findAll' })
     } catch (error) {
       next(error)
     }

@@ -1,8 +1,10 @@
+import { ReactElement, JSXElementConstructor } from 'react'
+
 export interface CustomTabProps {
   tabType: string
   tabIcon?: React.ReactElement
   tabLabel: string
-  tabContent: React.ReactElement
+  tabContent: () => JSX.Element
 }
 
 export enum ListViewType {

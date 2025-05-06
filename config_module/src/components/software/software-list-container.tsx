@@ -39,7 +39,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
       {
         tabType: ListViewType.ListView,
         tabLabel: 'List view',
-        tabContent: (
+        tabContent: () => (
           <SoftwareListView
             timeAgo={timeAgo}
             createSoftwareLoading={createSoftwareLoading}
@@ -52,7 +52,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
       {
         tabType: ListViewType.TableView,
         tabLabel: 'Table view',
-        tabContent: (
+        tabContent: () => (
           <SoftwareTableView
             timeAgo={timeAgo}
             softwareFilteredList={softwareFilteredList}
@@ -86,7 +86,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
       </Stack>
       {renderTabContent().map(item => (
         <TabPanel key={item.tabType} value={activeTab} index={item.tabType}>
-          {item.tabContent}
+          {item.tabContent()}
         </TabPanel>
       ))}
     </>
