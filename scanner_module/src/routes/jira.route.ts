@@ -13,6 +13,7 @@ class JiraRoute implements Route {
 
   private initializeRoutes() {
     this.router.post(`${this.path}/create-issue`, this.jiraController.createIssue)
+    this.router.put(`${this.path}/update-issue`, this.jiraController.updateIssue)
     this.router.get(`${this.path}/issue/:key`, this.jiraController.getIssue)
     this.router.get(`${this.path}/user/:name`, this.jiraController.getUserByName)
     this.router.get(`${this.path}/project/:id(\\d+)/components`, this.jiraController.getProjectComponents)

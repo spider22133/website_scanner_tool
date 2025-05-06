@@ -1,4 +1,3 @@
-import { SoftwareModel } from '@/models/software.model'
 import { BaseCurlApi, BaseCurlApiConfig } from '../abstract/BaseCurlApi'
 import { JiraIssuePayload } from '@/types/jira'
 
@@ -8,17 +7,33 @@ export class JiraApi extends BaseCurlApi {
     this.baseUrl += '/rest/api/2'
   }
 
+  //
+  // Issue Management
+  //
+
   public async createIssue(payload: JiraIssuePayload) {
     return await this.sendRequest('/issue', 'POST', payload)
   }
 
-  public async getIssue(issueKey: string) {
-    return await this.sendRequest(`/issue/${issueKey}`, 'GET')
+  public async updateIssue(issueIdOrKey: string, payload: Partial<JiraIssuePayload>) {
+    const result = await this.sendRequest(`/issue/${issueIdOrKey}`, 'PUT', payload)
+    // Jira returns HTTP 204 with no body on success
+    return result === null
   }
 
-  public async getIssueTypes() {
-    return await this.sendRequest('/issuetype', 'GET')
+  public async getIssue(issueIdOrKey: string) {
+    return await this.sendRequest(`/issue/${issueIdOrKey}`, 'GET')
   }
+
+  public async searchIssues(jql: string, maxResults = 50) {
+    const payload = { jql, maxResults }
+    const result = await this.sendRequest('/search', 'POST', payload)
+    return result?.issues || []
+  }
+
+  //
+  // Project and Component Management
+  //
 
   public async getProjects() {
     return await this.sendRequest('/project', 'GET')
@@ -28,25 +43,20 @@ export class JiraApi extends BaseCurlApi {
     return await this.sendRequest(`/project/${projectKey}/components`, 'GET')
   }
 
+  //
+  // User Management
+  //
+
   public async getUserByName(userName: string) {
-    return await this.sendRequest(`/user?username=${userName}`)
+    return await this.sendRequest(`/user?username=${userName}`, 'GET')
   }
 
-  public async updateIssue(issueKey: string, payload: Partial<JiraIssuePayload>) {
-    const result = await this.sendRequest(`/issue/${issueKey}`, 'PUT', payload)
-    // Jira returns no body and HTTP 204 on success, so we assume if no error -> success
-    return result === null
-  }
+  //
+  // Metadata
+  //
 
-  public async deleteIssue(issueKey: string) {
-    const result = await this.sendRequest(`/issue/${issueKey}`, 'DELETE')
-    return result === null
-  }
-
-  public async searchIssues(jql: string, maxResults = 50) {
-    const payload = { jql, maxResults }
-    const result = await this.sendRequest('/search', 'POST', payload)
-    return result?.issues || []
+  public async getIssueTypes() {
+    return await this.sendRequest('/issuetype', 'GET')
   }
 
   public async getResolutions() {
@@ -63,5 +73,9 @@ export class JiraApi extends BaseCurlApi {
 
   public async getPriorityById(id: string | number) {
     return await this.sendRequest(`/priority/${id}`, 'GET')
+  }
+
+  public async addWatcher(issueKey: string, username: string) {
+    await this.sendRequest(`/issue/${issueKey}/watchers`, 'POST', username)
   }
 }

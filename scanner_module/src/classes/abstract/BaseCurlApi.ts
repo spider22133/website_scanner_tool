@@ -26,7 +26,18 @@ export abstract class BaseCurlApi {
     let curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X ${method} "${url}" -H "Content-Type: application/json; charset=utf-8"`
 
     if (data) {
-      const jsonData = JSON.stringify(data).replace(/"/g, '\\"') // Escape quotes
+      let jsonData = JSON.stringify(data)
+
+      jsonData = jsonData
+        .replace(/ü/g, '\\u00fc')
+        .replace(/Ü/g, '\\u00dc')
+        .replace(/ö/g, '\\u00f6')
+        .replace(/Ö/g, '\\u00d6')
+        .replace(/ä/g, '\\u00e4')
+        .replace(/Ä/g, '\\u00c4')
+        .replace(/ß/g, '\\u00df')
+        .replace(/"/g, '\\"')
+
       curlCommand += ` --data "${jsonData}"`
     }
 
@@ -40,13 +51,7 @@ export abstract class BaseCurlApi {
       const { stdout } = await execPromise(curlCommand, { maxBuffer: 1024 * 1024 * 1024 })
       const responseData = stdout.trim()
 
-      try {
-        return JSON.parse(responseData)
-      } catch (parseError) {
-        logger.error('Error parsing JSON:', parseError.message)
-        logger.debug('Raw response:', responseData)
-        return null
-      }
+      if (responseData) return JSON.parse(responseData)
     } catch (error: any) {
       logger.error(`Error executing ${method} request:`, error.message)
 
