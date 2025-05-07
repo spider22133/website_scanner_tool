@@ -1,11 +1,32 @@
+import { IssueModel } from '@/models/issue.model'
 import { SoftwareModel } from '@/models/software.model'
 import { SoftwareVersionModel } from '@/models/software_version.model'
 import { UserModel } from '@/models/user.model'
 import { JiraIssueService } from '@/services/jira.service'
-import { Request, Response } from 'express'
+import SoftwareService from '@/services/software.service'
+import { NextFunction, Request, Response } from 'express'
 
 class JiraController {
   private service = new JiraIssueService()
+  public softwareService = new SoftwareService()
+
+  public getSoftwareJiraIssues = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = req.params.id
+      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
+      console.log(req.query.reload)
+
+      if (req.query.reload) {
+        await this.service.reloadJiraIssuesForSoftware(findOne)
+      }
+
+      const issues: IssueModel[] = await findOne.getIssues()
+
+      res.status(200).json({ data: issues, message: 'findAll' })
+    } catch (error) {
+      next(error)
+    }
+  }
 
   public createIssue = async (req: Request, res: Response) => {
     try {
@@ -21,7 +42,7 @@ class JiraController {
       if (!software) return res.status(404).json({ error: 'Software not found' })
 
       const dbIssue = await this.service.createJiraIssueForSoftware(software, payload.priority || '3')
-      res.status(201).json(dbIssue)
+      res.status(201).json({ data: dbIssue })
     } catch (err: any) {
       console.error('[JiraController Error]', err.message)
       res.status(500).json({ error: 'Failed to create Jira issue', message: err.message })

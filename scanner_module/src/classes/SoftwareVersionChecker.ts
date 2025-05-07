@@ -7,9 +7,11 @@ import { WingetUtils } from './api/WingetApi'
 import { OrgUnitType, SoftwareType } from '@/types/baramundi'
 import SoftwareUpdateNotifier from './SoftwareUpdateNotifier'
 import semver from 'semver'
+import { JiraIssueService } from '@/services/jira.service'
 
 class SoftwareVersionChecker {
   private softwareService = new SoftwareService()
+  private jiraService = new JiraIssueService()
   private softwareVersionService = new SoftwareVersionService()
 
   private notifier: SoftwareUpdateNotifier
@@ -37,7 +39,7 @@ class SoftwareVersionChecker {
         await this.checkSoftwareVersion(software)
       }
 
-      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV)
+      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID)
 
       this.socket?.connected && this.socket.emit('updateSoftware', 'changed')
     } catch (error) {
@@ -66,6 +68,9 @@ class SoftwareVersionChecker {
       // Single check should also send notification, if baramundi version is to be updated.
       single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV))
 
+      // Reload Jira issues data
+      await this.jiraService.reloadJiraIssuesForSoftware(software)
+
       return { software: updatedSoftware }
     } catch (error) {
       console.error('Error in checkSoftwareVersion:', error)
@@ -80,7 +85,7 @@ class SoftwareVersionChecker {
     let isUpdated = false
     const packageDetails = await WingetUtils.showSoftware(software.winget_id)
 
-    if (packageDetails.version !== software.version) {
+    if (packageDetails.version !== software?.version) {
       isUpdated = true
       return await this.softwareService.updateSoftware(
         software.winget_id,

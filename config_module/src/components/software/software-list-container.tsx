@@ -1,7 +1,7 @@
 import { SoftwareEntry } from '../../../../types/common'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { RootState } from '../../store'
+import { RootState } from '../../store/store'
 import { Box, Typography, Stack } from '@mui/material'
 import AppFilterBar from '../elements/app-filter-bar.component'
 import { CustomTabProps, ListViewType } from '../../interfaces/common'
@@ -72,7 +72,7 @@ const SoftwareList: React.FC<Props> = ({ setActiveWebsite, currentIndex, softwar
     <>
       <AppFilterBar />
       <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'} sx={{ mt: 3, mb: 1 }}>
-        <Stack direction={'row'} alignItems={'center'} spacing={3}>
+        <Stack direction={'row'} alignItems={'center'} spacing={3} flex={1}>
           <ViewSelectorTabs handleActiveTab={handleActiveTab} currentViewPreference={currentViewPreference} />
           <Typography variant="body2">
             Aktuell: {countByCurrentStatus(true)} / Nicht Aktuell: {countByCurrentStatus(false)}

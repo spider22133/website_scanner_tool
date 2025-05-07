@@ -4,12 +4,14 @@ import messageReducer from './slices/message.slice'
 import websiteReducer from './slices/software.slice'
 import authReducer from './slices/auth.slice'
 import userReducer from './slices/user.slice'
+import issuesSlice from './slices/issues.slice'
 
 const reducer = {
   software: websiteReducer,
   messages: messageReducer,
   auth: authReducer,
   users: userReducer,
+  issues: issuesSlice,
 }
 
 const store = configureStore({

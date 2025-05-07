@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { setMessage } from './message.slice'
-import AuthService from '../services/auth.service'
-import httpErrors from '../interfaces/api.error.interface'
+import AuthService from '../../services/auth.service'
+import httpErrors from '../../interfaces/api.error.interface'
 import { AxiosError } from 'axios'
-import IUser from '../interfaces/user.interface'
-import { getUser, setUserSession } from '../helpers/session.helper'
+import IUser from '../../interfaces/user.interface'
+import { getUser, setUserSession } from '../../helpers/session.helper'
 
 type loginType = {
   data: IUser

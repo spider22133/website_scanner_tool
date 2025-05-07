@@ -1,11 +1,6 @@
 import http from '../http-connection'
 import { SoftwareEntry } from '../../../types/common'
 
-type CreateSoftwarePayload = {
-  name: string
-  url: string
-}
-
 const SoftwareDataService = {
   getAll: () => http.get('/software'),
   getById: (id: string) => http.get(`/software/${id}`),
@@ -26,8 +21,6 @@ const SoftwareDataService = {
         'Content-Type': 'multipart/form-data',
       },
     }),
-
-  createJiraIssues: (id: string) => http.post(`/software/${id}/issues`),
 }
 
 export default SoftwareDataService

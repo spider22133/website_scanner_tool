@@ -12,8 +12,8 @@ import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined
 
 import { useSelector } from 'react-redux'
 import { SoftwareEntry } from '../../../../types/common'
-import { RootState, useAppDispatch } from '../../store'
-import { checkSoftware, deleteSoftware, updateSoftware } from '../../slices/software.slice'
+import { RootState, useAppDispatch } from '../../store/store'
+import { checkSoftware, deleteSoftware, updateSoftware } from '../../store/thunks/software.thunk'
 import TimeAgo from 'javascript-time-ago'
 
 interface SoftwareTableProps {
@@ -152,6 +152,7 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
           setActiveWebsite(params.row, index)
         }}
         sx={{ border: 'none' }}
+        slotProps={{ toolbar: { showQuickFilter: false } }}
         checkboxSelection
         disableRowSelectionOnClick
         autoPageSize

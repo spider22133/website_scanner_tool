@@ -1,4 +1,4 @@
-import { MessageState } from '../../slices/message.slice'
+import { MessageState } from '../../store/slices/message.slice'
 import { Alert } from '@mui/material'
 
 type Props = {

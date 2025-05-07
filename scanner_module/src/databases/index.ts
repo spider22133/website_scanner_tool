@@ -58,6 +58,11 @@ function initAssociations() {
     as: 'software',
   })
 
+  SoftwareModel.hasMany(IssueModel, {
+    foreignKey: 'software_id',
+    as: 'issues',
+  })
+
   // Software Version
   SoftwareModel.hasMany(SoftwareVersionModel, {
     sourceKey: 'id',

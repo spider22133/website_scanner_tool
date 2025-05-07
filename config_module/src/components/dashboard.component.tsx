@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { fetchAllSoftware } from '../slices/software.slice'
-import { RootState, useAppDispatch } from '../store'
+import { fetchAllSoftware } from '../store/thunks/software.thunk'
+import { RootState, useAppDispatch } from '../store/store'
 import { useSelector } from 'react-redux'
 import { Box, Container, Paper, Grid } from '@mui/material'
 import SoftwareList from './software/software-list-container'
@@ -13,7 +13,7 @@ import SoftwareWidgetsLayout from './software/tabs/software-widgets-layout.'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import FlipOutlinedIcon from '@mui/icons-material/FlipOutlined'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
-import { retrieveUsers } from '../slices/user.slice'
+import { retrieveUsers } from '../store/slices/user.slice'
 import SoftwareUpdateStepper from './software/tabs/software-update-steps-layout'
 
 const DashboardComponent: React.FC = () => {

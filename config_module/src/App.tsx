@@ -6,7 +6,7 @@ import DashboardComponent from './components/dashboard.component'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useSnackbar } from 'notistack'
-import { RootState } from './store'
+import { RootState } from './store/store'
 import { useEffect } from 'react'
 import 'bootstrap/dist/css/bootstrap.css'
 import { RedirectIfLogged, RequireAuth } from './helpers/routing.helper'

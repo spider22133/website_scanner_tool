@@ -1,17 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, Association } from 'sequelize'
 import { UserModel } from './user.model'
 import { SoftwareModel } from './software.model'
-
-export interface IssueAttributes {
-  id: number
-  priority: string
-  user_id: number
-  software_id: number
-  jira_id?: string
-  jira_key?: string
-  resolutionName?: string
-  resolutionDesc?: string
-}
+import { IssueAttributes } from '../../../types/common'
 
 export type IssueCreationAttributes = Optional<IssueAttributes, 'id' | 'jira_id' | 'jira_key' | 'resolutionName' | 'resolutionDesc'>
 
@@ -20,8 +10,11 @@ export class IssueModel extends Model<IssueAttributes, IssueCreationAttributes> 
   public priority!: string
   public user_id!: number
   public software_id!: number
-  public jira_id?: string
-  public jira_key?: string
+  public software_version!: string
+  public jira_id: string
+  public jira_key: string
+  public statusName: string
+  public statusDesc: string
   public resolutionName?: string
   public resolutionDesc?: string
 
@@ -61,6 +54,14 @@ export default function (sequelize: Sequelize): typeof IssueModel {
         allowNull: false,
         defaultValue: '1',
       },
+      statusName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      statusDesc: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       resolutionName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -75,6 +76,10 @@ export default function (sequelize: Sequelize): typeof IssueModel {
       },
       software_id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      software_version: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
     },

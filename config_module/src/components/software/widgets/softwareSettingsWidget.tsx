@@ -4,9 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, Chip, Stack, TextField, Typography, Box, Avatar } from '@mui/material'
 import SaveIcon from '@mui/icons-material/SaveOutlined'
-import { RootState, useAppDispatch } from '../../../store'
+import { RootState, useAppDispatch } from '../../../store/store'
 import { useSelector } from 'react-redux'
-import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives, uploadSoftwareIcon } from '../../../slices/software.slice'
+import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives, uploadSoftwareIcon } from '../../../store/thunks/software.thunk'
 import IUser from '../../../interfaces/user.interface'
 import { SoftwareEntry } from '../../../../../types/common'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -208,7 +208,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                 Unterstützte Formate: PNG, JPG, SVG (max. 2 MB)
               </Typography>
             </Box>
-            <Button type="submit" variant="contained" color="primary" endIcon={<SaveIcon />} disabled={!isDirty}>
+            <Button type="submit" variant="contained" color="primary" startIcon={<SaveIcon />} disabled={!isDirty} sx={{ height: 40, width: 200 }}>
               Speichern
             </Button>
           </Stack>

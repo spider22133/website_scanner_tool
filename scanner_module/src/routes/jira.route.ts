@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import Route from '@/interfaces/route.interface'
 import JiraController from '@controllers/jira.controller'
+import authMiddleware from '@/middlewares/auth.middleware'
 
 class JiraRoute implements Route {
   public path = '/jira'
@@ -12,12 +13,15 @@ class JiraRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}/create-issue`, this.jiraController.createIssue)
-    this.router.put(`${this.path}/update-issue`, this.jiraController.updateIssue)
-    this.router.get(`${this.path}/issue/:key`, this.jiraController.getIssue)
-    this.router.get(`${this.path}/user/:name`, this.jiraController.getUserByName)
+    // Software Jira Issues
+    this.router.get(`${this.path}/software/:id/issues`, authMiddleware, this.jiraController.getSoftwareJiraIssues)
+    this.router.get(`${this.path}/issue/:key`, authMiddleware, this.jiraController.getIssue)
+    this.router.get(`${this.path}/user/:name`, authMiddleware, this.jiraController.getUserByName)
     this.router.get(`${this.path}/project/:id(\\d+)/components`, this.jiraController.getProjectComponents)
     this.router.get(`${this.path}/issue-types`, this.jiraController.getIssueTypes)
+
+    this.router.post(`${this.path}/create-issue`, authMiddleware, this.jiraController.createIssue)
+    this.router.put(`${this.path}/update-issue`, this.jiraController.updateIssue)
   }
 }
 

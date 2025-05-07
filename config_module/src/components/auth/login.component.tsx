@@ -3,8 +3,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import IUser from '../../interfaces/user.interface'
-import { RootState, useAppDispatch } from '../../store'
-import { login } from '../../slices/auth.slice'
+import { RootState, useAppDispatch } from '../../store/store'
+import { login } from '../../store/slices/auth.slice'
 import { useSelector } from 'react-redux'
 import { APIErrorNotification } from '../elements/error-notification.component'
 import { Button, TextField, Box, Container, Paper, Typography } from '@mui/material'
@@ -54,15 +54,15 @@ export default function LogIn() {
             backgroundColor: '#fff',
           }}
         >
-          <Typography variant="h5" align="center" gutterBottom>
+          <Typography variant="h4" align="center" gutterBottom>
             Anmeldung
           </Typography>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 3, pt: 1 }}>
               <TextField
                 fullWidth
                 label="E-Mail oder Benutzername eingeben"
-                variant="outlined"
+                variant="filled"
                 autoComplete="email"
                 error={!!errors.email}
                 helperText={errors.email?.message}
@@ -74,7 +74,7 @@ export default function LogIn() {
                 fullWidth
                 label="Passwort eingeben"
                 type="password"
-                variant="outlined"
+                variant="filled"
                 autoComplete="current-password"
                 error={!!errors.password}
                 helperText={errors.password?.message}

@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { AxiosError } from 'axios'
 import { setMessage } from './message.slice'
-import httpErrors from '../interfaces/api.error.interface'
-import IUser from '../interfaces/user.interface'
-import UserDataService from '../services/user.service'
+import httpErrors from '../../interfaces/api.error.interface'
+import IUser from '../../interfaces/user.interface'
+import UserDataService from '../../services/user.service'
 
 const initialState: { users: IUser[]; loading: boolean; createUserLoading: boolean } = {
   users: [],

@@ -5,12 +5,21 @@ import { isEmpty } from '@/utils/util'
 import HttpException from '@/exceptions/HttpException'
 import { SoftwareModel } from '@/models/software.model'
 import { Op } from 'sequelize'
+import { SoftwareVersionModel } from '@/models/software_version.model'
 
 class SoftwareService {
   public software = DB.Software
 
   public async findAllSoftware(): Promise<SoftwareModel[]> {
-    return await this.software.findAll({ order: ['name'] })
+    return await this.software.findAll({
+      order: ['name'],
+      include: [
+        {
+          model: SoftwareVersionModel,
+          as: 'versions',
+        },
+      ],
+    })
   }
 
   public async findSoftwareById(softwareId: string): Promise<SoftwareModel> {

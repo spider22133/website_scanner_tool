@@ -1,11 +1,22 @@
 import React from 'react'
 import { SoftwareEntry } from '../../../../../types/common'
-import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import {
+  Typography,
+  Divider,
+  Tooltip,
+  Grid,
+  Stack,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Icon,
+  styled,
+  tooltipClasses,
+  TooltipProps,
+} from '@mui/material'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { CopyToClipboard } from '../../utilities/CopyToClipboard'
-import { setMessage } from '../../../slices/message.slice'
 import { useDispatch } from 'react-redux'
-import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 
 interface BaramundiInfoProps {
   software: SoftwareEntry
@@ -15,6 +26,16 @@ const BaramundiInfoWidget: React.FC<BaramundiInfoProps> = ({ software }) => {
   const dispatch = useDispatch()
 
   const { is_central_managed, name } = software
+
+  const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+    },
+  }))
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
@@ -28,12 +49,26 @@ const BaramundiInfoWidget: React.FC<BaramundiInfoProps> = ({ software }) => {
 
         <Grid container spacing={2}>
           <Grid size={12}>
-            <Typography>
-              UKD zentrale Applikationen:
-              <Typography component={'span'} variant="body2" fontWeight={700} paddingLeft={1}>
-                {is_central_managed ? 'Ja' : 'Nein'}
+            <Stack direction="row" justifyContent="space-between">
+              <Typography>
+                UKD zentrale Applikationen:
+                <Typography component={'span'} variant="body2" fontWeight={700} paddingLeft={1}>
+                  {is_central_managed ? 'Ja' : 'Nein'}
+                </Typography>
               </Typography>
-            </Typography>
+              <HtmlTooltip
+                title={
+                  <React.Fragment>
+                    <Typography color="inherit" component="div">
+                      Betreung durch EPM-Team
+                    </Typography>
+                    <em>{'Die Software befindet sich innerhalb des UKD/APPS-Ordners.'}</em>
+                  </React.Fragment>
+                }
+              >
+                <InfoOutlinedIcon />
+              </HtmlTooltip>
+            </Stack>
           </Grid>
         </Grid>
       </AccordionDetails>

@@ -54,8 +54,11 @@ Dieses Ticket wurde automatisiert über das Versionskontroll-Dashboard erstellt.
       priority: issue.fields.priority.id,
       user_id: software.user.id,
       software_id: software.id,
+      software_version: software.version,
       jira_id: issue.id,
       jira_key: issue.key,
+      statusName: issue.fields.status.name,
+      statusDesc: issue.fields.status.description,
       resolutionName: issue.fields.resolution?.name || '',
       resolutionDesc: issue.fields.resolution?.description || '',
     })
@@ -63,16 +66,44 @@ Dieses Ticket wurde automatisiert über das Versionskontroll-Dashboard erstellt.
     return dbIssue
   }
 
-  public async updateJiraIssueForSoftware(software: SoftwareModel, priority: string, issueId: string) {
+  public async updateJiraIssueForSoftware(software: SoftwareModel, priority?: string, issueId?: string) {
     const currentVersion = software.versions.find((v: SoftwareVersionModel) => v.version === software.version)
     if (!currentVersion) throw new Error('Software version not found')
     if (!currentVersion.hasJiraIssue) throw new Error('Issue does not exists')
 
     const template = this.createIssueTemplate(software, software.user.userName, priority)
-    const issueResponse = await this.jira.updateIssue(issueId, template)
+    // await this.jira.updateIssue(issueId, template)
+    // const resolution = await this.jira.getResolutionById(issueId)
     await this.jira.addWatcher(issueId, software.user.userName)
+    const issue = await this.jira.getIssue(issueId)
 
-    return issueResponse
+    const findOne = await IssueModel.findOne({ where: { jira_key: issueId } })
+    const dbIssue = await findOne.update({
+      priority: issue.fields.priority.id,
+      software_version: software.version,
+      statusName: issue.fields.status.name,
+      statusDesc: issue.fields.status.description,
+      resolutionName: issue.fields.resolution?.name || '',
+      resolutionDesc: issue.fields.resolution?.description || '',
+    })
+
+    return dbIssue
+  }
+
+  public async reloadJiraIssuesForSoftware(software: SoftwareModel) {
+    const issues: IssueModel[] = await software.getIssues()
+
+    issues.map(async jiraIssue => {
+      const issue = await this.jira.getIssue(jiraIssue.jira_id)
+      await jiraIssue.update({
+        priority: issue.fields.priority.id,
+        software_version: software.version,
+        statusName: issue.fields.status.name,
+        statusDesc: issue.fields.status.description,
+        resolutionName: issue.fields.resolution?.name || '',
+        resolutionDesc: issue.fields.resolution?.description || '',
+      })
+    })
   }
 
   public getIssue(key: string) {

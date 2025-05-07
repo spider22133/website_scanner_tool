@@ -3,7 +3,7 @@ import { SoftwareEntry } from '../../../../../types/common'
 import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { CopyToClipboard } from '../../utilities/CopyToClipboard'
-import { setMessage } from '../../../slices/message.slice'
+import { setMessage } from '../../../store/slices/message.slice'
 import { useDispatch } from 'react-redux'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 
@@ -21,38 +21,39 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Stack direction={{ xs: 'column', xl: 'row' }} alignItems={'center'} justifyContent={'space-between'} sx={{ width: '100%' }}>
-          <Typography variant="h5" fontWeight={600}>
-            Paket Information
-          </Typography>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 3 }}>
-            <CopyToClipboard
-              textToCopy={version}
-              onCopySuccess={() => dispatch(setMessage({ message: 'WinGet version copied successfully', variant: 'success' }))}
-            >
-              <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} icon={<ContentCopyOutlinedIcon />} />
-            </CopyToClipboard>
-            <CopyToClipboard
-              textToCopy={bara_version || ''}
-              onCopySuccess={() => dispatch(setMessage({ message: 'Baramundi version copied successfully', variant: 'success' }))}
-            >
-              <Chip
-                label={`Baramundi: ${bara_version}`}
-                color={software.bara_version !== null && software.bara_version !== undefined ? (is_current ? 'primary' : 'warning') : 'error'}
-                size="small"
-                sx={{ px: 1 }}
-                icon={<ContentCopyOutlinedIcon />}
-              />
-            </CopyToClipboard>
-          </Stack>
-        </Stack>
+        <Typography variant="h5" fontWeight={600}>
+          Paket Information
+        </Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Divider sx={{ mb: 2 }} />
 
         {/* Publisher Information */}
         <Grid container spacing={2}>
-          <Typography variant="h2">{name}</Typography>
+          <Stack spacing={1}>
+            <Typography variant="h2">{name}</Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CopyToClipboard
+                textToCopy={version}
+                onCopySuccess={() => dispatch(setMessage({ message: 'WinGet version copied successfully', variant: 'success' }))}
+              >
+                <Chip label={`Winget: ${version}`} color="success" size="small" sx={{ px: 1 }} icon={<ContentCopyOutlinedIcon />} />
+              </CopyToClipboard>
+              <CopyToClipboard
+                textToCopy={bara_version || ''}
+                onCopySuccess={() => dispatch(setMessage({ message: 'Baramundi version copied successfully', variant: 'success' }))}
+              >
+                <Chip
+                  label={`Baramundi: ${bara_version}`}
+                  color={software.bara_version !== null && software.bara_version !== undefined ? (is_current ? 'primary' : 'warning') : 'error'}
+                  size="small"
+                  sx={{ px: 1 }}
+                  icon={<ContentCopyOutlinedIcon />}
+                />
+              </CopyToClipboard>
+            </Stack>
+          </Stack>
+
           {description && (
             <Grid size={12}>
               <Typography className="fw-bold" color="text.secondary">

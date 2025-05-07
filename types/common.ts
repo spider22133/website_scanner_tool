@@ -1,3 +1,5 @@
+import { SoftwareVersionModel } from "@/models/software_version.model";
+
 export interface InstallerDetails {
   type?: string;
   locale?: string;
@@ -31,6 +33,7 @@ export interface SoftwareEntry {
   winget_id: string;
   user_id?: number;
   version: string;
+  versions?: SoftwareVersionModel[];
   bara_version?: string;
   icon?: string;
   source?: string;
@@ -58,4 +61,18 @@ export interface IRepresentative {
   createdAt: string;
   updatedAt: string;
   SoftwareRepresentative: ISoftwareRepresentative;
+}
+
+export interface IssueAttributes {
+  id: number;
+  priority: string;
+  user_id: number;
+  software_id: number;
+  software_version: string;
+  jira_id?: string;
+  jira_key?: string;
+  statusName?: string;
+  statusDesc?: string;
+  resolutionName?: string;
+  resolutionDesc?: string;
 }
