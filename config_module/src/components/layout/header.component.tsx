@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { NavLink, Link } from 'react-router-dom'
-import { logout } from '../../slices/auth.slice'
-import { RootState, useAppDispatch } from '../../store'
+import { logout } from '../../store/slices/auth.slice'
+import { RootState, useAppDispatch } from '../../store/store'
 import { Box } from '@mui/material'
 
 export default function Header() {

@@ -1,17 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional, BelongsToGetAssociationMixin, BelongsToSetAssociationMixin, Association } from 'sequelize'
 import { UserModel } from './user.model'
 import { SoftwareModel } from './software.model'
-
-export interface IssueAttributes {
-  id: number
-  priority: string
-  user_id: number
-  software_id: number
-  jira_id?: string
-  jira_key?: string
-  resolutionName?: string
-  resolutionDesc?: string
-}
+import { IssueAttributes } from '../../../types/common'
 
 export type IssueCreationAttributes = Optional<IssueAttributes, 'id' | 'jira_id' | 'jira_key' | 'resolutionName' | 'resolutionDesc'>
 

@@ -37,7 +37,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   // inclusions
   public user?: NonAttribute<UserModel>
   public versions?: NonAttribute<SoftwareVersionModel[]>
-  public readonly issues?: NonAttribute<IssueModel[]>
+  public issues?: NonAttribute<IssueModel[]>
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date

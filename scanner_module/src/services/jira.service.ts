@@ -69,10 +69,21 @@ Dieses Ticket wurde automatisiert über das Versionskontroll-Dashboard erstellt.
     if (!currentVersion.hasJiraIssue) throw new Error('Issue does not exists')
 
     const template = this.createIssueTemplate(software, software.user.userName, priority)
-    const issueResponse = await this.jira.updateIssue(issueId, template)
+    // await this.jira.updateIssue(issueId, template)
+    const resolution = await this.jira.getResolutionById(issueId)
     await this.jira.addWatcher(issueId, software.user.userName)
+    console.log(resolution)
+    const issue = await this.jira.getIssue(issueId)
+    console.log(issue)
 
-    return issueResponse
+    const dbIssue = await IssueModel.findOne({ where: { jira_key: issueId } })
+
+    dbIssue?.update({
+      resolutionName: resolution?.name || '',
+      resolutionDesc: resolution?.description || '',
+    })
+
+    return dbIssue
   }
 
   public getIssue(key: string) {

@@ -59,3 +59,14 @@ export interface IRepresentative {
   updatedAt: string;
   SoftwareRepresentative: ISoftwareRepresentative;
 }
+
+export interface IssueAttributes {
+  id: number;
+  priority: string;
+  user_id: number;
+  software_id: number;
+  jira_id?: string;
+  jira_key?: string;
+  resolutionName?: string;
+  resolutionDesc?: string;
+}

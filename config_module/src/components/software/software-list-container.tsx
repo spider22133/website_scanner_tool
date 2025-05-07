@@ -1,7 +1,7 @@
 import { SoftwareEntry } from '../../../../types/common'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { RootState } from '../../store'
+import { RootState } from '../../store/store'
 import { Box, Typography, Stack } from '@mui/material'
 import AppFilterBar from '../elements/app-filter-bar.component'
 import { CustomTabProps, ListViewType } from '../../interfaces/common'

@@ -27,7 +27,7 @@ const SoftwareDataService = {
       },
     }),
 
-  createJiraIssues: (id: string) => http.post(`/software/${id}/issues`),
+  getJiraIssues: (id: string) => http.get(`/software/${id}/issues`),
 }
 
 export default SoftwareDataService

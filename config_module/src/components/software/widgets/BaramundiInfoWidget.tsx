@@ -3,7 +3,7 @@ import { SoftwareEntry } from '../../../../../types/common'
 import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { CopyToClipboard } from '../../utilities/CopyToClipboard'
-import { setMessage } from '../../../slices/message.slice'
+import { setMessage } from '../../../store/slices/message.slice'
 import { useDispatch } from 'react-redux'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 

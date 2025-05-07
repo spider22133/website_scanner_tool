@@ -1,19 +1,52 @@
-import React from 'react'
-import { SoftwareEntry } from '../../../../../types/common'
+import React, { useEffect, useMemo } from 'react'
 import { Typography, Divider, Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../../../store/store'
+import { getJiraIssues } from '../../../store/thunks/software'
+import { SoftwareEntry } from '../../../../../types/common'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
 interface TicketsWidgetProps {
   software: SoftwareEntry
 }
 
 const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
+  const { softwareIssues, loading } = useSelector((state: RootState) => state.software)
 
-  const { version, bara_version, details, is_current, name } = software
-  const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description, releaseNotesUrl } =
-    details || {}
+  useEffect(() => {
+    if (software?.winget_id) {
+      dispatch(getJiraIssues(software.winget_id))
+    }
+  }, [software, dispatch])
+
+  const issues = useMemo(() => {
+    return software.id ? (softwareIssues[software.id] ?? []) : []
+  }, [softwareIssues, software])
+
+  const columns: GridColDef[] = [
+    {
+      field: 'jira_key',
+      headerName: 'Jira Key',
+      flex: 1,
+      renderCell: params => {
+        const key = params.row.jira_key
+        return (
+          <a href={`https://jira.med.tu-dresden.de/browse/${key}`} target="_blank" rel="noreferrer">
+            {key}
+          </a>
+        )
+      },
+    },
+    { field: 'priority', headerName: 'Priorität', width: 120 },
+    {
+      field: 'createdAt',
+      headerName: 'Erstellt am',
+      width: 180,
+      renderCell: params => new Date(params.row.createdAt).toLocaleString('de-DE'),
+    },
+  ]
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
@@ -23,7 +56,17 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Divider sx={{ mb: 2 }} />
+        <div style={{ height: 300, width: '100%' }}>
+          <DataGrid
+            rows={issues}
+            columns={columns}
+            loading={loading}
+            getRowId={row => row.id}
+            sx={{ border: 'none' }}
+            disableRowSelectionOnClick
+            autoPageSize
+          />
+        </div>
       </AccordionDetails>
     </Accordion>
   )

@@ -24,61 +24,15 @@ class SoftwareController {
     this.softwareVersionChecker = softwareVersionChecker
   }
 
+  //
+  // CRUD
+  //
+
   public getSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const findAllSoftwareData: Software[] = await this.softwareService.findAllSoftware()
 
       res.status(200).json({ data: findAllSoftwareData, message: 'findAll' })
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  public getSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const websiteId = req.params.id
-      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
-      const representatives: SoftwareRepresentative[] = await findOne.getRepresentatives()
-
-      res.status(200).json({ data: representatives, message: 'findAll' })
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  public getSoftwareJiraIssues = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const websiteId = req.params.id
-      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
-      const issues: IssueModel[] = await findOne.getIssues()
-
-      res.status(200).json({ data: issues, message: 'findAll' })
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  public setSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const softwareId = req.params.id
-      const representativeIds = req.body // Expects an array of user IDs
-
-      // Validate representative IDs
-      if (!Array.isArray(representativeIds) || representativeIds.some(id => typeof id !== 'number')) {
-        return res.status(400).json({ message: 'Invalid representative IDs' })
-      }
-
-      // Find the software entry by ID
-      const software: SoftwareModel = await this.softwareService.findSoftwareById(softwareId)
-
-      if (!software) {
-        return res.status(404).json({ message: 'Software not found' })
-      }
-
-      // Update representatives (assumes representativeIds is an array of user IDs)
-      await software.setRepresentatives(representativeIds)
-
-      res.status(200).json({ message: 'Representatives updated successfully' })
     } catch (error) {
       next(error)
     }
@@ -129,6 +83,79 @@ class SoftwareController {
     }
   }
 
+  public deleteSoftware = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const wingetId = req.params.id
+      const deleteSoftwareData: Software = await this.softwareService.deleteSoftware(wingetId)
+
+      res.status(200).json({ data: deleteSoftwareData, message: 'deleted' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  //
+  // Jira Issues
+  //
+
+  public getSoftwareJiraIssues = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = req.params.id
+      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
+      const issues: IssueModel[] = await findOne.getIssues()
+
+      res.status(200).json({ data: issues, message: 'findAll' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  //
+  // Representatives
+  //
+
+  public getSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const websiteId = req.params.id
+      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
+      const representatives: SoftwareRepresentative[] = await findOne.getRepresentatives()
+
+      res.status(200).json({ data: representatives, message: 'findAll' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  public setSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const softwareId = req.params.id
+      const representativeIds = req.body // Expects an array of user IDs
+
+      // Validate representative IDs
+      if (!Array.isArray(representativeIds) || representativeIds.some(id => typeof id !== 'number')) {
+        return res.status(400).json({ message: 'Invalid representative IDs' })
+      }
+
+      // Find the software entry by ID
+      const software: SoftwareModel = await this.softwareService.findSoftwareById(softwareId)
+
+      if (!software) {
+        return res.status(404).json({ message: 'Software not found' })
+      }
+
+      // Update representatives (assumes representativeIds is an array of user IDs)
+      await software.setRepresentatives(representativeIds)
+
+      res.status(200).json({ message: 'Representatives updated successfully' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  //
+  // WinGet
+  //
+
   public createWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const softwareData: CreateSoftwareDto = req.body
@@ -151,17 +178,6 @@ class SoftwareController {
       }
 
       res.status(201).json({ data: createSoftwareData, message: 'created' })
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  public deleteSoftware = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const wingetId = req.params.id
-      const deleteSoftwareData: Software = await this.softwareService.deleteSoftware(wingetId)
-
-      res.status(200).json({ data: deleteSoftwareData, message: 'deleted' })
     } catch (error) {
       next(error)
     }
