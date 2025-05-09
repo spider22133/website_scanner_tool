@@ -2,7 +2,6 @@ import { Box, IconButton, Stack, TextField, Autocomplete, Typography, InputAdorn
 import { createSoftware, queryWinGetSoftware } from '../../store/thunks/software.thunk'
 import { useState, useMemo } from 'react'
 import { RootState, useAppDispatch } from '../../store/store'
-import { RootState, useAppDispatch } from '../../store/store'
 import { useSelector } from 'react-redux'
 import { SoftwareEntry } from '../../../../types/common'
 import { debounce } from 'lodash'
