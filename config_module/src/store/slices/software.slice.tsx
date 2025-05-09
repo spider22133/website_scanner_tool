@@ -99,7 +99,6 @@ const softwareSlice = createSlice({
 
       .addCase(createSoftware.pending, (state, {}) => {
         state.createSoftwareLoading = true
-        console.log('pending')
       })
       .addCase(createSoftware.fulfilled, (state, { payload }) => {
         state.software.unshift({

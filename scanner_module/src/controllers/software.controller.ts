@@ -28,6 +28,10 @@ class SoftwareController {
   // CRUD
   //
 
+  //
+  // CRUD
+  //
+
   public getSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const findAllSoftwareData: Software[] = await this.softwareService.findAllSoftware()
