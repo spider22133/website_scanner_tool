@@ -1,7 +1,7 @@
-import { BaseCurlApi, BaseCurlApiConfig } from '../abstract/BaseCurlApi'
+import { BaseRequestApi, BaseCurlApiConfig } from '../abstract/BaseRequestApi'
 import { JiraIssuePayload } from '@/types/jira'
 
-export class JiraApi extends BaseCurlApi {
+export class JiraApi extends BaseRequestApi {
   constructor(config: BaseCurlApiConfig) {
     super(config)
     this.baseUrl += '/rest/api/2'

@@ -1,12 +1,16 @@
 import { logger } from '@/utils/logger'
 import Framework from 'webex-node-bot-framework'
+import { BaseRequestApi, BaseCurlApiConfig } from '../abstract/BaseRequestApi'
+import axios from 'axios'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 
-class WebexBot {
+class WebexBot extends BaseRequestApi {
   private framework: Framework
   public isInitialized = false
 
-  constructor(token: string) {
-    this.framework = new Framework({ token })
+  constructor(config: BaseCurlApiConfig) {
+    super(config)
+    this.framework = new Framework({ token: this.token })
   }
 
   public async initialize(): Promise<void> {
@@ -39,6 +43,18 @@ class WebexBot {
     this.framework.bots.forEach(bot => {
       if (bot.room.id === roomId) bot.say(message)
     })
+  }
+
+  /**
+   * Sends raw markdown directly via Webex REST API.
+   * Supports ASCII tables, code blocks, etc.
+   */
+  public async sendRawMarkdown(roomId: string, markdown: string): Promise<void> {
+    try {
+      await this.sendRequest('/messages', 'POST', { roomId, markdown })
+    } catch (error) {
+      logger.error('❌ Unknown error:', error)
+    }
   }
 
   public async stop(): Promise<void> {

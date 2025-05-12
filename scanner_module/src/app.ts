@@ -63,7 +63,10 @@ class App {
 
     // Webex Bot Initialization (Only if token is provided)
     if (process.env.WEBEX_BOT_TOKEN) {
-      this.webexBot = new WebexBot(process.env.WEBEX_BOT_TOKEN)
+      this.webexBot = new WebexBot({
+        baseUrl: process.env.WEBEX_URL,
+        token: process.env.WEBEX_BOT_TOKEN,
+      })
     }
 
     this.handleShutdown()

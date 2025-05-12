@@ -12,11 +12,11 @@ import { BaramundiSearch, OrgUnitType, SoftwareType } from '@/types/baramundi'
 import { logger } from '@/utils/logger'
 import fs from 'fs'
 import path from 'path'
-import { BaseCurlApi, BaseCurlApiConfig } from '../abstract/BaseCurlApi'
+import { BaseRequestApi, BaseCurlApiConfig } from '../abstract/BaseRequestApi'
 
 const execPromise = util.promisify(exec) // Promisify exec for async/await
 
-export class BaramundiApi extends BaseCurlApi {
+export class BaramundiApi extends BaseRequestApi {
   constructor(config: BaseCurlApiConfig) {
     super(config)
   }

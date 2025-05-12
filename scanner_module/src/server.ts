@@ -47,6 +47,6 @@ app.io.on('connection', socket => {
 })
 
 // Webex Bot initialization
-app.webexBot.initialize().then(() => {
+app.webexBot.initialize().then(async () => {
   logger.info('📢 Bot is ready to send messages.')
 })

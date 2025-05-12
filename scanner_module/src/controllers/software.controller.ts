@@ -13,7 +13,6 @@ import multer from 'multer'
 import HttpException from '@/exceptions/HttpException'
 import fs from 'fs'
 import path from 'path'
-import { IssueModel } from '@/models/issue.model'
 
 class SoftwareController {
   public softwareVersionChecker: SoftwareVersionChecker
@@ -23,10 +22,6 @@ class SoftwareController {
   constructor(softwareVersionChecker: SoftwareVersionChecker) {
     this.softwareVersionChecker = softwareVersionChecker
   }
-
-  //
-  // CRUD
-  //
 
   //
   // CRUD
