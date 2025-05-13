@@ -24,6 +24,8 @@ import { SoftwareEntry } from '../../../../../types/common'
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { PRIORITY_MAP } from '../../../helpers/issue-priority-mapper'
 import { createIssue, getJiraIssues } from '../../../store/thunks/issues.thunk'
+import MailIcon from '@mui/icons-material/Mail'
+import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 
 interface TicketsWidgetProps {
   software: SoftwareEntry
@@ -31,9 +33,11 @@ interface TicketsWidgetProps {
 
 const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
   const dispatch = useDispatch<AppDispatch>()
+
   const [selectedPriority, setSelectedPriority] = useState<string>('3')
+  const [autoCreateSubscribed, setAutoCreateSubscribed] = useState(false)
+
   const { softwareIssues, createIssueLoading } = useSelector((state: RootState) => state.issues)
-  console.log(softwareIssues)
 
   useEffect(() => {
     if (software?.winget_id) {
@@ -81,6 +85,10 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
     if (software?.winget_id) {
       dispatch(createIssue({ winget_id: software.winget_id, priority: selectedPriority }))
     }
+  }
+
+  const handleAutoUpdateSubscription = () => {
+    setAutoCreateSubscribed(!autoCreateSubscribed)
   }
 
   const renderPriority = (priorityId: string, isSkeleton: boolean) => {
@@ -211,9 +219,19 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
             </Button>
           </Stack>
 
-          <IconButton aria-label="Aktualisieren" onClick={handleRefresh} sx={{ height: 40, width: 40 }} title="Aktualisieren">
-            <RefreshIcon />
-          </IconButton>
+          <Stack direction="row" spacing={1}>
+            <IconButton onClick={handleRefresh} sx={{ height: 46, width: 46 }} title="Aktualisieren">
+              <RefreshIcon />
+            </IconButton>
+
+            <IconButton
+              onClick={handleAutoUpdateSubscription}
+              sx={{ height: 46, width: 46 }}
+              title={`Jira-Ticket-Erstellung${autoCreateSubscribed ? ' nicht mehr' : ''} abonnieren`}
+            >
+              {autoCreateSubscribed ? <MarkEmailReadIcon /> : <MailIcon />}
+            </IconButton>
+          </Stack>
         </Stack>
 
         <Divider sx={{ mb: 2 }} />

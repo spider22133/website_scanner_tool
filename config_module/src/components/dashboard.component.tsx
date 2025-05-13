@@ -16,6 +16,10 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import { retrieveUsers } from '../store/slices/user.slice'
 import SoftwareUpdateStepper from './software/tabs/software-update-steps-layout'
 
+export interface PackageDetailsProps {
+  software?: SoftwareEntry
+}
+
 const DashboardComponent: React.FC = () => {
   const ENDPOINT = 'http://localhost:3001/'
   const itemsPerPage = 20
@@ -74,7 +78,7 @@ const DashboardComponent: React.FC = () => {
       tabType: 'CREATE_BDS',
       tabIcon: <FlipOutlinedIcon />,
       tabLabel: 'Software paketieren',
-      tabContent: () => <SoftwareUpdateStepper />,
+      tabContent: () => <SoftwareUpdateStepper software={softwareFilteredList[currentIndex]} />,
     },
     {
       tabType: 'STATUS_REPORTS',

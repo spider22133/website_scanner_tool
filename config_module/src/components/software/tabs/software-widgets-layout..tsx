@@ -8,10 +8,7 @@ import { Alert, AlertTitle, Box, CircularProgress, Grid, Paper, Stack, Typograph
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import { reorder } from '../../utilities/ReorderDnD'
-
-interface PackageDetailsProps {
-  software?: SoftwareEntry
-}
+import { PackageDetailsProps } from '../../dashboard.component'
 
 interface WidgetItem {
   id: string

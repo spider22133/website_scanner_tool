@@ -8,7 +8,7 @@ import { Software } from '@interfaces/software.interface'
 import { WingetUtils } from '@/classes/api/WingetApi'
 import { logger } from '@/utils/logger'
 import { SoftwareModel } from '@/models/software.model'
-import { SoftwareRepresentative } from '@/models/software_representative.model'
+import { SoftwareUser } from '@/models/software_user.model'
 import multer from 'multer'
 import HttpException from '@/exceptions/HttpException'
 import fs from 'fs'
@@ -94,42 +94,47 @@ class SoftwareController {
   }
 
   //
-  // Representatives
+  // users
   //
 
-  public getSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
+  public getSoftwareUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteId = req.params.id
-      const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
-      const representatives: SoftwareRepresentative[] = await findOne.getRepresentatives()
+      const software: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
 
-      res.status(200).json({ data: representatives, message: 'findAll' })
+      const users = await software.getUsers({
+        joinTableAttributes: ['subscribeIssueCreate', 'isPrimaryResponsible', 'isRepresentative'],
+      })
+
+      res.status(200).json({ data: users, message: 'findAll' })
     } catch (error) {
       next(error)
     }
   }
 
-  public setSoftwareRepresentatives = async (req: Request, res: Response, next: NextFunction) => {
+  public setSoftwareUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const softwareId = req.params.id
-      const representativeIds = req.body // Expects an array of user IDs
+      const userIds = req.body // Expects an array of user IDs
 
-      // Validate representative IDs
-      if (!Array.isArray(representativeIds) || representativeIds.some(id => typeof id !== 'number')) {
-        return res.status(400).json({ message: 'Invalid representative IDs' })
+      // Validate user IDs
+      if (!Array.isArray(userIds) || userIds.some(id => typeof id !== 'number')) {
+        return res.status(400).json({ message: 'Invalid user IDs' })
       }
 
       // Find the software entry by ID
       const software: SoftwareModel = await this.softwareService.findSoftwareById(softwareId)
+      console.log(software)
 
       if (!software) {
         return res.status(404).json({ message: 'Software not found' })
       }
 
-      // Update representatives (assumes representativeIds is an array of user IDs)
-      await software.setRepresentatives(representativeIds)
+      // Update users (assumes userIds is an array of user IDs)
+      const result = await software.setUsers(userIds)
+      console.log(result)
 
-      res.status(200).json({ message: 'Representatives updated successfully' })
+      res.status(200).json({ message: 'users updated successfully' })
     } catch (error) {
       next(error)
     }

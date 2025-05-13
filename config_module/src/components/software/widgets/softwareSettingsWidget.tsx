@@ -6,7 +6,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, Ch
 import SaveIcon from '@mui/icons-material/SaveOutlined'
 import { RootState, useAppDispatch } from '../../../store/store'
 import { useSelector } from 'react-redux'
-import { fetchSoftwareRepresentatives, updateSoftware, updateSoftwareRepresentatives, uploadSoftwareIcon } from '../../../store/thunks/software.thunk'
+import { fetchSoftwareUsers, updateSoftware, updateSoftwareUsers, uploadSoftwareIcon } from '../../../store/thunks/software.thunk'
 import IUser from '../../../interfaces/user.interface'
 import { SoftwareEntry } from '../../../../../types/common'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -64,7 +64,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   const iconFiles = watch('icon')
 
   useEffect(() => {
-    dispatch(fetchSoftwareRepresentatives(software.winget_id))
+    dispatch(fetchSoftwareUsers(software.winget_id))
   }, [software, dispatch])
 
   useEffect(() => {
@@ -113,7 +113,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
     if (mainRepresentatives && mainRepresentatives.length > 0) {
       dispatch(
-        updateSoftwareRepresentatives({
+        updateSoftwareUsers({
           id: software.winget_id,
           data: mainRepresentatives.map(user => user.id || 0),
         }),

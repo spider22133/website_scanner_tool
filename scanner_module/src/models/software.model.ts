@@ -15,7 +15,7 @@ import {
 import { Software } from '@/interfaces/software.interface'
 import { SoftwareVersionModel } from './software_version.model'
 import { UserModel } from './user.model'
-import { SoftwareRepresentative } from './software_representative.model'
+import { SoftwareUser } from './software_user.model'
 import { IssueModel } from './issue.model'
 
 export type SoftwareCreationAttributes = Optional<Software, 'id' | 'name' | 'source' | 'icon'>
@@ -50,8 +50,8 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public getUser!: BelongsToGetAssociationMixin<UserModel>
   public setUser!: BelongsToSetAssociationMixin<UserModel, number>
 
-  public getRepresentatives!: BelongsToManyGetAssociationsMixin<SoftwareRepresentative>
-  public setRepresentatives!: BelongsToManySetAssociationsMixin<SoftwareRepresentative, number>
+  public getUsers!: BelongsToManyGetAssociationsMixin<SoftwareUser>
+  public setUsers!: BelongsToManySetAssociationsMixin<SoftwareUser, number>
 
   public async getLastVersion(): Promise<SoftwareVersionModel | null> {
     const versions = await this.getVersions({
@@ -65,7 +65,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public static associations: {
     versions: Association<SoftwareModel, SoftwareVersionModel>
     user: Association<SoftwareModel, UserModel>
-    representatives: Association<SoftwareModel, SoftwareRepresentative>
+    users: Association<SoftwareModel, SoftwareUser>
     issues: Association<SoftwareModel, IssueModel>
   }
 }

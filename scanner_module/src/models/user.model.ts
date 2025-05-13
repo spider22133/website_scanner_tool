@@ -17,6 +17,7 @@ import {
 import { User } from '@/interfaces/user.interface'
 import { RoleModel } from './role.model'
 import { SoftwareModel } from './software.model'
+import { SoftwareUser } from './software_user.model'
 
 export type UserCreationAttributes = Optional<User, 'id'>
 
@@ -26,6 +27,10 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public lastName: string
   public userName: string
   public email: string
+
+  // public subscribeIssueCreate!: boolean
+  // public isPrimaryResponsible!: boolean
+  // public isRepresentative!: boolean
 
   // inclusions
   public roles?: NonAttribute<RoleModel[]>

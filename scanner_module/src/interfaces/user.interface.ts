@@ -4,4 +4,7 @@ export interface User {
   lastName: string
   userName: string
   email: string
+  // subscribeIssueCreate?: boolean
+  // isPrimaryResponsible?: boolean
+  // isRepresentative?: boolean
 }

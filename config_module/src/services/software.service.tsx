@@ -6,8 +6,8 @@ const SoftwareDataService = {
   getById: (id: string) => http.get(`/software/${id}`),
   checkStatus: (id: string) => http.get(`/software/${id}/check`),
 
-  getRepresentatives: (id: string) => http.get(`/software/${id}/representatives`),
-  setRepresentatives: (id: string, data: number[]) => http.post(`/software/${id}/representatives`, data),
+  getUsers: (id: string) => http.get(`/software/${id}/users`),
+  setUsers: (id: string, data: number[]) => http.post(`/software/${id}/users`, data),
 
   update: (data: SoftwareEntry) => http.put(`/software/${data.winget_id}`, { ...data }),
   create: (data: SoftwareEntry) => http.post('/software/create', data),

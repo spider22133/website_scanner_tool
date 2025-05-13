@@ -39,8 +39,8 @@ class SoftwareRoute implements Route {
     this.router.get(`${this.path}/:id/check`, authMiddleware, this.softwareController.checkSoftware)
 
     // Representative management
-    this.router.get(`${this.path}/:id/representatives`, authMiddleware, this.softwareController.getSoftwareRepresentatives)
-    this.router.post(`${this.path}/:id/representatives`, authMiddleware, this.softwareController.setSoftwareRepresentatives)
+    this.router.get(`${this.path}/:id/users`, authMiddleware, this.softwareController.getSoftwareUsers)
+    this.router.post(`${this.path}/:id/users`, authMiddleware, this.softwareController.setSoftwareUsers)
 
     // Software modification routes
     this.router.post(

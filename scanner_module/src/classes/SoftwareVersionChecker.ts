@@ -65,7 +65,7 @@ class SoftwareVersionChecker {
       }
 
       // Single check should also send notification, if baramundi version is to be updated.
-      single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV))
+      // single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV))
 
       // Reload Jira ssues data
       await this.jiraService.reloadJiraIssuesForSoftware(software)

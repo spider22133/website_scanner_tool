@@ -13,6 +13,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 import 'react-xml-editor/css/xonomy.css'
 import StepCreateBds from '../steps/createBds'
+import { SoftwareEntry } from '../../../../../types/common'
+import { PackageDetailsProps } from '../../dashboard.component'
 
 const CustomConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -75,10 +77,10 @@ function StepJobsAnpassen() {
   return <Paper sx={{ p: 2 }}>Jobs & Gruppen anpassen Inhalt</Paper>
 }
 
-const renderStepContent = (step: number) => {
+const renderStepContent = (step: number, software?: SoftwareEntry) => {
   switch (step) {
     case 0:
-      return <StepCreateBds />
+      return <StepCreateBds software={software} />
     case 1:
       return <StepPaketHerunterladen />
     case 2:
@@ -90,7 +92,7 @@ const renderStepContent = (step: number) => {
   }
 }
 
-export default function SoftwareUpdateStepper() {
+const SoftwareUpdateStepper: React.FC<PackageDetailsProps> = ({ software }) => {
   const [activeStep, setActiveStep] = React.useState(0)
 
   const handleNext = () => setActiveStep(prev => prev + 1)
@@ -118,7 +120,7 @@ export default function SoftwareUpdateStepper() {
         </>
       ) : (
         <>
-          {renderStepContent(activeStep)}
+          {renderStepContent(activeStep, software)}
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Button onClick={handleBack} startIcon={<ArrowBackIcon />} disabled={activeStep === 0}>
               Zurück
@@ -133,3 +135,5 @@ export default function SoftwareUpdateStepper() {
     </Stack>
   )
 }
+
+export default SoftwareUpdateStepper

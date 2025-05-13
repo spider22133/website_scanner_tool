@@ -3,6 +3,9 @@ import { Box, Stack } from '@mui/system'
 import * as React from 'react'
 import { Util, XmlEditor } from 'react-xml-editor'
 import { DocSpec } from 'react-xml-editor/lib/src/types'
+import { RootState } from '../../../store/store'
+import { PackageDetailsProps } from '../../dashboard.component'
+import _ from 'lodash'
 
 const docSpec: DocSpec = {
   elements: {
@@ -81,28 +84,27 @@ const docSpec: DocSpec = {
 
 const steps = [
   {
-    label: 'Select campaign settings',
-    description: `For each ad campaign that you create, you can control how much
-                you're willing to spend on clicks and conversions, which networks
-                and geographical locations you want your ads to show on, and more.`,
+    label: 'Paket herunterladen',
+    description: <React.Fragment />,
   },
   {
-    label: 'Create an ad group',
-    description: 'An ad group contains one or more ads which target a shared set of keywords.',
+    label: 'BDS-Dateipfad auswählen',
+    description: <React.Fragment />,
   },
   {
-    label: 'Create an ad',
-    description: `Try out different ad text to see what brings in the most customers,
-                and learn how to enhance your ads using features like ad extensions.
-                If you run into any problems with your ads, find out how to tell if
-                they're running and how to resolve approval issues.`,
+    label: 'BDS anpassen',
+    description: <React.Fragment />,
+  },
+  {
+    label: 'BDS erstellen',
+    description: <React.Fragment />,
   },
 ]
 
 const xml = '<DATA><VARNAME>VersionAktuell</VARNAME><VALUE>4.4.0</VALUE><OPTIONS>0</OPTIONS></DATA>'
 
 // Step content components
-const StepCreateBds: React.FC = () => {
+const StepCreateBds: React.FC<PackageDetailsProps> = ({ software }) => {
   const ref = React.useRef<XmlEditor | null>(null)
   const dip = '\\\\med.tu-dresden.de\\app\\bara\\rep\\BaraProd\\APPS'
 
@@ -133,7 +135,7 @@ const StepCreateBds: React.FC = () => {
             flexGrow: 1,
             input: { fontFamily: 'monospace' },
           }}
-          value="\Blender Foundation\Blender\4.4.0\Installation_Blender.bds"
+          value={`\\#Generated\\${software?.winget_id}\\${software?.version}\\Installation_${software?.name.replace(' ', '_')}.bds`}
         />
       </Stack>
       <Box sx={{ maxWidth: 400 }}>
@@ -142,7 +144,7 @@ const StepCreateBds: React.FC = () => {
             <Step key={step.label}>
               <StepLabel optional={index === steps.length - 1 ? <Typography variant="caption">Last step</Typography> : null}>{step.label}</StepLabel>
               <StepContent>
-                <Typography>{step.description}</Typography>
+                <Box>{step.description}</Box>
                 <Box sx={{ mb: 2 }}>
                   <Button variant="contained" onClick={handleNext} sx={{ mt: 1, mr: 1 }}>
                     {index === steps.length - 1 ? 'Finish' : 'Continue'}

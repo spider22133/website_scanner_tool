@@ -6,7 +6,7 @@ import { UserModel, default as initUserModel } from '@models/user.model'
 import { RoleModel, default as initRoleModel } from '@models/role.model'
 import { SoftwareModel, default as initSoftwareModel } from '@models/software.model'
 import { SoftwareVersionModel, default as initSoftwareVersionModel } from '@models/software_version.model'
-import { SoftwareRepresentative, default as initSoftwareRepresentativeModel } from '@models/software_representative.model'
+import { SoftwareUser, default as initSoftwareRepresentativeModel } from '@/models/software_user.model'
 import { IssueModel, default as initIssueModel } from '@models/issue.model'
 
 const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig')
@@ -87,19 +87,17 @@ function initAssociations() {
     foreignKey: 'user_id',
   })
 
-  // Representatives for Software
   SoftwareModel.belongsToMany(UserModel, {
-    through: SoftwareRepresentative,
-    foreignKey: 'software_id',
-    otherKey: 'user_id',
-    as: 'representatives',
+    through: SoftwareUser,
+    foreignKey: 'softwareId',
+    otherKey: 'userId',
+    as: 'users',
   })
 
   UserModel.belongsToMany(SoftwareModel, {
-    through: SoftwareRepresentative,
-    foreignKey: 'user_id',
-    otherKey: 'software_id',
-    as: 'representedSoftware',
+    through: SoftwareUser,
+    foreignKey: 'userId',
+    otherKey: 'softwareId',
   })
 
   UserModel.belongsToMany(RoleModel, {

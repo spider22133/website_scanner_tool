@@ -137,9 +137,9 @@ export const queryWinGetSoftware = createAsyncThunk<
   }
 })
 
-export const fetchSoftwareRepresentatives = createAsyncThunk('softwareRepresentatives/fetch', async (id: string, { rejectWithValue }) => {
+export const fetchSoftwareUsers = createAsyncThunk('softwareUsers/fetch', async (id: string, { rejectWithValue }) => {
   try {
-    const response = await SoftwareDataService.getRepresentatives(id)
+    const response = await SoftwareDataService.getUsers(id)
     return response.data.data
   } catch (error: any) {
     return rejectWithValue(error.message)
@@ -147,11 +147,11 @@ export const fetchSoftwareRepresentatives = createAsyncThunk('softwareRepresenta
 })
 
 // Async thunk to set software representatives
-export const updateSoftwareRepresentatives = createAsyncThunk(
-  'softwareRepresentatives/update',
+export const updateSoftwareUsers = createAsyncThunk(
+  'softwareUsers/update',
   async ({ id, data }: { id: string; data: number[] }, { rejectWithValue }) => {
     try {
-      await SoftwareDataService.setRepresentatives(id, data)
+      await SoftwareDataService.setUsers(id, data)
       return data
     } catch (error: any) {
       return rejectWithValue(error.message)

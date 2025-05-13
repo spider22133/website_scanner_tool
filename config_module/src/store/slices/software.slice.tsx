@@ -7,8 +7,8 @@ import {
   queryWinGetSoftware,
   createSoftware,
   deleteSoftware,
-  fetchSoftwareRepresentatives,
-  updateSoftwareRepresentatives,
+  fetchSoftwareUsers,
+  updateSoftwareUsers,
   uploadSoftwareIcon,
 } from '../thunks/software.thunk'
 
@@ -118,25 +118,25 @@ const softwareSlice = createSlice({
       })
 
       // Fetch representatives
-      .addCase(fetchSoftwareRepresentatives.pending, state => {
+      .addCase(fetchSoftwareUsers.pending, state => {
         state.loading = true
       })
-      .addCase(fetchSoftwareRepresentatives.fulfilled, (state, action: PayloadAction<IRepresentative[]>) => {
+      .addCase(fetchSoftwareUsers.fulfilled, (state, action: PayloadAction<IRepresentative[]>) => {
         state.representatives = action.payload
         state.loading = false
       })
-      .addCase(fetchSoftwareRepresentatives.rejected, state => {
+      .addCase(fetchSoftwareUsers.rejected, state => {
         state.loading = false
       })
 
       // Update representatives
-      .addCase(updateSoftwareRepresentatives.pending, state => {
+      .addCase(updateSoftwareUsers.pending, state => {
         state.loading = true
       })
-      .addCase(updateSoftwareRepresentatives.fulfilled, state => {
+      .addCase(updateSoftwareUsers.fulfilled, state => {
         state.loading = false
       })
-      .addCase(updateSoftwareRepresentatives.rejected, state => {
+      .addCase(updateSoftwareUsers.rejected, state => {
         state.loading = false
       })
 
