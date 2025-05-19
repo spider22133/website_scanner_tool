@@ -34,7 +34,11 @@ const DashboardComponent: React.FC = () => {
     dispatch(fetchAllSoftware())
     dispatch(retrieveUsers())
 
-    const socket = socketIOClient(ENDPOINT)
+    const socket = socketIOClient(ENDPOINT, {
+      reconnectionAttempts: 5,
+      reconnectionDelay: 5000,
+      autoConnect: true,
+    })
     socket.on('updateSoftware', (data: any) => {
       if (data === 'changed') dispatch(fetchAllSoftware())
     })

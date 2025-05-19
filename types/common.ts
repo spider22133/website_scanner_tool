@@ -29,7 +29,7 @@ export interface WingetPackageDetails {
 }
 
 export interface SoftwareEntry {
-  id?: number;
+  id: string;
   name: string;
   winget_id: string;
   user_id?: number;

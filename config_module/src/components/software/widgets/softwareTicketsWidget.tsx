@@ -94,7 +94,7 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
   }
 
   const handleAutoUpdateSubscription = () => {
-    const { id, updatedAt, createdAt, details, versions, users, ...rest } = software
+    const { updatedAt, createdAt, details, versions, users, ...rest } = software
     dispatch(
       updateSoftware({
         ...rest,

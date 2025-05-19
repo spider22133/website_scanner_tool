@@ -6,15 +6,10 @@
 // const endpoint = '/bConnect/v1.1/Applications?orgUnit=E9E642B7-35C4-4F3B-9766-22AC2CC1AC4E'
 // const endpoint = '/bConnect/v1.1/Applications?id=B3AFF2C5-2C2F-4DF5-895E-078AA929B972'
 
-import util from 'util'
-import { exec } from 'child_process'
 import { BaramundiSearch, OrgUnitType, SoftwareType } from '@/types/baramundi'
 import { logger } from '@/utils/logger'
-import fs from 'fs'
-import path from 'path'
-import { BaseRequestApi, BaseCurlApiConfig } from '../abstract/BaseRequestApi'
 
-const execPromise = util.promisify(exec) // Promisify exec for async/await
+import { BaseRequestApi, BaseCurlApiConfig } from '../abstract/BaseRequestApi'
 
 export class BaramundiApi extends BaseRequestApi {
   constructor(config: BaseCurlApiConfig) {
@@ -34,31 +29,5 @@ export class BaramundiApi extends BaseRequestApi {
   public async getOrgUnitById(id: string): Promise<OrgUnitType> {
     const endpoint = `/bConnect/v1.1/OrgUnits?id=${id}`
     return await this.sendRequest(endpoint, 'GET')
-  }
-
-  public async downloadSoftwareScanRuleCountsXmlToFile(filename = 'software-scan-rule-counts.xml'): Promise<string | null> {
-    const endpoint = `/bConnect/v1.1/softwarescanrulecounts.xml`
-    const url = `${this.baseUrl}${endpoint}`
-    const filePath = path.resolve('downloads', filename)
-
-    // Sicherstellen, dass das downloads-Verzeichnis existiert
-    const dir = path.dirname(filePath)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
-    }
-
-    const curlCommand = `curl -v -k -u "${this.username}:${this.password}" -X GET "${url}" -o "${filePath}"`
-
-    try {
-      const { stdout, stderr } = await execPromise(curlCommand)
-      logger.info(`✅ XML file saved to ${filePath}`)
-      return filePath
-    } catch (error) {
-      logger.error('❌ Error downloading XML file:', error.message)
-      if (error.stderr) {
-        logger.error('curl stderr:', error.stderr)
-      }
-      return null
-    }
   }
 }

@@ -48,7 +48,7 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
 
   const handleToggleVisibility = useCallback(() => {
     const { id, updatedAt, createdAt, details, ...rest } = software
-    dispatch(updateSoftware({ ...rest, is_hidden: !software.is_hidden }))
+    dispatch(updateSoftware({ ...rest, id: software.id, is_hidden: !software.is_hidden }))
   }, [dispatch, software])
 
   const handleDelete = useCallback(

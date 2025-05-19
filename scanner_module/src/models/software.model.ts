@@ -95,6 +95,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       },
       winget_id: {
         type: DataTypes.STRING,
+        allowNull: true,
       },
       version: {
         type: DataTypes.STRING,
@@ -111,6 +112,7 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       },
       details: {
         type: DataTypes.TEXT,
+        allowNull: true,
       },
       subscribeCreateIssue: {
         type: DataTypes.BOOLEAN,
