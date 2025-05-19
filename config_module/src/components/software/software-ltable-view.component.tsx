@@ -15,6 +15,8 @@ import { SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store/store'
 import { checkSoftware, deleteSoftware, updateSoftware } from '../../store/thunks/software.thunk'
 import TimeAgo from 'javascript-time-ago'
+import { isAdminUser } from '../utilities/isAdminUser'
+import { getJiraIssues } from '../../store/thunks/issues.thunk'
 
 interface SoftwareTableProps {
   timeAgo: TimeAgo
@@ -26,10 +28,11 @@ interface SoftwareTableProps {
 const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilteredList, createSoftwareLoading, setActiveWebsite }) => {
   const dispatch = useAppDispatch()
   const { user } = useSelector((state: RootState) => state.auth)
-  const isAdmin = user?.roles?.some(role => role.name === 'admin')
+  const isAdmin = isAdminUser(user?.roles)
 
   const handleCheck = async (id: string) => {
     await dispatch(checkSoftware(id))
+    await dispatch(getJiraIssues({ winget_id: id, reload: true }))
   }
 
   const handleToggleVisibility = (software: SoftwareEntry) => {

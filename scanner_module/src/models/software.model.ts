@@ -24,20 +24,20 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public id: number
   public name: string
   public winget_id: string
-  public user_id: number
   public version: string
   public bara_version: string
   public icon: string
   public source: string
   public details: string
+  public subscribeCreateIssue: boolean
   public is_central_managed: boolean
   public is_hidden: boolean
   public is_current: boolean
 
   // inclusions
-  public user?: NonAttribute<UserModel>
   public versions?: NonAttribute<SoftwareVersionModel[]>
   public issues?: NonAttribute<IssueModel[]>
+  public users?: NonAttribute<SoftwareUser[]>
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -47,10 +47,7 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
   public getVersions!: HasManyGetAssociationsMixin<SoftwareVersionModel>
   public createVersion!: HasManyCreateAssociationMixin<SoftwareVersionModel>
 
-  public getUser!: BelongsToGetAssociationMixin<UserModel>
-  public setUser!: BelongsToSetAssociationMixin<UserModel, number>
-
-  public getUsers!: BelongsToManyGetAssociationsMixin<SoftwareUser>
+  public getUsers!: BelongsToManyGetAssociationsMixin<UserModel>
   public setUsers!: BelongsToManySetAssociationsMixin<SoftwareUser, number>
 
   public async getLastVersion(): Promise<SoftwareVersionModel | null> {
@@ -62,9 +59,24 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
     return versions.length > 0 ? versions[0] : null
   }
 
+  public async getPrimaryResponsible(): Promise<UserModel | null> {
+    const [primaryResponsible] = await this.getUsers({
+      include: [
+        {
+          model: SoftwareUser,
+          as: 'userSettings',
+          where: {
+            isPrimaryResponsible: true,
+          },
+        },
+      ],
+      limit: 1,
+    })
+    return primaryResponsible || null
+  }
+
   public static associations: {
     versions: Association<SoftwareModel, SoftwareVersionModel>
-    user: Association<SoftwareModel, UserModel>
     users: Association<SoftwareModel, SoftwareUser>
     issues: Association<SoftwareModel, IssueModel>
   }
@@ -84,9 +96,6 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       winget_id: {
         type: DataTypes.STRING,
       },
-      user_id: {
-        type: DataTypes.INTEGER,
-      },
       version: {
         type: DataTypes.STRING,
       },
@@ -102,6 +111,10 @@ export default function (sequelize: Sequelize): typeof SoftwareModel {
       },
       details: {
         type: DataTypes.TEXT,
+      },
+      subscribeCreateIssue: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
       },
       is_central_managed: {
         allowNull: false,

@@ -103,7 +103,8 @@ class SoftwareController {
       const software: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
 
       const users = await software.getUsers({
-        joinTableAttributes: ['subscribeIssueCreate', 'isPrimaryResponsible', 'isRepresentative'],
+        attributes: ['id', 'email'],
+        joinTableAttributes: ['isPrimaryResponsible', 'isRepresentative'],
       })
 
       res.status(200).json({ data: users, message: 'findAll' })
@@ -113,30 +114,43 @@ class SoftwareController {
   }
 
   public setSoftwareUsers = async (req: Request, res: Response, next: NextFunction) => {
+    const softwareName = req.params.id // winget_id
+
+    type PayloadItem = {
+      userId: number
+      isPrimaryResponsible: boolean
+      isRepresentative: boolean
+    }
+
+    const items: PayloadItem[] = req.body
+
     try {
-      const softwareId = req.params.id
-      const userIds = req.body // Expects an array of user IDs
-
-      // Validate user IDs
-      if (!Array.isArray(userIds) || userIds.some(id => typeof id !== 'number')) {
-        return res.status(400).json({ message: 'Invalid user IDs' })
-      }
-
-      // Find the software entry by ID
-      const software: SoftwareModel = await this.softwareService.findSoftwareById(softwareId)
-      console.log(software)
+      const software = await this.softwareService.findSoftwareById(softwareName)
 
       if (!software) {
         return res.status(404).json({ message: 'Software not found' })
       }
 
-      // Update users (assumes userIds is an array of user IDs)
-      const result = await software.setUsers(userIds)
-      console.log(result)
+      const softwareId = software.id
 
-      res.status(200).json({ message: 'users updated successfully' })
-    } catch (error) {
-      next(error)
+      // Step 1: Delete old relations
+      await SoftwareUser.destroy({
+        where: { softwareId },
+      })
+
+      // Step 2: Insert new user relations from req.body (not from DB!)
+      const userRecords = items.map(item => ({
+        softwareId,
+        userId: item.userId,
+        isPrimaryResponsible: item.isPrimaryResponsible,
+        isRepresentative: item.isRepresentative,
+      }))
+
+      await SoftwareUser.bulkCreate(userRecords)
+
+      return res.status(200).json({ message: 'Software users updated successfully' })
+    } catch (err) {
+      next(err)
     }
   }
 

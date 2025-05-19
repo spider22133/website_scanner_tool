@@ -19,9 +19,6 @@ export default class CreateSoftwareDto {
   @IsString()
   public icon: string
 
-  @IsNumber()
-  public user_id: number
-
   @IsString()
   public details: string
 
@@ -30,6 +27,9 @@ export default class CreateSoftwareDto {
 
   @IsBoolean()
   public is_current: boolean
+
+  @IsBoolean()
+  public subscribeCreateIssue: boolean
 
   @IsBoolean()
   public is_central_managed: boolean

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { WingetPackageDetails, SoftwareEntry, IRepresentative, IssueAttributes } from '../../../../types/common'
+import { WingetPackageDetails, SoftwareEntry, IRepresentative } from '../../../../types/common'
 import {
   fetchAllSoftware,
   updateSoftware,
@@ -11,12 +11,13 @@ import {
   updateSoftwareUsers,
   uploadSoftwareIcon,
 } from '../thunks/software.thunk'
+import { SoftwareUser } from '../../interfaces/common'
 
 const initialState = {
   softwareSearchList: [] as SoftwareEntry[],
   softwareFilteredList: [] as SoftwareEntry[],
   software: [] as SoftwareEntry[],
-  representatives: [] as IRepresentative[],
+  softwareUsers: [] as IRepresentative[],
   loading: false,
   createSoftwareLoading: false,
 }
@@ -122,7 +123,7 @@ const softwareSlice = createSlice({
         state.loading = true
       })
       .addCase(fetchSoftwareUsers.fulfilled, (state, action: PayloadAction<IRepresentative[]>) => {
-        state.representatives = action.payload
+        state.softwareUsers = action.payload
         state.loading = false
       })
       .addCase(fetchSoftwareUsers.rejected, state => {

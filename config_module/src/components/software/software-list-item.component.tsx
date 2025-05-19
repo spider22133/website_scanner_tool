@@ -15,8 +15,8 @@ import TimeAgo from 'javascript-time-ago'
 import { SoftwareEntry } from '../../../../types/common'
 import { RootState, AppDispatch } from '../../store/store'
 import { checkSoftware, deleteSoftware, updateSoftware } from '../../store/thunks/software.thunk'
-import { Role } from '../../../../scanner_module/dist/scanner_module/src/interfaces/role.interface'
 import { API_URL } from '../../http-connection'
+import { isAdminUser } from '../utilities/isAdminUser'
 
 interface WebsitesListItemProps {
   index: number
@@ -25,8 +25,6 @@ interface WebsitesListItemProps {
   currentIndex: number
   setActiveWebsite: (software: SoftwareEntry, index: number) => void
 }
-
-const isAdminUser = (roles?: Role[]): boolean => roles?.some(role => role.name === 'admin') ?? false
 
 const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, index, currentIndex, setActiveWebsite }) => {
   const theme = useTheme()

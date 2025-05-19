@@ -1,5 +1,6 @@
 import http from '../http-connection'
 import { SoftwareEntry } from '../../../types/common'
+import { SoftwareUser } from '../interfaces/common'
 
 const SoftwareDataService = {
   getAll: () => http.get('/software'),
@@ -7,7 +8,7 @@ const SoftwareDataService = {
   checkStatus: (id: string) => http.get(`/software/${id}/check`),
 
   getUsers: (id: string) => http.get(`/software/${id}/users`),
-  setUsers: (id: string, data: number[]) => http.post(`/software/${id}/users`, data),
+  setUsers: (id: string, data: SoftwareUser[]) => http.post(`/software/${id}/users`, data),
 
   update: (data: SoftwareEntry) => http.put(`/software/${data.winget_id}`, { ...data }),
   create: (data: SoftwareEntry) => http.post('/software/create', data),

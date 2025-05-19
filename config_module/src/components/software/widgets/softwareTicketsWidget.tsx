@@ -26,6 +26,8 @@ import { PRIORITY_MAP } from '../../../helpers/issue-priority-mapper'
 import { createIssue, getJiraIssues } from '../../../store/thunks/issues.thunk'
 import MailIcon from '@mui/icons-material/Mail'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
+import { updateSoftware } from '../../../store/thunks/software.thunk'
+import { isAdminUser } from '../../utilities/isAdminUser'
 
 interface TicketsWidgetProps {
   software: SoftwareEntry
@@ -38,10 +40,14 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
   const [autoCreateSubscribed, setAutoCreateSubscribed] = useState(false)
 
   const { softwareIssues, createIssueLoading } = useSelector((state: RootState) => state.issues)
+  const { user } = useSelector((state: RootState) => state.auth)
+
+  const isAdmin = isAdminUser(user?.roles)
 
   useEffect(() => {
     if (software?.winget_id) {
       dispatch(getJiraIssues({ winget_id: software.winget_id }))
+      setAutoCreateSubscribed(software.subscribeCreateIssue)
     }
   }, [software, dispatch])
 
@@ -88,6 +94,13 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
   }
 
   const handleAutoUpdateSubscription = () => {
+    const { id, updatedAt, createdAt, details, versions, users, ...rest } = software
+    dispatch(
+      updateSoftware({
+        ...rest,
+        subscribeCreateIssue: !autoCreateSubscribed,
+      }),
+    )
     setAutoCreateSubscribed(!autoCreateSubscribed)
   }
 
@@ -224,13 +237,15 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
               <RefreshIcon />
             </IconButton>
 
-            <IconButton
-              onClick={handleAutoUpdateSubscription}
-              sx={{ height: 46, width: 46 }}
-              title={`Jira-Ticket-Erstellung${autoCreateSubscribed ? ' nicht mehr' : ''} abonnieren`}
-            >
-              {autoCreateSubscribed ? <MarkEmailReadIcon /> : <MailIcon />}
-            </IconButton>
+            {!isAdmin && (
+              <IconButton
+                onClick={handleAutoUpdateSubscription}
+                sx={{ height: 46, width: 46 }}
+                title={`Jira-Ticket-Erstellung${autoCreateSubscribed ? ' nicht mehr' : ''} abonnieren`}
+              >
+                {autoCreateSubscribed ? <MarkEmailReadIcon /> : <MailIcon />}
+              </IconButton>
+            )}
           </Stack>
         </Stack>
 

@@ -67,7 +67,7 @@ class SoftwareVersionChecker {
       // Single check should also send notification, if baramundi version is to be updated.
       // single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV))
 
-      // Reload Jira ssues data
+      // Reload Jira issues data
       await this.jiraService.reloadJiraIssuesForSoftware(software)
 
       return { software: updatedSoftware }
@@ -82,14 +82,34 @@ class SoftwareVersionChecker {
    */
   private async updateSoftwareVersion(software: SoftwareModel): Promise<SoftwareModel> {
     let isUpdated = false
+
+    // 1. Validate Winget ID
+    if (!software.winget_id) {
+      throw new Error(`Software ${software.name} does not have a winget_id.`)
+    }
+
+    // 2. Try fetching Winget data (and handle potential failure)
     const packageDetails = await WingetUtils.showSoftware(software.winget_id)
 
-    if (packageDetails.version !== software?.version) {
+    if (!packageDetails || !packageDetails.version) {
+      throw new Error(`No version info found for Winget ID: ${software.winget_id}`)
+    }
+
+    if (packageDetails.version !== software.bara_version) {
+      try {
+        await this.jiraService.createJiraIssueForSoftware(software, '3')
+      } catch (err) {
+        console.error(`Failed to create Jira issue: ${err instanceof Error ? err.message : String(err)}`)
+      }
+    }
+
+    // 3. Check if main version is different
+    if (packageDetails.version !== software.version) {
       isUpdated = true
       return await this.softwareService.updateSoftware(
         software.winget_id,
         {
-          ...software,
+          ...software.get({ plain: true }), // avoid raw Sequelize instance
           version: packageDetails.version,
           is_current: false,
         },
@@ -97,8 +117,9 @@ class SoftwareVersionChecker {
       )
     }
 
+    // 4. Version already matches — update details and mark current
     return await this.softwareService.updateSoftware(software.winget_id, {
-      ...software,
+      ...software.get({ plain: true }),
       details: JSON.stringify(packageDetails),
       is_current: true,
     })

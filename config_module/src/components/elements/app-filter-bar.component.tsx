@@ -2,7 +2,7 @@ import { Box, IconButton, Stack, TextField, Tooltip, InputAdornment, Autocomplet
 import { useState, ChangeEvent, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { updateSoftwareFilteredList } from '../../store/slices/software.slice'
-import { SoftwareEntry } from '../../../../types/common'
+import { IRepresentative, SoftwareEntry } from '../../../../types/common'
 import { RootState, useAppDispatch } from '../../store/store'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
@@ -24,8 +24,10 @@ const optionLabelMap: Record<string, string> = {
 
 const AppFilterBar: React.FC = () => {
   const dispatch = useAppDispatch()
+
   const allSoftwareEntries = useSelector((state: RootState) => state.software.software)
   const { users } = useSelector((state: RootState) => state.users)
+
   const [hasLoadedStorage, setHasLoadedStorage] = useState(false)
   const [filterState, setFilterState] = useState<FilterState>({
     searchTerm: '',
@@ -38,22 +40,40 @@ const AppFilterBar: React.FC = () => {
     dispatch(updateSoftwareFilteredList(filteredSoftware))
   }
 
-  const getFilteredSoftwareList = (filter: FilterState): SoftwareEntry[] => {
-    return allSoftwareEntries.filter(software => {
-      const matchesName = software.name.toLowerCase().includes(filter.searchTerm.toLowerCase())
-      const matchesVisibility = software.is_hidden === filter.showHidden
-      const matchesStatus =
-        filter.status === 'all' ||
-        (filter.status === 'Aktuell' && software.is_current && software.bara_version !== null) ||
-        (filter.status === 'Nicht Aktuell' && !software.is_current && !(software.bara_version === null || software.bara_version === undefined)) ||
-        (filter.status === 'Fehlgeschlagen' && (software.bara_version === null || software.bara_version === undefined)) ||
-        (filter.status === 'EPM Team' && software.is_central_managed) ||
-        (filter.status === 'Nicht EPM Team' && !software.is_central_managed)
+  const isResponsibleUser = (software: SoftwareEntry, responsibleId?: number) =>
+    software.users?.some(user => user.id === responsibleId && user.userSettings.isPrimaryResponsible) ?? false
 
-      const matchesResponsible =
-        filter.responsible === 'all' ||
-        (filter.responsible === 'none' && software.user_id === null) ||
-        (typeof filter.responsible !== 'string' && software.user_id === filter.responsible.id)
+  const hasNoPrimaryResponsible = (software: SoftwareEntry) => !software.users?.some(user => user.userSettings.isPrimaryResponsible)
+
+  const getFilteredSoftwareList = (filter: FilterState): SoftwareEntry[] => {
+    const term = filter.searchTerm.toLowerCase()
+
+    return allSoftwareEntries.filter(software => {
+      const matchesName = software.name.toLowerCase().includes(term)
+      const matchesVisibility = software.is_hidden === filter.showHidden
+
+      const matchesStatus = (() => {
+        switch (filter.status) {
+          case 'Aktuell':
+            return software.is_current && software.bara_version !== null
+          case 'Nicht Aktuell':
+            return !software.is_current && software.bara_version != null
+          case 'Fehlgeschlagen':
+            return software.bara_version == null
+          case 'EPM Team':
+            return software.is_central_managed
+          case 'Nicht EPM Team':
+            return !software.is_central_managed
+          default:
+            return true // 'all'
+        }
+      })()
+
+      const matchesResponsible = (() => {
+        if (filter.responsible === 'all') return true
+        if (filter.responsible === 'none') return hasNoPrimaryResponsible(software)
+        return isResponsibleUser(software, (filter.responsible as IUser).id)
+      })()
 
       return matchesName && matchesVisibility && matchesStatus && matchesResponsible
     })

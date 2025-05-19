@@ -6,6 +6,7 @@ import authMiddleware from '@/middlewares/auth.middleware'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import CreateSoftwareDto from '@dtos/software.dto'
 import fs from 'fs'
+import { SoftwareUsersDto } from '@/dtos/users.dto'
 
 class SoftwareRoute implements Route {
   public path = '/software'

@@ -4,8 +4,10 @@ import CreateSoftwareDto from '@/dtos/software.dto'
 import { isEmpty } from '@/utils/util'
 import HttpException from '@/exceptions/HttpException'
 import { SoftwareModel } from '@/models/software.model'
-import { Op } from 'sequelize'
 import { SoftwareVersionModel } from '@/models/software_version.model'
+import { UserModel } from '@/models/user.model'
+import { SoftwareUser } from '@/models/software_user.model'
+const { Op } = require('sequelize')
 
 class SoftwareService {
   public software = DB.Software
@@ -18,6 +20,16 @@ class SoftwareService {
           model: SoftwareVersionModel,
           as: 'versions',
         },
+        {
+          model: UserModel,
+          as: 'users',
+          through: {
+            model: SoftwareUser,
+            attributes: ['isPrimaryResponsible', 'isRepresentative'],
+            where: { [Op.or]: [{ isPrimaryResponsible: true }, { isRepresentative: true }] },
+          },
+          attributes: ['id', 'email'],
+        },
       ],
     })
   }
@@ -25,7 +37,15 @@ class SoftwareService {
   public async findSoftwareById(softwareId: string): Promise<SoftwareModel> {
     if (isEmpty(softwareId)) throw new HttpException(400, 'Id is wrong')
 
-    const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: softwareId } })
+    const findSoftware: SoftwareModel = await this.software.findOne({
+      where: { winget_id: softwareId },
+      include: [
+        {
+          model: SoftwareVersionModel,
+          as: 'versions',
+        },
+      ],
+    })
 
     if (!findSoftware) throw new HttpException(409, "Software doesn't exist")
 

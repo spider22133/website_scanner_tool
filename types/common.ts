@@ -1,4 +1,5 @@
-import { SoftwareVersionModel } from "@/models/software_version.model";
+import { SoftwareVersion } from "../scanner_module/src/interfaces/software_version.interface";
+import { SoftwareUser } from "../config_module/src/interfaces/common";
 
 export interface InstallerDetails {
   type?: string;
@@ -32,8 +33,9 @@ export interface SoftwareEntry {
   name: string;
   winget_id: string;
   user_id?: number;
+  users?: IRepresentative[];
   version: string;
-  versions?: SoftwareVersionModel[];
+  versions?: SoftwareVersion[];
   bara_version?: string;
   icon?: string;
   source?: string;
@@ -41,6 +43,7 @@ export interface SoftwareEntry {
   is_central_managed?: boolean;
   is_hidden?: boolean;
   is_current?: boolean;
+  subscribeCreateIssue: boolean;
   updatedAt?: string;
   createdAt?: string;
 }
@@ -54,13 +57,12 @@ export interface ISoftwareRepresentative {
 
 export interface IRepresentative {
   id: number;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
-  password: string;
-  createdAt: string;
-  updatedAt: string;
-  SoftwareRepresentative: ISoftwareRepresentative;
+  userSettings: SoftwareUser;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IssueAttributes {

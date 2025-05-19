@@ -14,7 +14,6 @@ class JiraController {
     try {
       const websiteId = req.params.id
       const findOne: SoftwareModel = await this.softwareService.findSoftwareById(websiteId)
-      console.log(req.query.reload)
 
       if (req.query.reload) {
         await this.service.reloadJiraIssuesForSoftware(findOne)
@@ -33,10 +32,7 @@ class JiraController {
       const payload = req.body
       const software = await SoftwareModel.findOne({
         where: { winget_id: payload.winget_id },
-        include: [
-          { model: UserModel, as: 'user' },
-          { model: SoftwareVersionModel, as: 'versions' },
-        ],
+        include: [{ model: SoftwareVersionModel, as: 'versions' }],
       })
 
       if (!software) return res.status(404).json({ error: 'Software not found' })

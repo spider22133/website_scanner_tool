@@ -13,3 +13,5 @@ export class CreateUserDto {
   @IsString()
   public password: string
 }
+
+export class SoftwareUsersDto {}

@@ -109,6 +109,7 @@ h2,
   height: calc(100vh - 92px);
   display: flex;
   flex-direction: column;
+  padding-top: 16px;
 }
 
 .tab-list-wrapper {

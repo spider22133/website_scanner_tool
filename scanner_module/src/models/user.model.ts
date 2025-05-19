@@ -18,6 +18,7 @@ import { User } from '@/interfaces/user.interface'
 import { RoleModel } from './role.model'
 import { SoftwareModel } from './software.model'
 import { SoftwareUser } from './software_user.model'
+import { NextFunction } from 'express'
 
 export type UserCreationAttributes = Optional<User, 'id'>
 
@@ -28,12 +29,9 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public userName: string
   public email: string
 
-  // public subscribeIssueCreate!: boolean
-  // public isPrimaryResponsible!: boolean
-  // public isRepresentative!: boolean
-
   // inclusions
   public roles?: NonAttribute<RoleModel[]>
+  public userSettings?: NonAttribute<SoftwareUser>
 
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
@@ -42,11 +40,6 @@ export class UserModel extends Model<User, UserCreationAttributes> {
   public hasRole!: BelongsToManyHasAssociationMixin<RoleModel, number>
   public setRoles!: BelongsToManySetAssociationsMixin<RoleModel, number>
   public countRoles!: BelongsToManyCountAssociationsMixin
-
-  public getSoftware!: HasManyGetAssociationsMixin<SoftwareModel>
-  public setSoftware!: HasManySetAssociationsMixin<SoftwareModel, number>
-  public removeSoftware!: HasManyRemoveAssociationMixin<SoftwareModel, number>
-  public countSoftware!: HasManyCountAssociationsMixin
 
   public static associations: {
     roles: Association<UserModel, RoleModel>

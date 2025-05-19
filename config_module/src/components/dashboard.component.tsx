@@ -99,7 +99,7 @@ const DashboardComponent: React.FC = () => {
             <SoftwareList software={displayedSoftware} currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
           </Paper>
         </Grid>
-        <Grid className="tabs-container" size={{ xs: 12, lg: 5, xl: 7 }}>
+        <Grid size={{ xs: 12, lg: 5, xl: 7 }}>
           <TabsComponent tabs={tabs} />
         </Grid>
       </Grid>

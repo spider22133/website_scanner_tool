@@ -3,7 +3,6 @@ import { Sequelize, DataTypes, Model } from 'sequelize'
 export interface SoftwareUserAttributes {
   userId: number
   softwareId: number
-  subscribeIssueCreate: boolean
   isPrimaryResponsible: boolean
   isRepresentative: boolean
 }
@@ -11,7 +10,6 @@ export interface SoftwareUserAttributes {
 export class SoftwareUser extends Model<SoftwareUserAttributes> implements SoftwareUserAttributes {
   public userId!: number
   public softwareId!: number
-  public subscribeIssueCreate!: boolean
   public isPrimaryResponsible!: boolean
   public isRepresentative!: boolean
 
@@ -31,10 +29,6 @@ export default function (sequelize: Sequelize): typeof SoftwareUser {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
-      },
-      subscribeIssueCreate: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
       },
       isPrimaryResponsible: {
         type: DataTypes.BOOLEAN,

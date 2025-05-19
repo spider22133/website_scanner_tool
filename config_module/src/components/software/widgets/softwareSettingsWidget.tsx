@@ -1,32 +1,31 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, Chip, Stack, TextField, Typography, Box, Avatar } from '@mui/material'
 import SaveIcon from '@mui/icons-material/SaveOutlined'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { RootState, useAppDispatch } from '../../../store/store'
 import { useSelector } from 'react-redux'
-import { fetchSoftwareUsers, updateSoftware, updateSoftwareUsers, uploadSoftwareIcon } from '../../../store/thunks/software.thunk'
+import { fetchSoftwareUsers, updateSoftwareUsers, uploadSoftwareIcon } from '../../../store/thunks/software.thunk'
 import IUser from '../../../interfaces/user.interface'
 import { SoftwareEntry } from '../../../../../types/common'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { isAdminUser } from '../../utilities/isAdminUser'
 
-// Define the form data type
 interface FormData {
   mainResponsible: IUser | null
   mainRepresentatives: IUser[]
   icon: FileList
 }
 
-// Define a Yup schema for IUser
 const userSchema = Yup.object().shape({
   id: Yup.number().required(),
   email: Yup.string().required(),
 })
 
-// Validation schema with explicit typing
 const validationSchema = Yup.object().shape({
   mainResponsible: userSchema.nullable().required('Hauptverantwortlicher ist erforderlich'),
+  mainRepresentatives: Yup.array().of(userSchema).nullable(),
   icon: Yup.mixed()
     .test('fileSize', 'Zu große Datei', (value: any) => {
       if (!value || value.length === 0) return true
@@ -41,7 +40,7 @@ const validationSchema = Yup.object().shape({
 
 const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ software }) => {
   const { users } = useSelector((state: RootState) => state.users)
-  const { representatives } = useSelector((state: RootState) => state.software)
+  const { softwareUsers } = useSelector((state: RootState) => state.software)
   const dispatch = useAppDispatch()
 
   const {
@@ -68,58 +67,68 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   }, [software, dispatch])
 
   useEffect(() => {
-    const initialResponsible = users.find(user => user.id === software.user_id) || null
-    const initialRepresentatives = representatives
-      .map(repr => users.find(user => user.email === repr.email))
-      .filter((user): user is IUser => user !== undefined)
+    const responsible = softwareUsers.find(user => user.userSettings.isPrimaryResponsible) || null
+    const representatives = softwareUsers.filter(repr => repr.userSettings.isRepresentative)
+
+    const initialResponsible = users.find(user => user.id === responsible?.id) || null
+    const initialRepresentatives = users.filter(user => representatives.find(repr => user.id === repr.id))
 
     reset({
       mainResponsible: initialResponsible,
       mainRepresentatives: initialRepresentatives,
+      icon: undefined,
     })
-  }, [software, representatives, users, reset])
+  }, [softwareUsers, users, reset])
 
   const onSubmit: SubmitHandler<FormData> = data => {
-    console.log(errors)
-    console.log(isDirty, data)
+    const { mainResponsible, mainRepresentatives, icon } = data
 
-    // if (!isDirty) return
-
-    const updatedSoftware: SoftwareEntry = {
-      version: software.version,
-      winget_id: software.winget_id,
-      name: software.name,
-      user_id: data.mainResponsible?.id,
-    }
-
-    dispatch(updateSoftware(updatedSoftware))
-
-    if (data.icon?.[0]) {
-      const originalExt = data.icon[0].name.split('.').pop()?.toLowerCase()
-      const renamedFile = new File([data.icon[0]], `${software.winget_id}.${originalExt}`, {
-        type: data.icon[0].type,
+    // Construct final user list from softwareUsers
+    const updatedUsers = users
+      .filter(user => !isAdminUser(user.roles))
+      .map(user => {
+        const existing = softwareUsers.find(su => su.id === user.id)
+        return {
+          userId: user.id,
+          ...existing?.userSettings,
+          isPrimaryResponsible: user.id === mainResponsible?.id,
+          isRepresentative: mainRepresentatives.some(rep => rep.id === user.id),
+        }
       })
+
+    dispatch(
+      updateSoftwareUsers({
+        id: software.winget_id,
+        data: updatedUsers,
+      }),
+    )
+
+    // Upload icon if changed
+    if (icon?.[0]) {
+      const file = icon[0]
+      const ext = file.name.split('.').pop()?.toLowerCase()
+      const renamedFile = new File([file], `${software.winget_id}.${ext}`, { type: file.type })
 
       const formData = new FormData()
       formData.append('icon', renamedFile)
 
       dispatch(
         uploadSoftwareIcon({
-          id: updatedSoftware.winget_id,
-          formData: formData,
-        }),
-      )
-    }
-
-    if (mainRepresentatives && mainRepresentatives.length > 0) {
-      dispatch(
-        updateSoftwareUsers({
           id: software.winget_id,
-          data: mainRepresentatives.map(user => user.id || 0),
+          formData,
         }),
       )
     }
   }
+
+  // Filter non-admin users
+  const nonAdminUsers = users.filter(user => !isAdminUser(user?.roles))
+
+  // Options for mainResponsible: exclude users in mainRepresentatives
+  const responsibleOptions = nonAdminUsers
+
+  // Options for mainRepresentatives: exclude mainResponsible
+  const representativeOptions = nonAdminUsers.filter(user => !mainResponsible || mainResponsible.id !== user.id)
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
@@ -131,12 +140,20 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
       <AccordionDetails>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={3} sx={{ width: '100%' }}>
+            {/* Hauptverantwortlicher */}
             <Stack direction="row" alignItems="center" spacing={2}>
               <Autocomplete
-                options={users.filter(user => !user.roles?.some(role => role.name === 'admin'))}
+                options={responsibleOptions}
                 getOptionLabel={option => option.email}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={mainResponsible}
-                onChange={(_, value) => setValue('mainResponsible', value, { shouldDirty: true })}
+                onChange={(_, value) => {
+                  setValue('mainResponsible', value, { shouldDirty: true })
+                  if (value) {
+                    const updatedRepresentatives = mainRepresentatives.filter(rep => rep.id !== value.id)
+                    setValue('mainRepresentatives', updatedRepresentatives, { shouldDirty: true })
+                  }
+                }}
                 renderInput={params => (
                   <TextField
                     {...params}
@@ -149,13 +166,18 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                 sx={{ flexGrow: 1 }}
               />
             </Stack>
+
+            {/* Vertreter */}
             <Stack direction="row" alignItems="center" spacing={2}>
               <Autocomplete
                 multiple
-                options={users.filter(user => !user.roles?.some(role => role.name === 'admin'))}
+                options={representativeOptions}
                 getOptionLabel={option => option.email}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={mainRepresentatives}
-                onChange={(_, value) => setValue('mainRepresentatives', value, { shouldDirty: true })}
+                onChange={(_, value) => {
+                  setValue('mainRepresentatives', value, { shouldDirty: true })
+                }}
                 renderTags={(value: readonly IUser[], getTagProps) =>
                   value.map((option, index) => <Chip {...getTagProps({ index })} key={option.id} label={option.email} size="small" />)
                 }
@@ -164,13 +186,15 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                     {...params}
                     label="Vertreter"
                     error={!!errors.mainRepresentatives?.[0]}
-                    variant="filled"
                     helperText={errors.mainRepresentatives?.[0]?.message}
+                    variant="filled"
                   />
                 )}
                 sx={{ flexGrow: 1 }}
               />
             </Stack>
+
+            {/* Icon Upload */}
             <Box>
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Button variant="outlined" component="label" sx={{ textTransform: 'none' }}>
@@ -178,7 +202,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                   <input
                     hidden
                     type="file"
-                    accept="image/png,image/jpeg,image/svg+xml" // Specify supported types
+                    accept="image/png,image/jpeg,image/svg+xml"
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const files = e.target.files
                       if (files?.length) {
@@ -188,7 +212,6 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                   />
                 </Button>
                 {software.icon && <Avatar src={`http://localhost:3001${software.icon}`} alt="Software Icon" sx={{ width: 32, height: 32 }} />}
-
                 {iconFiles?.[0] && (
                   <Box>
                     <Typography variant="body2" noWrap>
@@ -208,6 +231,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                 Unterstützte Formate: PNG, JPG, SVG (max. 2 MB)
               </Typography>
             </Box>
+
             <Button type="submit" variant="contained" color="primary" startIcon={<SaveIcon />} disabled={!isDirty} sx={{ height: 40, width: 200 }}>
               Speichern
             </Button>

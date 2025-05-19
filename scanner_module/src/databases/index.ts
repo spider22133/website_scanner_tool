@@ -6,7 +6,7 @@ import { UserModel, default as initUserModel } from '@models/user.model'
 import { RoleModel, default as initRoleModel } from '@models/role.model'
 import { SoftwareModel, default as initSoftwareModel } from '@models/software.model'
 import { SoftwareVersionModel, default as initSoftwareVersionModel } from '@models/software_version.model'
-import { SoftwareUser, default as initSoftwareRepresentativeModel } from '@/models/software_user.model'
+import { SoftwareUser, default as initSoftwareUserModel } from '@/models/software_user.model'
 import { IssueModel, default as initIssueModel } from '@models/issue.model'
 
 const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig')
@@ -37,7 +37,7 @@ sequelize.authenticate()
 const DB: any = {
   Roles: initRoleModel(sequelize),
   SoftwareVersions: initSoftwareVersionModel(sequelize),
-  SoftwareRepresentative: initSoftwareRepresentativeModel(sequelize),
+  SoftwareUser: initSoftwareUserModel(sequelize),
   Users: initUserModel(sequelize),
   Software: initSoftwareModel(sequelize),
   Issue: initIssueModel(sequelize),
@@ -76,17 +76,7 @@ function initAssociations() {
     as: 'software',
   })
 
-  // Responsible for Software
-  UserModel.hasMany(SoftwareModel, {
-    as: 'software',
-    foreignKey: 'user_id',
-  })
-
-  SoftwareModel.belongsTo(UserModel, {
-    as: 'user',
-    foreignKey: 'user_id',
-  })
-
+  // Sofrware users settings
   SoftwareModel.belongsToMany(UserModel, {
     through: SoftwareUser,
     foreignKey: 'softwareId',
@@ -100,6 +90,7 @@ function initAssociations() {
     otherKey: 'softwareId',
   })
 
+  // User roles
   UserModel.belongsToMany(RoleModel, {
     as: 'roles',
     through: 'user_roles',

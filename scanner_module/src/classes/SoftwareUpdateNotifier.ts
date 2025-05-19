@@ -136,10 +136,11 @@ class SoftwareUpdateNotifier {
     const tableRows = await Promise.all(
       sortedUpdates.reverse().map(async item => {
         const { software, date } = item
+        const softwareUser = await software.getPrimaryResponsible()
         const version = software.version || 'N/A'
         const baraVersion = software.bara_version || 'N/A'
         const name = software.name || 'Unbekannt'
-        const responsibleId = software.user_id
+        const responsibleId = softwareUser?.id
 
         let responsibleName = 'Unbekannt'
         if (responsibleId) {

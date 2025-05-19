@@ -4,6 +4,7 @@ import { IssueAttributes, SoftwareEntry } from '../../../../types/common'
 import httpErrors from '../../interfaces/api.error.interface'
 import SoftwareDataService from '../../services/software.service'
 import { setMessage } from '../slices/message.slice'
+import { SoftwareUser, SoftwareUserEntries } from '../../interfaces/common'
 
 export const fetchAllSoftware = createAsyncThunk<
   SoftwareEntry[],
@@ -149,7 +150,7 @@ export const fetchSoftwareUsers = createAsyncThunk('softwareUsers/fetch', async 
 // Async thunk to set software representatives
 export const updateSoftwareUsers = createAsyncThunk(
   'softwareUsers/update',
-  async ({ id, data }: { id: string; data: number[] }, { rejectWithValue }) => {
+  async ({ id, data }: { id: string; data: SoftwareUser[] }, { rejectWithValue }) => {
     try {
       await SoftwareDataService.setUsers(id, data)
       return data

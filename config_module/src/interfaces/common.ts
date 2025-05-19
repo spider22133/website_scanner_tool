@@ -11,3 +11,16 @@ export enum ListViewType {
   ListView = 'ListView',
   TableView = 'TableView',
 }
+
+export type SoftwareUserEntries = {
+  id?: number
+  userSettings: SoftwareUser
+}
+
+export interface SoftwareUser {
+  userId?: number
+  softwareId?: number
+  isPrimaryResponsible?: boolean
+  isRepresentative?: boolean
+  subscribeIssueCreate?: boolean
+}
