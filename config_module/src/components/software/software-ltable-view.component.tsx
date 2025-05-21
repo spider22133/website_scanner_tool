@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   DataGrid,
   GridColDef,
@@ -14,8 +14,10 @@ import {
   GridRowModel,
   GridActionsCellItem,
   GridRowId,
+  GridValidRowModel,
+  GridApi,
 } from '@mui/x-data-grid'
-import { IconButton, Tooltip, Stack, Box, Avatar } from '@mui/material'
+import { Tooltip, Stack, Box, Avatar, Divider, Typography } from '@mui/material'
 import Visibility from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined'
 import DeleteIcon from '@mui/icons-material/DeleteOutlined'
@@ -29,6 +31,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 
 import { useSelector } from 'react-redux'
 import { SoftwareEntry } from '../../../../types/common'
@@ -58,23 +61,37 @@ type SoftwareRow = SoftwareEntry & { isNew?: boolean }
 const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilteredList, createSoftwareLoading, setActiveWebsite }) => {
   const dispatch = useAppDispatch()
   const { user } = useSelector((state: RootState) => state.auth)
+  const { software } = useSelector((state: RootState) => state.software)
   const isAdmin = isAdminUser(user?.roles)
 
-  const [rows, setRows] = React.useState<SoftwareRow[]>(softwareFilteredList)
+  const [rows, setRows] = useState<GridValidRowModel[]>(softwareFilteredList)
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({})
+  const gridRef = useRef<GridApi>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setRows(softwareFilteredList)
   }, [softwareFilteredList])
 
+  useEffect(() => {
+    const newRowId = Object.keys(rowModesModel).find(id => rowModesModel[id].mode === GridRowModes.Edit && rows.find(row => row.id === id)?.isNew)
+    if (newRowId && gridRef.current) {
+      const rowIndex = rows.findIndex(row => row.id === newRowId)
+      if (rowIndex !== -1) {
+        const pageSize = gridRef.current.state.pagination.paginationModel.pageSize || 20
+        const page = Math.floor(rowIndex / pageSize)
+        gridRef.current.setPage(page)
+        gridRef.current.setCellFocus(newRowId, 'name')
+      }
+    }
+  }, [rowModesModel, rows])
+
   const columns: GridColDef[] = [
     {
-      field: 'name',
-      headerName: 'Name',
-      flex: 1,
-      editable: true,
+      field: 'icons',
+      headerName: '',
+      width: 80,
       renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack direction="row" alignItems="center" spacing={2} height="100%">
           {params.row?.bara_version !== null && params.row?.bara_version !== undefined ? (
             <>
               {params.row?.is_current ? (
@@ -93,9 +110,15 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
               <Inventory2OutlinedIcon sx={{ width: 25, height: 25 }} />
             )}
           </>
-          <Box>{params.value}</Box>
         </Stack>
       ),
+    },
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 1,
+      editable: true,
+      renderCell: (params: GridRenderCellParams<SoftwareEntry>) => <Box>{params.value}</Box>,
     },
     {
       field: 'publisher',
@@ -123,7 +146,7 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
       headerName: 'Version',
       flex: 1,
       sortable: false,
-      editable: true,
+      editable: false,
       renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
         <Stack direction="row" alignItems="center" spacing={1}>
           <Box>
@@ -147,12 +170,22 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
       getActions: params => {
         const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit
         const isHidden = params.row.is_hidden
+        const isCustom = params.row.source === 'custom'
 
         const actions = [
           // Visible to everyone
-          <GridActionsCellItem icon={<CachedOutlinedIcon />} label="Prüfen" onClick={() => handleCheck(params.row.winget_id)} showInMenu={false} />,
           <GridActionsCellItem
-            icon={isHidden ? <VisibilityOff /> : <Visibility />}
+            icon={
+              <Tooltip title="Prüfen">
+                <CachedOutlinedIcon />
+              </Tooltip>
+            }
+            label="Prüfen"
+            onClick={() => handleCheck(params.row.winget_id)}
+            showInMenu={false}
+          />,
+          <GridActionsCellItem
+            icon={<Tooltip title={isHidden ? 'Anzeigen' : 'Ausblenden'}>{isHidden ? <VisibilityOff /> : <Visibility />}</Tooltip>}
             label={isHidden ? 'Anzeigen' : 'Ausblenden'}
             onClick={() => handleToggleVisibility(params.row)}
             showInMenu={false}
@@ -162,14 +195,62 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
         // Admin-only actions
         if (isAdmin) {
           if (isInEditMode) {
+            if (isCustom) {
+              actions.push(
+                <GridActionsCellItem
+                  key="save"
+                  icon={
+                    <Tooltip title="Speichern">
+                      <SaveIcon />
+                    </Tooltip>
+                  }
+                  label="Save"
+                  onClick={handleSaveClick(params.id)}
+                  showInMenu
+                />,
+              )
+            }
             actions.push(
-              <GridActionsCellItem icon={<SaveIcon />} label="Save" onClick={handleSaveClick(params.id)} />,
-              <GridActionsCellItem icon={<CancelIcon />} label="Cancel" onClick={handleCancelClick(params.id)} />,
+              <GridActionsCellItem
+                key="cancel"
+                icon={
+                  <Tooltip title="Abbrechen">
+                    <CancelIcon />
+                  </Tooltip>
+                }
+                label="Abbrechen"
+                onClick={handleCancelClick(params.id)}
+                showInMenu
+              />,
             )
           } else {
+            if (isCustom) {
+              actions.push(
+                <GridActionsCellItem
+                  key="edit"
+                  icon={
+                    <Tooltip title="Bearbeiten">
+                      <EditIcon />
+                    </Tooltip>
+                  }
+                  label="Bearbeiten"
+                  onClick={handleEditClick(params.id)}
+                  showInMenu
+                />,
+              )
+            }
             actions.push(
-              <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleEditClick(params.id)} />,
-              <GridActionsCellItem icon={<DeleteIcon color="error" />} label="Delete" onClick={handleDeleteClick(params.row.winget_id)} />,
+              <GridActionsCellItem
+                key="delete"
+                icon={
+                  <Tooltip title="Löschen">
+                    <DeleteIcon color="error" />
+                  </Tooltip>
+                }
+                label="Löschen"
+                onClick={handleDeleteClick(params.row.winget_id)}
+                showInMenu
+              />,
             )
           }
         }
@@ -179,11 +260,9 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
     },
   ]
 
-  const typedSetRows = setRows as unknown as (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void
-
   const handleCheck = async (id: string) => {
     await dispatch(checkSoftware(id))
-    await dispatch(getJiraIssues({ winget_id: id, reload: true }))
+    await dispatch(getJiraIssues({ id, reload: true }))
   }
 
   const handleToggleVisibility = (software: SoftwareEntry) => {
@@ -235,6 +314,14 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
     return updatedRow
   }
 
+  const countByVisibility = (isHidden: boolean) => {
+    return software.filter(software => software.is_hidden === isHidden).length
+  }
+
+  const countByCurrentStatus = (isCurrent: boolean) => {
+    return software.filter(software => software.is_current === isCurrent).length
+  }
+
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel)
   }
@@ -243,28 +330,54 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
     const { setRows, setRowModesModel } = props
 
     const handleClick = () => {
-      const id = `new-${Math.random().toString(36).substr(2, 9)}`
-      setRows(oldRows => [{ id, winget_id: id, name: '', version: '', subscribeCreateIssue: false, isNew: true } as SoftwareEntry, ...oldRows])
+      const maxId = Math.max(...rows.map(item => Number(item.id)), 0)
+      const newId = (maxId + 1).toString()
+      setRows(oldRows => [
+        ...oldRows,
+        {
+          id: newId,
+          winget_id: undefined,
+          name: '',
+          version: '0.0.0',
+          subscribeCreateIssue: false,
+          source: 'custom',
+          isNew: true,
+        } as SoftwareEntry,
+      ])
+
       setRowModesModel(oldModel => ({
-        [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         ...oldModel,
+        [newId]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
       }))
     }
 
     return (
       <Toolbar>
-        <Tooltip title="Add record">
+        <Tooltip title="Software manuell hinzufügen">
           <ToolbarButton onClick={handleClick}>
-            <AddIcon fontSize="small" />
+            <AddBoxOutlinedIcon />
           </ToolbarButton>
         </Tooltip>
+        <Stack direction={'row'} alignItems={'center'} justifyContent={'flex-end'} sx={{ width: '100%' }} spacing={3}>
+          <Stack direction={'row'} alignItems={'center'} spacing={3}>
+            <Typography variant="body2">
+              Aktuell: {countByCurrentStatus(true)} / Nicht Aktuell: {countByCurrentStatus(false)}
+            </Typography>
+          </Stack>
+          <Box>
+            <Typography variant="body2">
+              Ausgeblendet: {countByVisibility(true)} / Sichtbar: {countByVisibility(false)} / Gesamt: {software.length}
+            </Typography>
+          </Box>
+        </Stack>
       </Toolbar>
     )
   }
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <DataGrid<SoftwareEntry>
+      <DataGrid
+        apiRef={gridRef}
         editMode="row"
         rows={rows}
         columns={columns}
@@ -279,9 +392,17 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
         processRowUpdate={processRowUpdate}
         sx={{ border: 'none' }}
         slots={{ toolbar: EditToolbar }}
-        slotProps={{ toolbar: { showQuickFilter: false, setRows: typedSetRows, setRowModesModel } }}
-        checkboxSelection
-        disableRowSelectionOnClick
+        slotProps={{
+          toolbar: {
+            setRows: updateFn => {
+              setRows(prev => [...updateFn(prev)])
+            },
+            setRowModesModel: updateFn => {
+              setRowModesModel(prev => ({ ...updateFn(prev) }))
+            },
+          },
+        }}
+        // disableRowSelectionOnClick
         autoPageSize
         showToolbar
       />

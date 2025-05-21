@@ -31,9 +31,9 @@ export const getJiraIssues = createAsyncThunk<
   {
     rejectValue: httpErrors
   }
->('software/issues', async ({ winget_id, reload = false }, { rejectWithValue, dispatch }) => {
+>('software/issues', async ({ id, reload = false }, { rejectWithValue, dispatch }) => {
   try {
-    const res = await JiraDataService.getJiraSoftwareIssues({ winget_id, reload })
+    const res = await JiraDataService.getJiraSoftwareIssues({ id, reload })
     return res.data.data
   } catch (err: any) {
     const error: AxiosError<httpErrors> = err

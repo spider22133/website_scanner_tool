@@ -63,7 +63,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   const iconFiles = watch('icon')
 
   useEffect(() => {
-    dispatch(fetchSoftwareUsers(software.winget_id))
+    dispatch(fetchSoftwareUsers(software.id))
   }, [software, dispatch])
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
     dispatch(
       updateSoftwareUsers({
-        id: software.winget_id,
+        id: software.id,
         data: updatedUsers,
       }),
     )
@@ -114,7 +114,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
       dispatch(
         uploadSoftwareIcon({
-          id: software.winget_id,
+          id: software.id,
           formData,
         }),
       )

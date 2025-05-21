@@ -45,10 +45,8 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
   const isAdmin = isAdminUser(user?.roles)
 
   useEffect(() => {
-    if (software?.winget_id) {
-      dispatch(getJiraIssues({ winget_id: software.winget_id }))
-      setAutoCreateSubscribed(software.subscribeCreateIssue)
-    }
+    dispatch(getJiraIssues({ id: software.id }))
+    setAutoCreateSubscribed(software.subscribeCreateIssue)
   }, [software, dispatch])
 
   const issues = useMemo(() => {
@@ -82,15 +80,11 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
   const version = useMemo(() => software?.versions?.find(item => item.version === software.version), [software])
 
   const handleRefresh = () => {
-    if (software?.winget_id) {
-      dispatch(getJiraIssues({ winget_id: software.winget_id, reload: true }))
-    }
+    dispatch(getJiraIssues({ id: software.id, reload: true }))
   }
 
   const handleCreateTicket = () => {
-    if (software?.winget_id) {
-      dispatch(createIssue({ winget_id: software.winget_id, priority: selectedPriority }))
-    }
+    dispatch(createIssue({ id: software.id, priority: selectedPriority }))
   }
 
   const handleAutoUpdateSubscription = () => {

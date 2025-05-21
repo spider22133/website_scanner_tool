@@ -2,8 +2,6 @@ import { SoftwareModel } from '@/models/software.model'
 import { JiraApi } from '@/classes/api/AtlassianJiraApi'
 import { IssueModel } from '@/models/issue.model'
 import { SoftwareVersionModel } from '@/models/software_version.model'
-import { UserModel } from '@/models/user.model'
-import { SoftwareUser } from '@/models/software_user.model'
 
 export class JiraIssueService {
   private jira: JiraApi

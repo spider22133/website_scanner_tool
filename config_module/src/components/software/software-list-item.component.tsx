@@ -130,7 +130,7 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
                   aria-label="prüfen"
                   onClick={e => {
                     e.stopPropagation()
-                    handleCheckStatus(software.winget_id)
+                    handleCheckStatus(software.id)
                   }}
                 >
                   <CachedOutlinedIcon />
@@ -155,7 +155,7 @@ const WebsitesListItem: React.FC<WebsitesListItemProps> = ({ timeAgo, software, 
                   color="error"
                   onClick={e => {
                     e.stopPropagation()
-                    handleDelete(software.winget_id)
+                    handleDelete(software.id)
                   }}
                 >
                   <DeleteOutlinedIcon />

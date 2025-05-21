@@ -38,7 +38,7 @@ class SoftwareService {
     if (isEmpty(softwareId)) throw new HttpException(400, 'Id is wrong')
 
     const findSoftware: SoftwareModel = await this.software.findOne({
-      where: { winget_id: softwareId },
+      where: { id: softwareId },
       include: [
         {
           model: SoftwareVersionModel,
@@ -53,10 +53,10 @@ class SoftwareService {
   }
 
   public async updateSoftware(id: string, data: CreateSoftwareDto, withVersion = false): Promise<SoftwareModel> {
-    const findSoftware = await this.software.findOne({ where: { winget_id: id } })
+    const findSoftware = await this.software.findOne({ where: { id } })
     if (!findSoftware) throw new HttpException(409, 'There is no software with such id')
 
-    await this.software.update(data, { where: { winget_id: id } })
+    await this.software.update(data, { where: { id } })
 
     if (withVersion && findSoftware) {
       // Check for existing version
@@ -89,13 +89,13 @@ class SoftwareService {
     return software
   }
 
-  public async deleteSoftware(wingetId: string): Promise<Software> {
-    if (isEmpty(wingetId)) throw new HttpException(400, "This isn't softwareId")
+  public async deleteSoftware(id: string): Promise<Software> {
+    if (isEmpty(id)) throw new HttpException(400, "This isn't softwareId")
 
-    const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: wingetId } })
+    const findSoftware: SoftwareModel = await this.software.findOne({ where: { id } })
     if (!findSoftware) throw new HttpException(409, "You're not software")
 
-    await this.software.destroy({ where: { winget_id: wingetId } })
+    await this.software.destroy({ where: { id } })
 
     return findSoftware
   }

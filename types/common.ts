@@ -31,7 +31,7 @@ export interface WingetPackageDetails {
 export interface SoftwareEntry {
   id: string;
   name: string;
-  winget_id: string;
+  winget_id?: string;
   user_id?: number;
   users?: IRepresentative[];
   version: string;
