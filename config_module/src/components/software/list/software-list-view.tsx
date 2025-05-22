@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react'
 import { List, Skeleton } from '@mui/material'
-import WebsitesListItem from './software-list-item.component'
-import { SoftwareEntry } from '../../../../types/common'
+import WebsitesListItem from './software-list-item'
+import { SoftwareEntry } from '../../../../../types/common'
 import TimeAgo from 'javascript-time-ago'
 
 interface SoftwareListProps {
@@ -28,7 +28,6 @@ const SoftwareListView: React.FC<SoftwareListProps> = ({ timeAgo, createSoftware
         newIndex = Math.max(currentIndex - 1, 0)
         e.preventDefault()
       }
-
       if (newIndex !== currentIndex) {
         setActiveWebsite(softwareFilteredList[newIndex], newIndex)
 

@@ -1,9 +1,9 @@
-import { SoftwareEntry } from '../../../../types/common'
+import { SoftwareEntry } from '../../../../../types/common'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { RootState } from '../../store/store'
-import AppFilterBar from '../elements/app-filter-bar.component'
-import SoftwareTableView from './software-ltable-view.component'
+import { RootState } from '../../../store/store'
+import AppFilterBar from '../../elements/app-filter-bar.component'
+import SoftwareTableView from './software-ltable-view'
 import de from 'javascript-time-ago/locale/de.json'
 import TimeAgo from 'javascript-time-ago'
 

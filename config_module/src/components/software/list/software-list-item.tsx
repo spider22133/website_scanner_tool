@@ -12,11 +12,11 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import TimeAgo from 'javascript-time-ago'
-import { SoftwareEntry } from '../../../../types/common'
-import { RootState, AppDispatch } from '../../store/store'
-import { checkSoftware, deleteSoftware, updateSoftware } from '../../store/thunks/software.thunk'
-import { API_URL } from '../../http-connection'
-import { isAdminUser } from '../utilities/isAdminUser'
+import { SoftwareEntry } from '../../../../../types/common'
+import { RootState, AppDispatch } from '../../../store/store'
+import { checkSoftware, deleteSoftware, updateSoftware } from '../../../store/thunks/software.thunk'
+import { API_URL } from '../../../http-connection'
+import { isAdminUser } from '../../utilities/isAdminUser'
 
 interface WebsitesListItemProps {
   index: number

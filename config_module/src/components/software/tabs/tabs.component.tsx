@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Tab } from '@mui/material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
-import { CustomTabProps } from '../../interfaces/common'
+import { CustomTabProps } from '../../../interfaces/common'
 
 type Props = {
   tabs: CustomTabProps[]
