@@ -3,7 +3,7 @@ import { Socket } from 'socket.io'
 import { SoftwareModel } from '@models/software.model'
 import SoftwareVersionService from '@services/software_versions.service'
 import { BaramundiApi } from './api/BaramundiApi'
-import { WingetUtils } from './api/WingetApi'
+import { WingetApi } from './api/WingetApi'
 import { OrgUnitType, SoftwareType } from '@/types/baramundi'
 import SoftwareUpdateNotifier from './SoftwareUpdateNotifier'
 import semver from 'semver'
@@ -89,7 +89,7 @@ class SoftwareVersionChecker {
     }
 
     // 2. Try fetching Winget data (and handle potential failure)
-    const packageDetails = await WingetUtils.showSoftware(software.winget_id)
+    const packageDetails = await WingetApi.showSoftware(software.winget_id)
 
     if (!packageDetails || !packageDetails.version) {
       throw new Error(`No version info found for Winget ID: ${software.winget_id}`)

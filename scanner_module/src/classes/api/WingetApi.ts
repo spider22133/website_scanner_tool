@@ -1,11 +1,11 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { WingetPackageDetails, SoftwareEntry, InstallerDetails } from '../../../../types/common'
+import { WingetPackageDetails, SoftwareEntry } from '../../../../types/common'
 import { logger } from '@utils/logger'
 
 const execAsync = promisify(exec)
 
-export class WingetUtils {
+export class WingetApi {
   private static async execWingetCommand(command: string): Promise<string> {
     try {
       const { stdout, stderr } = await execAsync(command)

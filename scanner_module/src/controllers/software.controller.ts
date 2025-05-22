@@ -5,7 +5,7 @@ import SoftwareVersionService from '@services/software_versions.service'
 import { SoftwareEntry } from '../../../types/common'
 import CreateSoftwareDto from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
-import { WingetUtils } from '@/classes/api/WingetApi'
+import { WingetApi } from '@/classes/api/WingetApi'
 import { logger } from '@/utils/logger'
 import { SoftwareModel } from '@/models/software.model'
 import { SoftwareUser } from '@/models/software_user.model'
@@ -161,7 +161,7 @@ class SoftwareController {
   public createWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const softwareData: CreateSoftwareDto = req.body
-      const packageDetails = await WingetUtils.showSoftware(softwareData.winget_id)
+      const packageDetails = await WingetApi.showSoftware(softwareData.winget_id)
 
       let createSoftwareData = await this.softwareService.createSoftware({
         ...softwareData,
@@ -188,7 +188,7 @@ class SoftwareController {
   public searchWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const searchString = String(req.params.query)
-      const searchSoftwareData: SoftwareEntry[] = await WingetUtils.searchSoftware(searchString)
+      const searchSoftwareData: SoftwareEntry[] = await WingetApi.searchSoftware(searchString)
 
       res.status(200).json({ data: searchSoftwareData })
     } catch (error) {
