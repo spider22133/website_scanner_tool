@@ -1,31 +1,44 @@
 import { SoftwareVersion } from "../scanner_module/src/interfaces/software_version.interface";
 import { SoftwareUser } from "../config_module/src/interfaces/common";
 
+interface InstallerSwitch {
+  silent?: string;
+  silentWithProgress?: string;
+  custom?: string;
+}
+
 export interface InstallerDetails {
-  type?: string;
+  architecture: string;
+  type: string;
+  url: string;
+  sha256: string;
+  scope?: string;
   locale?: string;
-  url?: string;
-  sha256?: string;
-  releaseDate?: string;
-  offlineSupported?: boolean;
+  minimumOSVersion?: string;
+  installModes?: string[];
+  switches?: InstallerSwitch;
 }
 
 export interface WingetPackageDetails {
-  version?: string;
-  publisher?: string;
+  id: string;
+  version: string;
+  publisher: string;
   publisherUrl?: string;
   publisherSupportUrl?: string;
   author?: string;
+  name: string;
+  moniker?: string;
   description?: string;
   homepage?: string;
   license?: string;
   licenseUrl?: string;
   privacyUrl?: string;
   copyright?: string;
-  copyrightUrl?: string;
   releaseNotes?: string;
   releaseNotesUrl?: string;
-  installer?: InstallerDetails;
+  documentations?: { DocumentLabel: string; DocumentUrl: string }[];
+  tags?: string[];
+  installers: InstallerDetails[];
 }
 
 export interface SoftwareEntry {

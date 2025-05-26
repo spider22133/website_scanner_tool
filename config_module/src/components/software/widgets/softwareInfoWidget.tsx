@@ -1,11 +1,12 @@
 import React from 'react'
 import { SoftwareEntry } from '../../../../../types/common'
-import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
+import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary, Box } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { CopyToClipboard } from '../../utilities/CopyToClipboard'
 import { setMessage } from '../../../store/slices/message.slice'
 import { useDispatch } from 'react-redux'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
+import AddIcon from '@mui/icons-material/Add'
 
 interface SoftwareInfoWidgetProps {
   software: SoftwareEntry
@@ -15,8 +16,9 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
   const dispatch = useDispatch()
 
   const { version, bara_version, details, is_current, name } = software
-  const { publisher, publisherUrl, publisherSupportUrl, installer, homepage, license, licenseUrl, copyright, description, releaseNotesUrl } =
+  const { publisher, publisherUrl, publisherSupportUrl, installers, homepage, license, licenseUrl, copyright, description, releaseNotesUrl } =
     details || {}
+  console.log(installers)
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>
@@ -91,29 +93,41 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
           </Grid>
 
           {/* Installer Information */}
-          {installer && (
-            <Grid size={12}>
-              <Typography className="fw-bold" color="text.secondary" sx={{ mt: 2 }}>
-                Installer
-              </Typography>
-              {installer.url && (
-                <Typography variant="body2">
-                  Download:{' '}
-                  <Link href={installer.url} target="_blank" rel="noopener">
-                    {installer.url}
-                  </Link>
+          <Grid size={12}>
+            <Accordion
+              defaultExpanded
+              disableGutters
+              square
+              sx={{
+                padding: 0,
+                boxShadow: 'none',
+                borderTop: '1px solid #f2f2f2',
+                borderBottom: '1px solid #f2f2f2',
+              }}
+            >
+              <AccordionSummary sx={{ p: 0, m: 0 }} expandIcon={<AddIcon />}>
+                <Typography className="fw-bold" color="text.secondary">
+                  Installer
                 </Typography>
-              )}
-              {installer.sha256 && (
-                <Tooltip title="SHA256-Prüfsumme" arrow>
-                  <Typography variant="body2" sx={{ wordBreak: 'break-word', fontSize: '0.9rem' }}>
-                    SHA256: {installer.sha256}
-                  </Typography>
-                </Tooltip>
-              )}
-              {installer.releaseDate && <Typography variant="body2">Veröffentlicht: {installer.releaseDate}</Typography>}
-            </Grid>
-          )}
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: 0 }}>
+                {installers?.map((installer, index) => (
+                  <Box key={index} sx={{ pb: 2 }}>
+                    {installer.scope && <Typography variant="body2">Geltungsbereich: {installer.scope}</Typography>}
+                    {installer.architecture && <Typography variant="body2">Architektur: {installer.architecture}</Typography>}
+                    {installer.url && (
+                      <Typography variant="body2">
+                        Download:{' '}
+                        <Link href={installer.url} target="_blank" rel="noopener">
+                          {installer.url}
+                        </Link>
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
 
           {/* License Information */}
           <Grid size={12}>

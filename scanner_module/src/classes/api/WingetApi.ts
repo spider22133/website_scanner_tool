@@ -1,48 +1,13 @@
 import fs from 'fs'
 import path from 'path'
 import fg from 'fast-glob'
-import { SoftwareEntry } from '../../../../types/common'
+import { InstallerDetails, SoftwareEntry, WingetPackageDetails } from '../../../../types/common'
 import { BaseRequestApi } from '../abstract/BaseRequestApi'
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { logger } from './../../utils/logger'
+import { logger } from '../../utils/logger'
 import yaml from 'js-yaml'
 import semver from 'semver'
-
-interface WingetSearchResultItem {
-  name: string
-  path: string
-  repository: { name: string; full_name: string }
-  html_url: string
-}
-
-interface WingetPackageDetails {
-  id: string
-  version: string
-  publisher: string
-  publisherUrl?: string
-  publisherSupportUrl?: string
-  author?: string
-  name: string
-  moniker?: string
-  description?: string
-  homepage?: string
-  license?: string
-  licenseUrl?: string
-  privacyUrl?: string
-  copyright?: string
-  releaseNotes?: string
-  releaseNotesUrl?: string
-  documentations?: { DocumentLabel: string; DocumentUrl: string }[]
-  tags?: string[]
-  installer: {
-    type?: string
-    url?: string
-    sha256?: string
-    releaseDate?: string
-    offlineSupported?: boolean
-  }
-}
 
 const execAsync = promisify(exec)
 
@@ -53,30 +18,23 @@ export class WingetGitHubApi extends BaseRequestApi {
 
   public async searchSoftware(query: string): Promise<SoftwareEntry[]> {
     const pattern = `${this.manifestsPath.replace(/\\/g, '/')}/**/*${query.toLowerCase()}*.locale.en-US.yaml`
-    const files = await fg(pattern, {
-      caseSensitiveMatch: false,
-      dot: false,
-    })
-
+    const files = await fg(pattern, { caseSensitiveMatch: false, dot: false })
     return this.parseEntriesFromPaths(files)
   }
 
   public async showSoftware(packageId: string): Promise<WingetPackageDetails | null> {
     try {
-      // Ensure manifests directory exists
       if (!fs.existsSync(this.manifestsPath)) {
         logger.error(`Manifests directory does not exist: ${this.manifestsPath}`)
         return null
       }
 
-      // Find the latest YAML file
       const yamlPath = this.findLatestYamlPath(packageId)
       if (!yamlPath) {
         logger.error(`No YAML file found for packageId: ${packageId}`)
         return null
       }
 
-      // Parse the YAML file
       const packageDetails = this.parseYamlToPackageDetails(yamlPath)
       if (!packageDetails) {
         logger.error(`Failed to parse YAML file: ${yamlPath}`)
@@ -94,37 +52,22 @@ export class WingetGitHubApi extends BaseRequestApi {
     const entriesMap = new Map<string, SoftwareEntry>()
 
     for (const file of files) {
-      // Normalize path and split into parts
       const pathParts = file.replace(/\\/g, '/').split('/')
-
-      // Extract version as the second-to-last part
       const version = pathParts[pathParts.length - 2]
+      const wingetId = path.basename(file, '.locale.en-US.yaml')
+      const name = wingetId.split('.').slice(1).join(' ').replace(/\s+/g, ' ').trim()
 
-      // Extract winget_id from filename
-      const filename = path.basename(file, '.locale.en-US.yaml')
-      const winget_id = filename
-
-      // Derive name from winget_id: split by '.', take parts after publisher, join with spaces
-      const idParts = winget_id.split('.')
-      const nameParts = idParts.slice(1) // Exclude publisher
-      let name = nameParts
-        .join(' ')
-        .replace(/\s+/g, ' ') // Normalize spaces
-        .trim()
-
-      // Create entry
       const entry: SoftwareEntry = {
         id: '',
         name,
-        winget_id,
+        winget_id: wingetId,
         version,
         source: 'winget',
       }
 
-      // Keep only the highest version per winget_id
-      const existing = entriesMap.get(winget_id)
+      const existing = entriesMap.get(wingetId)
       if (!existing || this.compareVersions(entry.version, existing.version) > 0) {
-        entriesMap.set(winget_id, entry)
+        entriesMap.set(wingetId, entry)
       }
     }
 
@@ -134,46 +77,53 @@ export class WingetGitHubApi extends BaseRequestApi {
   public compareVersions(a: string, b: string): number {
     const semA = semver.coerce(a)
     const semB = semver.coerce(b)
-    if (semA && semB) return semver.compare(semA, semB)
-    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+    return semA && semB ? semver.compare(semA, semB) : a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
   }
 
   private findLatestYamlPath(packageId: string): string | null {
     const parts = packageId.split('.')
-    if (parts.length < 2) return null // Invalid packageId
+    if (parts.length < 2) {
+      logger.error(`Invalid packageId: ${packageId}`)
+      return null
+    }
 
     const firstLetter = parts[0][0].toLowerCase()
     const baseDir = path.join(this.manifestsPath, firstLetter, ...parts)
-    if (!fs.existsSync(baseDir)) return null
+    if (!fs.existsSync(baseDir)) {
+      logger.debug(`Base directory does not exist: ${baseDir}`)
+      return null
+    }
 
-    // List all subdirectories (versions) containing the YAML file
     const versions = fs.readdirSync(baseDir).filter(dir => {
       const dirPath = path.join(baseDir, dir)
       const yamlPath = path.join(dirPath, `${packageId}.locale.en-US.yaml`)
       return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory() && fs.existsSync(yamlPath)
     })
 
-    if (versions.length === 0) return null
-
-    // Find the highest version using compareVersions
-    let maxV = versions[0]
-    for (let i = 1; i < versions.length; i++) {
-      if (this.compareVersions(versions[i], maxV) > 0) {
-        maxV = versions[i]
-      }
+    if (versions.length === 0) {
+      logger.debug(`No versions found for packageId: ${packageId}`)
+      return null
     }
 
-    return path.join(baseDir, maxV, `${packageId}.locale.en-US.yaml`)
+    const maxVersion = versions.reduce((max, curr) => (this.compareVersions(curr, max) > 0 ? curr : max), versions[0])
+
+    return path.join(baseDir, maxVersion, `${packageId}.locale.en-US.yaml`)
   }
 
   private parseYamlToPackageDetails(yamlPath: string): WingetPackageDetails | null {
-    if (!fs.existsSync(yamlPath)) return null
+    if (!fs.existsSync(yamlPath)) {
+      logger.error(`YAML file does not exist: ${yamlPath}`)
+      return null
+    }
+
     try {
       const fileContent = fs.readFileSync(yamlPath, 'utf8')
-      const yamlData = yaml.load(fileContent)
+      const yamlData = yaml.load(fileContent) as any
 
-      // Map YAML fields to WingetPackageDetails
-      const packageDetails: WingetPackageDetails = {
+      const installerPath = yamlPath.replace('.locale.en-US.yaml', '.installer.yaml')
+      const installers = this.parseInstallerYaml(installerPath)
+
+      return {
         id: yamlData.PackageIdentifier,
         version: yamlData.PackageVersion,
         publisher: yamlData.Publisher,
@@ -192,34 +142,75 @@ export class WingetGitHubApi extends BaseRequestApi {
         releaseNotesUrl: yamlData.ReleaseNotesUrl,
         documentations: yamlData.Documentations || [],
         tags: yamlData.Tags || [],
-        installer: {}, // Empty for now; extend to parse .installer.yaml if needed
+        installers,
       }
-
-      return packageDetails
     } catch (error) {
       logger.error(`Error parsing YAML file ${yamlPath}:`, error)
       return null
     }
   }
 
-  public async updateManifests(): Promise<void> {
-    if (fs.existsSync(this.tempRepoPath)) {
-      logger.info('[WingetGitHubApi] Pulling latest changes...')
-
-      const { stdout } = await execAsync(`git -C "${this.tempRepoPath}" pull`)
-      if (/Already up[ -]to[ -]date/.test(stdout)) {
-        logger.info('[WingetGitHubApi] Already up to date.')
-      } else {
-        logger.info('[WingetGitHubApi] Updates pulled:')
-        logger.info(stdout)
-      }
-
-      return
+  private parseInstallerYaml(installerPath: string): InstallerDetails[] {
+    if (!fs.existsSync(installerPath)) {
+      logger.debug(`Installer YAML file does not exist: ${installerPath}`)
+      return []
     }
 
-    logger.info('[WingetGitHubApi] Cloning manifests folder only with sparse checkout...')
-    await execAsync(`git clone --filter=blob:none --sparse --depth=1 ${this.repoUrl} "${this.tempRepoPath}"`)
-    await execAsync(`git -C "${this.tempRepoPath}" sparse-checkout set manifests`)
-    logger.info('[WingetGitHubApi] Clone complete.')
+    try {
+      const fileContent = fs.readFileSync(installerPath, 'utf8')
+      const yamlData = yaml.load(fileContent) as any
+
+      const topLevelFields = {
+        locale: yamlData.InstallerLocale,
+        minimumOSVersion: yamlData.MinimumOSVersion,
+        type: yamlData.InstallerType || undefined, // Handle null explicitly
+        installModes: yamlData.InstallModes,
+        upgradeBehavior: yamlData.UpgradeBehavior,
+      }
+
+      return (yamlData.Installers || []).map((installer: any) => ({
+        architecture: installer.Architecture,
+        type: installer.InstallerType || topLevelFields.type,
+        url: installer.InstallerUrl,
+        sha256: installer.InstallerSha256,
+        scope: installer.Scope,
+        locale: installer.InstallerLocale || topLevelFields.locale,
+        minimumOSVersion: installer.MinimumOSVersion || topLevelFields.minimumOSVersion,
+        installModes: installer.InstallModes || topLevelFields.installModes,
+        upgradeBehavior: installer.UpgradeBehavior || topLevelFields.upgradeBehavior,
+        switches: installer.InstallerSwitches
+          ? {
+              silent: installer.InstallerSwitches.Silent,
+              silentWithProgress: installer.InstallerSwitches.SilentWithProgress,
+              custom: installer.InstallerSwitches.Custom,
+            }
+          : undefined,
+      }))
+    } catch (error) {
+      logger.error(`Error parsing installer YAML file ${installerPath}:`, error)
+      return []
+    }
+  }
+  public async updateManifests(): Promise<void> {
+    try {
+      if (fs.existsSync(this.tempRepoPath)) {
+        logger.info('[WingetGitHubApi] Pulling latest changes...')
+        const { stdout } = await execAsync(`git -C "${this.tempRepoPath}" pull`)
+        if (/Already up[ -]to[ -]date/.test(stdout)) {
+          logger.info('[WingetGitHubApi] Already up to date.')
+        } else {
+          logger.info('[WingetGitHubApi] Updates pulled:', stdout)
+        }
+        return
+      }
+
+      logger.info('[WingetGitHubApi] Cloning manifests folder only with sparse checkout...')
+      await execAsync(`git clone --filter=blob:none --sparse --depth=1 ${this.repoUrl} "${this.tempRepoPath}"`)
+      await execAsync(`git -C "${this.tempRepoPath}" sparse-checkout set manifests`)
+      logger.info('[WingetGitHubApi] Clone complete.')
+    } catch (error) {
+      logger.error('Error updating manifests:', error)
+      throw error
+    }
   }
 }

@@ -46,7 +46,7 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
 
   useEffect(() => {
     dispatch(getJiraIssues({ id: software.id }))
-    setAutoCreateSubscribed(software.subscribeCreateIssue)
+    software.subscribeCreateIssue && setAutoCreateSubscribed(software.subscribeCreateIssue)
   }, [software, dispatch])
 
   const issues = useMemo(() => {

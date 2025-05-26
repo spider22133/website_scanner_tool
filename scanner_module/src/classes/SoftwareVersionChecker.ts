@@ -5,7 +5,6 @@ import { BaramundiApi } from './api/BaramundiApi'
 import { WingetGitHubApi } from './api/WingetApi'
 import { OrgUnitType, SoftwareType } from '@/types/baramundi'
 import SoftwareUpdateNotifier from './SoftwareUpdateNotifier'
-import semver from 'semver'
 import { JiraIssueService } from '@/services/jira.service'
 
 class SoftwareVersionChecker {
@@ -44,7 +43,7 @@ class SoftwareVersionChecker {
         await this.checkSoftwareVersion(software)
       }
 
-      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID)
+      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV)
 
       this.socket?.connected && this.socket.emit('updateSoftware', 'changed')
     } catch (error) {
@@ -96,8 +95,6 @@ class SoftwareVersionChecker {
 
     // 2. Try fetching Winget data (and handle potential failure)
     const packageDetails = await this.wingetApi.showSoftware(software.winget_id)
-    console.log(packageDetails)
-
     if (!packageDetails || !packageDetails.version) {
       throw new Error(`No version info found for Winget ID: ${software.winget_id}`)
     }
