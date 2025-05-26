@@ -131,7 +131,7 @@ export class WingetGitHubApi extends BaseRequestApi {
     return Array.from(entriesMap.values())
   }
 
-  private compareVersions(a: string, b: string): number {
+  public compareVersions(a: string, b: string): number {
     const semA = semver.coerce(a)
     const semB = semver.coerce(b)
     if (semA && semB) return semver.compare(semA, semB)

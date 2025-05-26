@@ -159,17 +159,7 @@ class SoftwareVersionChecker {
 
     if (versions.length > 0) {
       // Sort versions: first by semantic version comparison, then by natural order if semver fails
-      versions.sort((a, b) => {
-        const semverA = semver.coerce(a.version)
-        const semverB = semver.coerce(b.version)
-
-        if (semverA && semverB) {
-          return semver.rcompare(semverA, semverB) // Use semver if valid
-        }
-
-        // Fallback to natural string comparison (case-insensitive, numeric aware)
-        return b.version.localeCompare(a.version, undefined, { numeric: true, sensitivity: 'base' })
-      })
+      versions.sort((a, b) => this.wingetApi.compareVersions(a.version, b.version))
 
       // Select the latest version
       currentBaramundiAppId = versions[0].id
