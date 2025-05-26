@@ -147,7 +147,7 @@ const SoftwareColumns = ({
             </Tooltip>
           }
           label="Prüfen"
-          onClick={() => onCheck(row.winget_id)}
+          onClick={() => onCheck(row.id)}
           showInMenu={false}
         />,
         <GridActionsCellItem

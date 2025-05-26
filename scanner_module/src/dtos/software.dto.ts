@@ -2,6 +2,9 @@ import { IsString, IsBoolean, IsNumber } from 'class-validator'
 
 export default class CreateSoftwareDto {
   @IsString()
+  public id: number
+
+  @IsString()
   public name: string
 
   @IsString()

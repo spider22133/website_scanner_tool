@@ -1,9 +1,8 @@
 import SoftwareService from '@services/software.service'
 import { Socket } from 'socket.io'
 import { SoftwareModel } from '@models/software.model'
-import SoftwareVersionService from '@services/software_versions.service'
 import { BaramundiApi } from './api/BaramundiApi'
-import { WingetApi } from './api/WingetApi'
+import { WingetGitHubApi } from './api/WingetApi'
 import { OrgUnitType, SoftwareType } from '@/types/baramundi'
 import SoftwareUpdateNotifier from './SoftwareUpdateNotifier'
 import semver from 'semver'
@@ -16,6 +15,11 @@ class SoftwareVersionChecker {
   private notifier: SoftwareUpdateNotifier
   private socket: Socket
   private baramundi: BaramundiApi
+  public wingetApi: WingetGitHubApi
+
+  public connectWingetApi(api: WingetGitHubApi) {
+    this.wingetApi = api
+  }
 
   public connectSocket = (socket: Socket) => {
     this.socket = socket
@@ -33,6 +37,8 @@ class SoftwareVersionChecker {
   public async checkAllSoftware(): Promise<void> {
     try {
       const findAllSoftwaresData: SoftwareModel[] = await this.softwareService.findAllSoftware()
+
+      await this.wingetApi.updateManifests()
 
       for (const software of findAllSoftwaresData) {
         await this.checkSoftwareVersion(software)
@@ -64,6 +70,8 @@ class SoftwareVersionChecker {
         updatedSoftware = await this.updateSoftwareFromBaramundi(updatedSoftware, currentBaramundiAppId)
       }
 
+      if (single) await this.wingetApi.updateManifests()
+
       // Single check should also send notification, if baramundi version is to be updated.
       // single && (await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV))
 
@@ -81,15 +89,14 @@ class SoftwareVersionChecker {
    * Fetches package details and updates the software version if needed.
    */
   private async updateSoftwareVersion(software: SoftwareModel): Promise<SoftwareModel> {
-    let isUpdated = false
-
     // 1. Validate Winget ID
     if (!software.winget_id) {
       throw new Error(`Software ${software.name} does not have a winget_id.`)
     }
 
     // 2. Try fetching Winget data (and handle potential failure)
-    const packageDetails = await WingetApi.showSoftware(software.winget_id)
+    const packageDetails = await this.wingetApi.showSoftware(software.winget_id)
+    console.log(packageDetails)
 
     if (!packageDetails || !packageDetails.version) {
       throw new Error(`No version info found for Winget ID: ${software.winget_id}`)
@@ -105,11 +112,10 @@ class SoftwareVersionChecker {
 
     // 3. Check if main version is different
     if (packageDetails.version !== software.version) {
-      isUpdated = true
       return await this.softwareService.updateSoftware(
-        software.winget_id,
+        software.id.toString(),
         {
-          ...software.get({ plain: true }), // avoid raw Sequelize instance
+          ...software.get({ plain: true }),
           version: packageDetails.version,
           is_current: false,
         },
@@ -118,7 +124,7 @@ class SoftwareVersionChecker {
     }
 
     // 4. Version already matches — update details and mark current
-    return await this.softwareService.updateSoftware(software.winget_id, {
+    return await this.softwareService.updateSoftware(software.id.toString(), {
       ...software.get({ plain: true }),
       details: JSON.stringify(packageDetails),
       is_current: true,
@@ -180,7 +186,7 @@ class SoftwareVersionChecker {
     let updatedSoftware = software
 
     if (resultAppByID) {
-      updatedSoftware = await this.softwareService.updateSoftware(software.winget_id, {
+      updatedSoftware = await this.softwareService.updateSoftware(software.id.toString(), {
         ...software,
         bara_version: resultAppByID.Version,
         is_current: software.version === resultAppByID.Version,

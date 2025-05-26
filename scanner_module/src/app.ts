@@ -1,4 +1,8 @@
 import 'dotenv/config'
+import path from 'path'
+import { createServer, Server as HttpServer } from 'http'
+import { Server } from 'socket.io'
+import express, { Application } from 'express'
 import { initRoles } from '@models/role.model'
 
 process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
@@ -6,70 +10,58 @@ process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import express from 'express'
 import helmet from 'helmet'
 import hpp from 'hpp'
 import morgan from 'morgan'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
-import { createServer, Server as HttpServer } from 'http'
-import { Server } from 'socket.io'
-import DB from '@databases'
-import Routes from '@/interfaces/route.interface'
-import errorMiddleware from '@middlewares/error.middleware'
+
 import { logger, stream } from '@utils/logger'
-import { BaramundiApi } from './classes/api/BaramundiApi'
+import errorMiddleware from '@middlewares/error.middleware'
+import DB from '@databases'
+
+import Routes from '@/interfaces/route.interface'
+
+import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
+import TimerController from '@controllers/timer.controller'
 import WebexBot from './classes/api/WebexNodeBotFramework'
-import Route from '@/interfaces/route.interface'
-import path from 'path'
+import SoftwareUpdateNotifier from './classes/SoftwareUpdateNotifier'
+import { BaramundiApi } from './classes/api/BaramundiApi'
+import { WingetGitHubApi } from './classes/api/WingetApi'
 
 class App {
-  public app: express.Application
-  public port: string | number
+  public app: Application
   public env: string
+  public port: string | number
   public httpServer: HttpServer
   public io: Server
-  public baramundi: BaramundiApi
-  public webexBot?: WebexBot // Optional
 
-  // Baramundi Credentials
-  private baraUrl: string
-  private baraUsername: string
-  private baraSecret: string
+  public baramundi: BaramundiApi
+  public webexBot?: WebexBot
+  public softwareVersionChecker: SoftwareVersionChecker
+  public timerController: TimerController
 
   constructor(routes: Routes[]) {
-    this.app = express()
-    this.port = process.env.PORT || 3000
     this.env = process.env.NODE_ENV || 'development'
+    this.port = process.env.PORT || 3000
+    this.app = express()
     this.httpServer = createServer(this.app)
-    this.io = new Server(this.httpServer, { cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] } })
+    this.io = new Server(this.httpServer, {
+      cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] },
+    })
 
-    this.baraUrl = process.env.BARAMUNDI_URL
-    this.baraUsername = process.env.BARAMUNDI_USERNAME
-    this.baraSecret = process.env.BARAMUNDI_SECRET
+    this.softwareVersionChecker = new SoftwareVersionChecker()
+    this.timerController = TimerController.getInstance(this.softwareVersionChecker)
 
-    // Initialize app components
     this.initializeMiddlewares()
     this.initializeRoutes(routes)
     this.initializeSwagger()
     this.initializeErrorHandling()
-
-    // Baramundi API initialization
-    this.baramundi = new BaramundiApi({
-      baseUrl: this.baraUrl,
-      username: this.baraUsername,
-      password: this.baraSecret,
-    })
-
-    // Webex Bot Initialization (Only if token is provided)
-    if (process.env.WEBEX_BOT_TOKEN) {
-      this.webexBot = new WebexBot({
-        baseUrl: process.env.WEBEX_URL,
-        token: process.env.WEBEX_BOT_TOKEN,
-      })
-    }
-
+    this.initializeExternalServices()
+    this.initializeWebSocket()
     this.handleShutdown()
+
+    this.timerController.run()
   }
 
   public async listen() {
@@ -80,8 +72,12 @@ class App {
     })
   }
 
-  public getServer() {
+  public getServer(): HttpServer {
     return this.httpServer
+  }
+
+  public addRoutes(routes: Routes[]) {
+    this.initializeRoutes(routes)
   }
 
   private async connectToDatabase() {
@@ -109,37 +105,36 @@ class App {
   }
 
   private configureLogging() {
-    const logMode = this.env === 'production' ? 'combined' : 'dev'
-    this.app.use(morgan(logMode, { stream }))
+    const logFormat = this.env === 'production' ? 'combined' : 'dev'
+    this.app.use(morgan(logFormat, { stream }))
   }
 
   private configureCors() {
     const corsOptions = {
-      origin: this.env === 'production' ? 'your.domain.com' : true,
+      origin: this.env === 'production' ? 'https://your.domain.com' : true,
       credentials: true,
     }
     this.app.use(cors(corsOptions))
   }
 
   private initializeRoutes(routes: Routes[]) {
-    routes.forEach((route: Route) => {
+    routes.forEach(route => {
       this.app.use('/', route.router)
     })
   }
 
   private initializeSwagger() {
-    const options = {
+    const specs = swaggerJSDoc({
       swaggerDefinition: {
         info: {
           title: 'REST API',
           version: '1.0.0',
-          description: 'Example docs',
+          description: 'Example documentation',
         },
       },
       apis: ['swagger.yaml'],
-    }
+    })
 
-    const specs = swaggerJSDoc(options)
     this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
   }
 
@@ -147,18 +142,65 @@ class App {
     this.app.use(errorMiddleware)
   }
 
-  private handleShutdown() {
-    process.on('SIGINT', () => {
-      logger.info('🛑 Gracefully shutting down the server...')
-      this.webexBot?.stop()
-      process.exit(0)
+  private initializeWebSocket() {
+    this.io.on('connection', socket => {
+      logger.info('[WebSocket] New client connected')
+      this.softwareVersionChecker.connectSocket(socket)
+    })
+  }
+
+  private initializeExternalServices() {
+    this.initBaramundi()
+    this.initWinget()
+    this.initWebex()
+  }
+
+  private initBaramundi() {
+    const { BARAMUNDI_URL, BARAMUNDI_USERNAME, BARAMUNDI_SECRET } = process.env
+
+    this.baramundi = new BaramundiApi({
+      baseUrl: BARAMUNDI_URL,
+      username: BARAMUNDI_USERNAME,
+      password: BARAMUNDI_SECRET,
     })
 
-    process.on('SIGTERM', async () => {
+    this.softwareVersionChecker.connectBaramundiApi(this.baramundi)
+  }
+
+  private initWinget() {
+    const { GITHUB_TOKEN, GITHUB_URL } = process.env
+
+    const wingetApi = new WingetGitHubApi({
+      baseUrl: GITHUB_URL,
+      token: GITHUB_TOKEN,
+    })
+
+    this.softwareVersionChecker.connectWingetApi(wingetApi)
+  }
+
+  private initWebex() {
+    const { WEBEX_BOT_TOKEN, WEBEX_URL } = process.env
+
+    if (!WEBEX_BOT_TOKEN) return
+
+    this.webexBot = new WebexBot({
+      baseUrl: WEBEX_URL,
+      token: WEBEX_BOT_TOKEN,
+    })
+
+    const notifier = new SoftwareUpdateNotifier(this.webexBot)
+    this.softwareVersionChecker.connectNotifier(notifier)
+  }
+
+  private handleShutdown() {
+    const gracefulShutdown = async () => {
       logger.info('🛑 Gracefully shutting down the server...')
       await this.webexBot?.stop()
       process.exit(0)
-    })
+    }
+
+    process.on('SIGINT', gracefulShutdown)
+    process.on('SIGTERM', gracefulShutdown)
   }
 }
 

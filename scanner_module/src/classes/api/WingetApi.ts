@@ -1,173 +1,225 @@
+import fs from 'fs'
+import path from 'path'
+import fg from 'fast-glob'
+import { SoftwareEntry } from '../../../../types/common'
+import { BaseRequestApi } from '../abstract/BaseRequestApi'
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { WingetPackageDetails, SoftwareEntry } from '../../../../types/common'
-import { logger } from '@utils/logger'
+import { logger } from './../../utils/logger'
+import yaml from 'js-yaml'
+import semver from 'semver'
+
+interface WingetSearchResultItem {
+  name: string
+  path: string
+  repository: { name: string; full_name: string }
+  html_url: string
+}
+
+interface WingetPackageDetails {
+  id: string
+  version: string
+  publisher: string
+  publisherUrl?: string
+  publisherSupportUrl?: string
+  author?: string
+  name: string
+  moniker?: string
+  description?: string
+  homepage?: string
+  license?: string
+  licenseUrl?: string
+  privacyUrl?: string
+  copyright?: string
+  releaseNotes?: string
+  releaseNotesUrl?: string
+  documentations?: { DocumentLabel: string; DocumentUrl: string }[]
+  tags?: string[]
+  installer: {
+    type?: string
+    url?: string
+    sha256?: string
+    releaseDate?: string
+    offlineSupported?: boolean
+  }
+}
 
 const execAsync = promisify(exec)
 
-export class WingetApi {
-  private static async execWingetCommand(command: string): Promise<string> {
-    try {
-      const { stdout, stderr } = await execAsync(command)
-      if (stderr) logger.error(`winget stderr: ${stderr}`)
+export class WingetGitHubApi extends BaseRequestApi {
+  private readonly repoUrl = 'https://github.com/microsoft/winget-pkgs.git'
+  private readonly tempRepoPath = path.resolve('../../winget-temp')
+  private readonly manifestsPath = path.join(this.tempRepoPath, 'manifests')
 
-      return stdout
-    } catch (error) {
-      logger.error(`Command failed: ${command} - ${(error as Error).message}`)
-      throw error
-    }
+  public async searchSoftware(query: string): Promise<SoftwareEntry[]> {
+    const pattern = `${this.manifestsPath.replace(/\\/g, '/')}/**/*${query.toLowerCase()}*.locale.en-US.yaml`
+    const files = await fg(pattern, {
+      caseSensitiveMatch: false,
+      dot: false,
+    })
+
+    return this.parseEntriesFromPaths(files)
   }
 
-  public static async showSoftware(packageId: string): Promise<WingetPackageDetails | null> {
+  public async showSoftware(packageId: string): Promise<WingetPackageDetails | null> {
     try {
-      const stdout = await this.execWingetCommand(`winget show --id ${packageId}`)
-      return this.parsePackageDetailsFromMultilineOutput(stdout)
+      // Ensure manifests directory exists
+      if (!fs.existsSync(this.manifestsPath)) {
+        logger.error(`Manifests directory does not exist: ${this.manifestsPath}`)
+        return null
+      }
+
+      // Find the latest YAML file
+      const yamlPath = this.findLatestYamlPath(packageId)
+      if (!yamlPath) {
+        logger.error(`No YAML file found for packageId: ${packageId}`)
+        return null
+      }
+
+      // Parse the YAML file
+      const packageDetails = this.parseYamlToPackageDetails(yamlPath)
+      if (!packageDetails) {
+        logger.error(`Failed to parse YAML file: ${yamlPath}`)
+        return null
+      }
+
+      return packageDetails
     } catch (error) {
+      logger.error(`Error in showSoftware for packageId ${packageId}:`, error)
       return null
     }
   }
 
-  public static async searchSoftware(query: string): Promise<SoftwareEntry[]> {
-    try {
-      const stdout = await this.execWingetCommand(`winget search --name "${query.trim()}"`)
-      return this.parseSoftwareTable(stdout)
-    } catch (error) {
-      logger.error(`Search failed: ${(error as Error).message}`)
-      return []
-    }
-  }
+  private parseEntriesFromPaths(files: string[]): SoftwareEntry[] {
+    const entriesMap = new Map<string, SoftwareEntry>()
 
-  private static parseSoftwareTable(input: string): SoftwareEntry[] {
-    const lines = input.split('\n').slice(2) // Skip header lines
+    for (const file of files) {
+      // Normalize path and split into parts
+      const pathParts = file.replace(/\\/g, '/').split('/')
 
-    const entries: SoftwareEntry[] = []
+      // Extract version as the second-to-last part
+      const version = pathParts[pathParts.length - 2]
 
-    for (const line of lines) {
-      const parts = line.trim().split(/\s+/)
-      if (parts.length < 4) continue // Skip malformed lines
+      // Extract winget_id from filename
+      const filename = path.basename(file, '.locale.en-US.yaml')
+      const winget_id = filename
 
-      // Extract name (everything until we detect an ID, which should contain a dot)
-      const nameParts = []
-      let i = 0
-      while (i < parts.length && !parts[i].includes('.') && parts[i] !== 'Unknown') {
-        nameParts.push(parts[i])
-        i++
-      }
+      // Derive name from winget_id: split by '.', take parts after publisher, join with spaces
+      const idParts = winget_id.split('.')
+      const nameParts = idParts.slice(1) // Exclude publisher
+      let name = nameParts
+        .join(' ')
+        .replace(/\s+/g, ' ') // Normalize spaces
+        .trim()
 
-      const name = nameParts.join(' ')
-      const winget_id = parts[i] || ''
-      const version = parts[i + 1] || 'Unknown'
-      const source = parts[i + 2] || ''
-
-      // Only accept correctly formatted entries (ignores parsed headers)
-      if (source !== 'winget' && source !== 'msstore') continue
-      if (!winget_id.includes('.')) continue // Ensure ID format
-
-      entries.push({
+      // Create entry
+      const entry: SoftwareEntry = {
+        id: '',
         name,
         winget_id,
         version,
-        source,
-      })
+        source: 'winget',
+      }
+
+      // Keep only the highest version per winget_id
+      const existing = entriesMap.get(winget_id)
+      if (!existing || this.compareVersions(entry.version, existing.version) > 0) {
+        entriesMap.set(winget_id, entry)
+      }
     }
 
-    return entries
+    return Array.from(entriesMap.values())
   }
 
-  private static parsePackageDetailsFromMultilineOutput(multilineOutput: string): any {
-    const lines = multilineOutput.split('\n')
-    const packageDetails: any = {
-      installer: {},
-    }
+  private compareVersions(a: string, b: string): number {
+    const semA = semver.coerce(a)
+    const semB = semver.coerce(b)
+    if (semA && semB) return semver.compare(semA, semB)
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+  }
 
-    let isParsingMultiLine = false
-    let multiLineField = ''
-    let multiLineContent: string[] = []
+  private findLatestYamlPath(packageId: string): string | null {
+    const parts = packageId.split('.')
+    if (parts.length < 2) return null // Invalid packageId
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].replace(/^PUSH MULTILINE:\s*/, '').trim()
-      if (line === '') continue
+    const firstLetter = parts[0][0].toLowerCase()
+    const baseDir = path.join(this.manifestsPath, firstLetter, ...parts)
+    if (!fs.existsSync(baseDir)) return null
 
-      const colonIndex = line.indexOf(':')
-      const key = colonIndex !== -1 ? line.slice(0, colonIndex).trim() : ''
-      const value = colonIndex !== -1 ? line.slice(colonIndex + 1).trim() : ''
+    // List all subdirectories (versions) containing the YAML file
+    const versions = fs.readdirSync(baseDir).filter(dir => {
+      const dirPath = path.join(baseDir, dir)
+      const yamlPath = path.join(dirPath, `${packageId}.locale.en-US.yaml`)
+      return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory() && fs.existsSync(yamlPath)
+    })
 
-      // === Skip "Release Notes" completely ===
-      if (key === 'Release Notes') {
-        isParsingMultiLine = false
-        multiLineField = ''
-        multiLineContent = []
-        continue
-      }
+    if (versions.length === 0) return null
 
-      // === Handle Release Notes Url safely ===
-      if (key === 'Release Notes Url') {
-        packageDetails.releaseNotesUrl = value
-        isParsingMultiLine = false
-        continue
-      }
-
-      // === Multiline Top-level fields ===
-      const knownTopLevelFields = [
-        'Version',
-        'Publisher',
-        'Publisher Url',
-        'Publisher Support Url',
-        'Author',
-        'Moniker',
-        'Description',
-        'Homepage',
-        'License',
-        'License Url',
-        'Privacy Url',
-        'Copyright',
-        'Copyright Url',
-        'Purchase Url',
-        'Documentation',
-      ]
-
-      const knownInstallerFields = ['Installer Type', 'Installer Url', 'Installer SHA256', 'Release Date', 'Offline Distribution Supported']
-
-      if (knownTopLevelFields.includes(key)) {
-        if (isParsingMultiLine && multiLineField && multiLineContent.length > 0) {
-          packageDetails[multiLineField] = multiLineContent.join('\n').trim()
-        }
-
-        isParsingMultiLine = true
-        multiLineField = key.replace(/ /g, '').replace(/^./, c => c.toLowerCase())
-        multiLineContent = value ? [value] : []
-        continue
-      }
-
-      if (knownInstallerFields.includes(key)) {
-        if (isParsingMultiLine && multiLineField && multiLineContent.length > 0) {
-          packageDetails[multiLineField] = multiLineContent.join('\n').trim()
-          isParsingMultiLine = false
-          multiLineField = ''
-          multiLineContent = []
-        }
-
-        const installerKey = key
-          .replace(/Installer /, '')
-          .replace(/ /g, '')
-          .replace(/^./, c => c.toLowerCase())
-        let parsedValue: any = value
-        if (installerKey === 'offlineSupported') parsedValue = value.toLowerCase() === 'true'
-        packageDetails.installer[installerKey] = parsedValue
-        continue
-      }
-
-      // === Collect multiline content ===
-      if (isParsingMultiLine) {
-        multiLineContent.push(line)
+    // Find the highest version using compareVersions
+    let maxV = versions[0]
+    for (let i = 1; i < versions.length; i++) {
+      if (this.compareVersions(versions[i], maxV) > 0) {
+        maxV = versions[i]
       }
     }
 
-    // === Final flush ===
-    if (isParsingMultiLine && multiLineField && multiLineContent.length > 0) {
-      packageDetails[multiLineField] = multiLineContent.join('\n').trim()
+    return path.join(baseDir, maxV, `${packageId}.locale.en-US.yaml`)
+  }
+
+  private parseYamlToPackageDetails(yamlPath: string): WingetPackageDetails | null {
+    if (!fs.existsSync(yamlPath)) return null
+    try {
+      const fileContent = fs.readFileSync(yamlPath, 'utf8')
+      const yamlData = yaml.load(fileContent)
+
+      // Map YAML fields to WingetPackageDetails
+      const packageDetails: WingetPackageDetails = {
+        id: yamlData.PackageIdentifier,
+        version: yamlData.PackageVersion,
+        publisher: yamlData.Publisher,
+        publisherUrl: yamlData.PublisherUrl,
+        publisherSupportUrl: yamlData.PublisherSupportUrl,
+        author: yamlData.Author,
+        name: yamlData.PackageName,
+        moniker: yamlData.Moniker,
+        description: yamlData.Description,
+        homepage: yamlData.PackageUrl,
+        license: yamlData.License,
+        licenseUrl: yamlData.LicenseUrl,
+        privacyUrl: yamlData.PrivacyUrl,
+        copyright: yamlData.Copyright,
+        releaseNotes: yamlData.ReleaseNotes,
+        releaseNotesUrl: yamlData.ReleaseNotesUrl,
+        documentations: yamlData.Documentations || [],
+        tags: yamlData.Tags || [],
+        installer: {}, // Empty for now; extend to parse .installer.yaml if needed
+      }
+
+      return packageDetails
+    } catch (error) {
+      logger.error(`Error parsing YAML file ${yamlPath}:`, error)
+      return null
+    }
+  }
+
+  public async updateManifests(): Promise<void> {
+    if (fs.existsSync(this.tempRepoPath)) {
+      logger.info('[WingetGitHubApi] Pulling latest changes...')
+
+      const { stdout } = await execAsync(`git -C "${this.tempRepoPath}" pull`)
+      if (/Already up[ -]to[ -]date/.test(stdout)) {
+        logger.info('[WingetGitHubApi] Already up to date.')
+      } else {
+        logger.info('[WingetGitHubApi] Updates pulled:')
+        logger.info(stdout)
+      }
+
+      return
     }
 
-    return packageDetails
+    logger.info('[WingetGitHubApi] Cloning manifests folder only with sparse checkout...')
+    await execAsync(`git clone --filter=blob:none --sparse --depth=1 ${this.repoUrl} "${this.tempRepoPath}"`)
+    await execAsync(`git -C "${this.tempRepoPath}" sparse-checkout set manifests`)
+    logger.info('[WingetGitHubApi] Clone complete.')
   }
 }

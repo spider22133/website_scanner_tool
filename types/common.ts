@@ -43,7 +43,7 @@ export interface SoftwareEntry {
   is_central_managed?: boolean;
   is_hidden?: boolean;
   is_current?: boolean;
-  subscribeCreateIssue: boolean;
+  subscribeCreateIssue?: boolean;
   updatedAt?: string;
   createdAt?: string;
 }

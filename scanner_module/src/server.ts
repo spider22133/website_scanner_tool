@@ -7,46 +7,23 @@ import UsersRoute from '@routes/users.route'
 import WebsiteStepsRoute from '@routes/control_steps.route'
 import SoftwareRoute from '@routes/software.route'
 import validateEnv from '@utils/validateEnv'
-import TimerController from '@controllers/timer.controller'
-import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import { logger } from './utils/logger'
-import SoftwareUpdateNotifier from './classes/SoftwareUpdateNotifier'
 import JiraRoute from './routes/jira.route'
 
 // 1️⃣ Environment Setup
 process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
 validateEnv()
 
-// 2️⃣ Dependency Initialization
-const softwareVersionChecker = new SoftwareVersionChecker()
-const timerController = TimerController.getInstance(softwareVersionChecker)
-timerController.run()
+// 2️⃣ Initial App setup with independent routes
+const app = new App([new JiraRoute(), new IndexRoute(), new UsersRoute(), new AuthRoute(), new WebsiteStepsRoute()])
 
-// 3️⃣ Application Setup
-const app = new App([
-  new JiraRoute(),
-  new IndexRoute(),
-  new UsersRoute(),
-  new AuthRoute(),
-  new SoftwareRoute(softwareVersionChecker),
-  new TimerRoute(timerController),
-  new WebsiteStepsRoute(),
-])
+// 3️⃣ Now that `app` is defined, inject dependent routes
+app.addRoutes([new SoftwareRoute(app.softwareVersionChecker), new TimerRoute(app.timerController)])
 
-// 4️⃣ Start Application
+// 4️⃣ Start App
 app.listen()
 
-// 5️⃣ Connect APIs after App is Running
-softwareVersionChecker.connectBaramundiApi(app.baramundi)
-softwareVersionChecker.connectNotifier(new SoftwareUpdateNotifier(app.webexBot))
-
-// 6️⃣ WebSocket Handling (After Server Starts)
-app.io.on('connection', socket => {
-  logger.info('[WebSocket] New client connected')
-  softwareVersionChecker.connectSocket(socket)
-})
-
-// Webex Bot initialization
-app.webexBot.initialize().then(async () => {
+// 5️⃣ Initialize bot
+app.webexBot?.initialize().then(() => {
   logger.info('📢 Bot is ready to send messages.')
 })
