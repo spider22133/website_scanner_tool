@@ -11,7 +11,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
-import 'react-xml-editor/css/xonomy.css'
+// import 'react-xml-editor/css/xonomy.css'
 import StepCreateBds from '../steps/createBds'
 import { SoftwareEntry } from '../../../../../types/common'
 import { PackageDetailsProps } from '../../dashboard.component'
@@ -49,7 +49,7 @@ const StepIconWrapper = styled('div', {
 }))
 
 function CustomStepIcon({ icon, active, completed, className }: StepIconProps) {
-  const icons: Record<string, React.ReactElement> = {
+  const icons: Record<string, React.ReactElement<any>> = {
     1: <EditDocumentIcon />,
     2: <DownloadIcon />,
     3: <ViewInArIcon />,

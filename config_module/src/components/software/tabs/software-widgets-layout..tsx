@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, type JSX } from 'react'
 import { SoftwareEntry } from '../../../../../types/common'
 import SoftwareInfoWidget from '../widgets/softwareInfoWidget'
 import SoftwareSettingsWidget from '../widgets/softwareSettingsWidget'

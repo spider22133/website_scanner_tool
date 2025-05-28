@@ -1,8 +1,8 @@
-import { ReactElement, JSXElementConstructor } from 'react'
+import { ReactElement, JSXElementConstructor, type JSX } from 'react';
 
 export interface CustomTabProps {
   tabType: string
-  tabIcon?: React.ReactElement
+  tabIcon?: React.ReactElement<any>
   tabLabel: string
   tabContent: () => JSX.Element
 }

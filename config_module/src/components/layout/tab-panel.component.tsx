@@ -6,7 +6,7 @@ interface TabPanelProps {
   value: number | string
 }
 
-const TabPanel = (props: TabPanelProps): ReactElement => {
+const TabPanel = (props: TabPanelProps): ReactElement<any> => {
   const { children, value, index, ...other } = props
 
   return (

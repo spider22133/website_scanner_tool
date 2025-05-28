@@ -26,7 +26,7 @@ export default function Header() {
           }}
         >
           <Link to="/dashboard">
-            <img src="/logo1.png" alt="logo" width="100%" height="50" />
+            <img src="/Logo1.png" alt="logo" width="100%" height="50" />
             {/* <img src="/logo.jpg" alt="logo" width="50" height="50" /> */}
           </Link>
 
