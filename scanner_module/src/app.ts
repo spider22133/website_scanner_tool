@@ -96,7 +96,11 @@ class App {
     this.configureCors()
 
     this.app.use(hpp())
-    this.app.use(helmet())
+    this.app.use(
+      helmet({
+        crossOriginResourcePolicy: { policy: 'cross-origin' }, // Override CORP to allow cross-origin
+      }),
+    )
     this.app.use(compression())
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: true }))
@@ -111,7 +115,7 @@ class App {
 
   private configureCors() {
     const corsOptions = {
-      origin: this.env === 'production' ? 'https://your.domain.com' : true,
+      origin: this.env === 'production' ? 'https://your.domain.com' : 'http://localhost:3000',
       credentials: true,
     }
     this.app.use(cors(corsOptions))

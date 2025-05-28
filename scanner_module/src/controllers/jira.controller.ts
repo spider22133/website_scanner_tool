@@ -27,7 +27,7 @@ class JiraController {
     }
   }
 
-  public createIssue = async (req: Request, res: Response) => {
+  public createIssue = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const payload = req.body
       const software = await SoftwareModel.findOne({
@@ -35,7 +35,10 @@ class JiraController {
         include: [{ model: SoftwareVersionModel, as: 'versions' }],
       })
 
-      if (!software) return res.status(404).json({ error: 'Software not found' })
+      if (!software) {
+        res.status(404).json({ error: 'Software not found' })
+        return
+      }
 
       const dbIssue = await this.service.createJiraIssueForSoftware(software, payload.priority || '3')
       res.status(201).json({ data: dbIssue })
@@ -45,7 +48,7 @@ class JiraController {
     }
   }
 
-  public updateIssue = async (req: Request, res: Response) => {
+  public updateIssue = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const payload = req.body
       const software = await SoftwareModel.findOne({
@@ -56,7 +59,10 @@ class JiraController {
         ],
       })
 
-      if (!software) return res.status(404).json({ error: 'Software not found' })
+      if (!software) {
+        res.status(404).json({ error: 'Software not found' })
+        return
+      }
 
       const dbIssue = await this.service.updateJiraIssueForSoftware(software, payload.priority || '3', payload.issue_id)
       res.status(201).json(dbIssue)

@@ -130,15 +130,14 @@ class SoftwareController {
       const software = await this.softwareService.findSoftwareById(softwareName)
 
       if (!software) {
-        return res.status(404).json({ message: 'Software not found' })
+        res.status(404).json({ message: 'Software not found' })
+        return
       }
 
       const softwareId = software.id
 
       // Step 1: Delete old relations
-      await SoftwareUser.destroy({
-        where: { softwareId },
-      })
+      await SoftwareUser.destroy({ where: { softwareId } })
 
       // Step 2: Insert new user relations from req.body (not from DB!)
       const userRecords = items.map(item => ({
@@ -150,12 +149,11 @@ class SoftwareController {
 
       await SoftwareUser.bulkCreate(userRecords)
 
-      return res.status(200).json({ message: 'Software users updated successfully' })
+      res.status(200).json({ message: 'Software users updated successfully' })
     } catch (err) {
       next(err)
     }
   }
-
   //
   // WinGet
   //

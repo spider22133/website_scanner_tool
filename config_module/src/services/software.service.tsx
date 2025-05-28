@@ -14,7 +14,7 @@ const SoftwareDataService = {
   create: (data: SoftwareEntry) => http.post('/software/create', data),
   delete: (id: string) => http.delete(`/software/${id}`),
 
-  searchWithWinget: (query: string) => http.get(`/software/q=${query}`),
+  searchWithWinget: (query: string) => http.get(`/software/q/${query}`),
 
   updateIcon: (id: string, formData: FormData) =>
     http.post(`/software/${id}/icon`, formData, {

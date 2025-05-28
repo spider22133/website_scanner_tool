@@ -20,8 +20,8 @@ class SoftwareRoute implements Route {
   private initializeRoutes() {
     // Software retrieval routes
     this.router.get(this.path, authMiddleware, this.softwareController.getSoftware)
-    this.router.get(`${this.path}/:id(\\d+)`, authMiddleware, this.softwareController.getSoftwareById)
-    this.router.get(`${this.path}/q=:query`, authMiddleware, this.softwareController.searchWinGetSoftware)
+    this.router.get(`${this.path}/:id`, authMiddleware, this.softwareController.getSoftwareById)
+    this.router.get(`${this.path}/q/:query`, authMiddleware, this.softwareController.searchWinGetSoftware)
 
     // curl -X GET http://localhost:3001/software/load-xml
     this.router.get(`${this.path}/load-xml`, (req, res) => {
