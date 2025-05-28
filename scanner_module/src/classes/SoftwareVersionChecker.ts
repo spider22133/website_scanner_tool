@@ -43,7 +43,7 @@ class SoftwareVersionChecker {
         await this.checkSoftwareVersion(software)
       }
 
-      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID_DEV)
+      await this.notifier.sendDailySoftwareUpdates(process.env.WEBEX_CHAT_ID)
 
       this.socket?.connected && this.socket.emit('updateSoftware', 'changed')
     } catch (error) {

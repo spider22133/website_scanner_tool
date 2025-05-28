@@ -40,7 +40,7 @@ const softwareSlice = createSlice({
       .addCase(fetchAllSoftware.fulfilled, (state, { payload }) => {
         state.software = payload.map(item => ({
           ...item,
-          details: JSON.parse(item.details as string) as WingetPackageDetails,
+          details: item.details ? (JSON.parse(item.details.toString()) as WingetPackageDetails) : undefined,
         }))
         state.loading = false
       })
@@ -59,7 +59,7 @@ const softwareSlice = createSlice({
         state.software[index] = {
           ...state.software[index],
           ...payload,
-          details: JSON.parse(payload.details as string) as WingetPackageDetails,
+          details: payload.details ? (JSON.parse(payload.details.toString()) as WingetPackageDetails) : undefined,
         }
       })
       .addCase(updateSoftware.rejected, state => {
@@ -78,7 +78,7 @@ const softwareSlice = createSlice({
           state.software[index] = {
             ...state.software[index],
             ...payload,
-            details: JSON.parse(payload.details as string) as WingetPackageDetails,
+            details: payload.details ? (JSON.parse(payload.details.toString()) as WingetPackageDetails) : undefined,
           }
         }
       })
@@ -104,7 +104,7 @@ const softwareSlice = createSlice({
       .addCase(createSoftware.fulfilled, (state, { payload }) => {
         state.software.unshift({
           ...payload,
-          details: JSON.parse(payload.details as string) as WingetPackageDetails,
+          details: payload.details ? (JSON.parse(payload.details.toString()) as WingetPackageDetails) : undefined,
         })
         state.createSoftwareLoading = false
       })
@@ -153,7 +153,7 @@ const softwareSlice = createSlice({
           state.software[index] = {
             ...state.software[index],
             ...payload,
-            details: JSON.parse(payload.details as string) as WingetPackageDetails,
+            details: payload.details ? (JSON.parse(payload.details.toString()) as WingetPackageDetails) : undefined,
           }
         }
       })
