@@ -1,6 +1,6 @@
 import React from 'react'
 import { SoftwareEntry } from '../../../../../types/common'
-import { Typography, Divider, Link, Grid, Chip, Stack, Tooltip, Accordion, AccordionDetails, AccordionSummary, Box } from '@mui/material'
+import { Typography, Divider, Link, Grid, Chip, Stack, Accordion, AccordionDetails, AccordionSummary, Box } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { CopyToClipboard } from '../../utilities/CopyToClipboard'
 import { setMessage } from '../../../store/slices/message.slice'
@@ -18,7 +18,6 @@ const SoftwareInfoWidget: React.FC<SoftwareInfoWidgetProps> = ({ software }) => 
   const { version, bara_version, details, is_current, name } = software
   const { publisher, publisherUrl, publisherSupportUrl, installers, homepage, license, licenseUrl, copyright, description, releaseNotesUrl } =
     details || {}
-  console.log(installers)
 
   return (
     <Accordion defaultExpanded sx={{ p: 2 }} elevation={0}>

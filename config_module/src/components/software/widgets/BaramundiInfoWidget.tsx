@@ -9,23 +9,19 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Icon,
   styled,
   tooltipClasses,
   TooltipProps,
 } from '@mui/material'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useDispatch } from 'react-redux'
 
 interface BaramundiInfoProps {
   software: SoftwareEntry
 }
 
 const BaramundiInfoWidget: React.FC<BaramundiInfoProps> = ({ software }) => {
-  const dispatch = useDispatch()
-
-  const { is_central_managed, name } = software
+  const { is_central_managed } = software
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => <Tooltip {...props} classes={{ popper: className }} />)(({ theme }) => ({
     [`& .${tooltipClasses.tooltip}`]: {

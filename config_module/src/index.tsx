@@ -40,7 +40,7 @@ root.render(
     <StyledEngineProvider injectFirst>
       <Provider store={store}>
         <SnackbarProvider maxSnack={3}>
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
             <ThemeProvider theme={theme}>
               <CssBaseline />
               <App />
