@@ -53,7 +53,7 @@ class SoftwareService {
   }
 
   public async updateSoftware(id: string, data: CreateSoftwareDto, withVersion = false): Promise<SoftwareModel> {
-    const findSoftware = await this.software.findOne({ where: { id } })
+    const findSoftware = await this.software.findByPk(id)
 
     if (!findSoftware) throw new HttpException(409, 'There is no software with such id')
 

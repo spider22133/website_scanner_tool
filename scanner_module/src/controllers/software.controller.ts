@@ -62,8 +62,6 @@ class SoftwareController {
   public checkSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const websiteId = req.params.id
-      console.log(websiteId)
-
       const findOne = await this.softwareService.findSoftwareById(websiteId)
       const { software, message } = await this.softwareVersionChecker.checkSoftwareVersion(findOne, true)
 

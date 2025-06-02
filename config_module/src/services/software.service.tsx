@@ -10,7 +10,7 @@ const SoftwareDataService = {
   getUsers: (id: string) => http.get(`/software/${id}/users`),
   setUsers: (id: string, data: SoftwareUser[]) => http.post(`/software/${id}/users`, data),
 
-  update: (data: SoftwareEntry) => http.put(`/software/${data.winget_id}`, { ...data }),
+  update: (data: SoftwareEntry) => http.put(`/software/${data.id}`, { ...data }),
   create: (data: SoftwareEntry) => http.post('/software/create', data),
   delete: (id: string) => http.delete(`/software/${id}`),
 
