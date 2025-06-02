@@ -8,8 +8,8 @@ dayjs.extend(weekday)
 class TimerController {
   private static _instance: TimerController
   private timer?: NodeJS.Timeout
-  private triggerHour = 13
-  private triggerMinute = 35
+  private triggerHour = 10
+  private triggerMinute = 20
   private constructor(public worker: SoftwareVersionChecker) {}
 
   public static getInstance(worker: SoftwareVersionChecker): TimerController {

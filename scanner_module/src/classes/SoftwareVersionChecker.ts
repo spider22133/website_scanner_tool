@@ -136,6 +136,7 @@ class SoftwareVersionChecker {
 
     let resultAppList = await this.baramundi.findApplicationByName(software.name)
     resultAppList = resultAppList.filter(app => app.AdditionalInfo !== 'AppleMac')
+    console.log(resultAppList)
 
     // Try to find the exact version first
     for (const app of resultAppList) {
@@ -149,14 +150,14 @@ class SoftwareVersionChecker {
     const versions = resultAppList
       .map(app => {
         // Extract version patterns like "2024.12.1+563", "25.0.2-alpha", "25.0.0.1"
-        const versionMatch = app.Name.match(/(\d+(\.\d+)*([a-zA-Z-+][\d]*)*)/)
+        const versionMatch = app.Name.match(/(\d+\.\d+(\.\d+)*)(([a-zA-Z-+][\d]*)*)?/)
         return versionMatch ? { id: app.Id, version: versionMatch[0] } : null
       })
       .filter((item): item is { id: string; version: string } => item !== null)
 
     if (versions.length > 0) {
       // Sort versions: first by semantic version comparison, then by natural order if semver fails
-      versions.sort((a, b) => this.wingetApi.compareVersions(a.version, b.version))
+      versions.sort((a, b) => this.wingetApi.compareVersions(a.version, b.version)).reverse()
 
       // Select the latest version
       currentBaramundiAppId = versions[0].id

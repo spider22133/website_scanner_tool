@@ -90,11 +90,11 @@ class SoftwareService {
     return software
   }
 
-  public async deleteSoftware(id: string): Promise<Software> {
+  public async deleteSoftware(id: string): Promise<SoftwareModel> {
     if (isEmpty(id)) throw new HttpException(400, "This isn't softwareId")
 
-    const findSoftware: SoftwareModel = await this.software.findOne({ where: { id } })
-    if (!findSoftware) throw new HttpException(409, "You're not software")
+    const findSoftware: SoftwareModel = await this.software.findByPk(id)
+    if (!findSoftware) throw new HttpException(409, 'Cant find software with the id')
 
     await this.software.destroy({ where: { id } })
 

@@ -211,7 +211,7 @@ const SoftwareColumns = ({
                 </Tooltip>
               }
               label="Löschen"
-              onClick={onDelete(row.winget_id)}
+              onClick={onDelete(row.id)}
               showInMenu
             />,
           )

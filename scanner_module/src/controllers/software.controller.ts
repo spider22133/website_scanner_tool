@@ -86,8 +86,7 @@ class SoftwareController {
 
   public deleteSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const wingetId = req.params.id
-      const deleteSoftwareData: Software = await this.softwareService.deleteSoftware(wingetId)
+      const deleteSoftwareData: Software = await this.softwareService.deleteSoftware(req.params.id)
 
       res.status(200).json({ data: deleteSoftwareData, message: 'deleted' })
     } catch (error) {
