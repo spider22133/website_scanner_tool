@@ -46,6 +46,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
   const {
     handleSubmit,
     setValue,
+    getValues,
     reset,
     watch,
     formState: { errors, isDirty },
@@ -60,13 +61,18 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
 
   const mainResponsible = watch('mainResponsible')
   const mainRepresentatives = watch('mainRepresentatives')
-  const iconFiles = watch('icon')
+  const iconFiles = getValues('icon')
 
   useEffect(() => {
     dispatch(fetchSoftwareUsers(software.id))
+    software.icon && resetIcon()
   }, [software, dispatch])
 
   useEffect(() => {
+    resetIcon()
+  }, [softwareUsers, users, software, reset])
+
+  const resetIcon = () => {
     const responsible = softwareUsers.find(user => user.userSettings.isPrimaryResponsible) || null
     const representatives = softwareUsers.filter(repr => repr.userSettings.isRepresentative)
 
@@ -78,7 +84,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
       mainRepresentatives: initialRepresentatives,
       icon: undefined,
     })
-  }, [softwareUsers, users, reset])
+  }
 
   const onSubmit: SubmitHandler<FormData> = data => {
     const { mainResponsible, mainRepresentatives, icon } = data
@@ -118,6 +124,8 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
           formData,
         }),
       )
+
+      resetIcon()
     }
   }
 
@@ -203,6 +211,9 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                     hidden
                     type="file"
                     accept="image/png,image/jpeg,image/svg+xml"
+                    onClick={e => {
+                      ;(e.target as HTMLInputElement).value = ''
+                    }}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const files = e.target.files
                       if (files?.length) {
@@ -211,7 +222,9 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                     }}
                   />
                 </Button>
-                {software.icon && <Avatar src={`http://localhost:3001${software.icon}`} alt="Software Icon" sx={{ width: 32, height: 32 }} />}
+                {software.icon && !iconFiles?.[0] && (
+                  <Avatar src={`http://localhost:3001${software.icon}?v=${Date.now()}`} alt="Software Icon" sx={{ width: 32, height: 32 }} />
+                )}
                 {iconFiles?.[0] && (
                   <Box>
                     <Typography variant="body2" noWrap>

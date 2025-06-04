@@ -27,7 +27,6 @@ import { createIssue, getJiraIssues } from '../../../store/thunks/issues.thunk'
 import MailIcon from '@mui/icons-material/Mail'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 import { updateSoftware } from '../../../store/thunks/software.thunk'
-import { isAdminUser } from '../../utilities/isAdminUser'
 
 interface TicketsWidgetProps {
   software: SoftwareEntry
@@ -41,8 +40,6 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
 
   const { softwareIssues, createIssueLoading } = useSelector((state: RootState) => state.issues)
   const { user } = useSelector((state: RootState) => state.auth)
-
-  const isAdmin = isAdminUser(user?.roles)
 
   useEffect(() => {
     dispatch(getJiraIssues({ id: software.id }))
@@ -230,16 +227,13 @@ const TicketsWidget: React.FC<TicketsWidgetProps> = ({ software }) => {
             <IconButton onClick={handleRefresh} sx={{ height: 46, width: 46 }} title="Aktualisieren">
               <RefreshIcon />
             </IconButton>
-
-            {!isAdmin && (
-              <IconButton
-                onClick={handleAutoUpdateSubscription}
-                sx={{ height: 46, width: 46 }}
-                title={`Jira-Ticket-Erstellung${autoCreateSubscribed ? ' nicht mehr' : ''} abonnieren`}
-              >
-                {autoCreateSubscribed ? <MarkEmailReadIcon /> : <MailIcon />}
-              </IconButton>
-            )}
+            <IconButton
+              onClick={handleAutoUpdateSubscription}
+              sx={{ height: 46, width: 46 }}
+              title={`Jira-Ticket-Erstellung${autoCreateSubscribed ? ' nicht mehr' : ''} abonnieren`}
+            >
+              {autoCreateSubscribed ? <MarkEmailReadIcon /> : <MailIcon />}
+            </IconButton>
           </Stack>
         </Stack>
 

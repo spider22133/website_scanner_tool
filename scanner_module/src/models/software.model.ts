@@ -59,6 +59,15 @@ export class SoftwareModel extends Model<Software, SoftwareCreationAttributes> {
     return versions.length > 0 ? versions[0] : null
   }
 
+  public async getLastIssue(): Promise<IssueModel | null> {
+    const issues = await this.getIssues({
+      order: [['createdAt', 'DESC']],
+      limit: 1,
+    })
+
+    return issues.length > 0 ? issues[0] : null
+  }
+
   public async getPrimaryResponsible(): Promise<UserModel | null> {
     const [primaryResponsible] = await this.getUsers({
       include: [

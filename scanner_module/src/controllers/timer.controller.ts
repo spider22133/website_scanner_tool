@@ -9,7 +9,7 @@ class TimerController {
   private static _instance: TimerController
   private timer?: NodeJS.Timeout
   private triggerHour = 8
-  private triggerMinute = 30
+  private triggerMinute = 0
   private constructor(public worker: SoftwareVersionChecker) {}
 
   public static getInstance(worker: SoftwareVersionChecker): TimerController {

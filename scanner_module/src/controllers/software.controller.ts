@@ -3,7 +3,7 @@ import SoftwareService from '@services/software.service'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import SoftwareVersionService from '@services/software_versions.service'
 import { SoftwareEntry } from '../../../types/common'
-import CreateSoftwareDto from '@dtos/software.dto'
+import { CreateSoftwareDto, UpdateSoftwareDto } from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
 import { WingetGitHubApi } from '@/classes/api/WingetApi'
 import { logger } from '@/utils/logger'
@@ -50,7 +50,7 @@ class SoftwareController {
 
   public updateSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteData: CreateSoftwareDto = req.body
+      const websiteData: UpdateSoftwareDto = req.body
       const updateSoftwareData = await this.softwareService.updateSoftware(req.params.id, { ...websiteData })
 
       res.status(200).json({ data: updateSoftwareData, message: 'updated' })
@@ -73,7 +73,7 @@ class SoftwareController {
 
   public createSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const websiteData: CreateSoftwareDto = req.body
+      const websiteData = req.body
 
       const createSoftwareData = await this.softwareService.createSoftware({ ...websiteData, is_current: true })
       res.status(201).json({ data: createSoftwareData, message: 'created' })
@@ -194,9 +194,11 @@ class SoftwareController {
   }
 
   public saveSoftwareIcon = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const wingetId = req.params.id
+    const softwareID = req.params.id
+    const findOne = await this.softwareService.findSoftwareById(softwareID)
+    const iconName = findOne.winget_id ? findOne.winget_id : findOne.name + '_' + softwareID
 
+    try {
       const storage = multer.diskStorage({
         destination: (req, file, cb) => {
           const dir = 'public/icons'
@@ -209,7 +211,7 @@ class SoftwareController {
         filename: (req, file, cb) => {
           // Preserve the original file extension
           const ext = path.extname(file.originalname).toLowerCase()
-          cb(null, `${wingetId}${ext}`)
+          cb(null, `${iconName}${ext}`)
         },
       })
 
@@ -238,11 +240,11 @@ class SoftwareController {
 
       // Use the uploaded file's extension in the icon path
       const ext = path.extname(req.file.originalname).toLowerCase()
-      const iconPath = `/icons/${wingetId}${ext}`
+      const iconPath = `/icons/${iconName}${ext}`
 
       // Update software with the icon path
-      const findOne = await this.softwareService.findSoftwareById(wingetId)
-      const updatedSoftware = await this.softwareService.updateSoftware(wingetId, { ...findOne, icon: iconPath })
+      const findOne = await this.softwareService.findSoftwareById(softwareID)
+      const updatedSoftware = await this.softwareService.updateSoftware(softwareID, { ...findOne, icon: iconPath })
 
       res.status(200).json({
         data: updatedSoftware,

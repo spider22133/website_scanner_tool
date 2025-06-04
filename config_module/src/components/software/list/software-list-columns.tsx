@@ -113,10 +113,8 @@ const SoftwareColumns = ({
     sortable: false,
     editable: false,
     renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
-      <Stack direction="row" alignItems="center" spacing={1}>
-        <Box>
-          <DeviceHubOutlinedIcon fontSize="small" />
-        </Box>
+      <Stack direction="row" alignItems="center" spacing={1} height="100%">
+        <DeviceHubOutlinedIcon fontSize="small" />
         <span>{params.row.bara_version || ''}</span>
       </Stack>
     ),

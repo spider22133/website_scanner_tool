@@ -4,7 +4,7 @@ import Route from '@/interfaces/route.interface'
 import validationMiddleware from '@middlewares/validation.middleware'
 import authMiddleware from '@/middlewares/auth.middleware'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
-import CreateSoftwareDto from '@dtos/software.dto'
+import { CreateSoftwareDto, UpdateSoftwareDto } from '@dtos/software.dto'
 import fs from 'fs'
 
 class SoftwareRoute implements Route {
@@ -45,10 +45,10 @@ class SoftwareRoute implements Route {
     // Software modification routes
     this.router.post(
       `${this.path}/create`,
-      [validationMiddleware(CreateSoftwareDto, 'body'), authMiddleware],
+      [validationMiddleware(CreateSoftwareDto, 'body', true), authMiddleware],
       this.softwareController.createWinGetSoftware,
     )
-    this.router.put(`${this.path}/:id`, validationMiddleware(CreateSoftwareDto, 'body', true), this.softwareController.updateSoftware)
+    this.router.put(`${this.path}/:id`, validationMiddleware(UpdateSoftwareDto, 'body', true), this.softwareController.updateSoftware)
     this.router.delete(`${this.path}/:id`, authMiddleware, this.softwareController.deleteSoftware)
     this.router.post(`${this.path}/:id/icon`, authMiddleware, this.softwareController.saveSoftwareIcon)
   }

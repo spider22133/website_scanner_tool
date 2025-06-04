@@ -1,6 +1,6 @@
 import DB from '@databases'
 import { Software } from '@/interfaces/software.interface'
-import CreateSoftwareDto from '@/dtos/software.dto'
+import { CreateSoftwareDto, UpdateSoftwareDto } from '@/dtos/software.dto'
 import { isEmpty } from '@/utils/util'
 import HttpException from '@/exceptions/HttpException'
 import { SoftwareModel } from '@/models/software.model'
@@ -52,7 +52,7 @@ class SoftwareService {
     return findSoftware
   }
 
-  public async updateSoftware(id: string, data: CreateSoftwareDto, withVersion = false): Promise<SoftwareModel> {
+  public async updateSoftware(id: string, data: UpdateSoftwareDto, withVersion = false): Promise<SoftwareModel> {
     const findSoftware = await this.software.findByPk(id)
 
     if (!findSoftware) throw new HttpException(409, 'There is no software with such id')

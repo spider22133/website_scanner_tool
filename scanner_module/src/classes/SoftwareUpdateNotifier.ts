@@ -11,6 +11,7 @@ type SoftwareRow = {
   version: string
   baraVersion: string
   responsible: string
+  jiraKey: string
 }
 
 // Define constants for date formats to avoid repetition
@@ -47,7 +48,6 @@ class SoftwareUpdateNotifier {
 
       const markdown = await this.formatSoftwareUpdateMessage(todaysUpdates)
       if (markdown) {
-        //   this.webexBot.sendMessage(roomId, message)
         await this.webexBot.sendRawMarkdown(roomId, markdown)
       } else {
         logger.info('ℹ️ Keine relevanten Updates zum Senden.')
@@ -75,54 +75,6 @@ class SoftwareUpdateNotifier {
     return updatedItems
   }
 
-  // private async formatSoftwareUpdateMessage(updates: SoftwareModel[]): Promise<string | null> {
-  //   if (updates.length === 0) {
-  //     return null
-  //   }
-
-  //   const header = `**🆕 NON-MSW Changelog**`
-  //   const tableHeader = [
-  //     '| Nr. | Datum  Produkt | Version | Baramundi V. | Verantwortlich |',
-  //     '|----|-------|---------|---------|--------------|---------------|',
-  //   ].join('\n')
-
-  //   // Fetch all versions and process them
-  //   const sortedUpdates = await this.getSortedUpdates(updates)
-
-  //   if (sortedUpdates.length === 0) {
-  //     return null
-  //   }
-
-  //   // Generate table rows asynchronously
-  //   const tableRows = await Promise.all(
-  //     sortedUpdates.reverse().map(async (item, index) => {
-  //       const { software, date, time } = item
-  //       const version = software.version || 'N/A'
-  //       const baraVersion = software.bara_version || 'N/A'
-  //       const name = software.name || 'Unbekannt'
-  //       const responsibleId = software.user_id
-
-  //       let responsibleName = 'Unbekannt'
-  //       if (responsibleId) {
-  //         try {
-  //           const responsible = await this.userService.findUserById(responsibleId)
-  //           responsibleName = `${responsible.firstName} ${responsible.lastName}`
-  //         } catch (error) {
-  //           responsibleName = 'Nicht gefunden'
-  //         }
-  //       }
-
-  //       return `| ${sortedUpdates.length - index} | ${dayjs(date).format(
-  //         DISPLAY_DATE_FORMAT,
-  //       )} | ${name} | ${version} | ${baraVersion} | ${responsibleName} |`
-  //     }),
-  //   )
-
-  //   return [header, '', 'Hier sind die neuesten Software-Updates für heute:', '', tableHeader, ...tableRows, ''].join('\n')
-  // }
-
-  // Helper function to get sorted updates
-
   private async formatSoftwareUpdateMessage(updates: SoftwareModel[]): Promise<string | null> {
     if (updates.length === 0) {
       return null
@@ -135,7 +87,7 @@ class SoftwareUpdateNotifier {
 
     const tableRows = await Promise.all(
       sortedUpdates.reverse().map(async item => {
-        const { software, date } = item
+        const { software, date, jiraKey } = item
         const softwareUser = await software.getPrimaryResponsible()
         const version = software.version || 'N/A'
         const baraVersion = software.bara_version || 'N/A'
@@ -158,6 +110,7 @@ class SoftwareUpdateNotifier {
           version,
           baraVersion,
           responsible: responsibleName,
+          jiraKey,
         }
       }),
     )
@@ -169,20 +122,21 @@ class SoftwareUpdateNotifier {
     return [header, '', intro, '```', asciiTable, '```'].join('\n')
   }
 
-  private async getSortedUpdates(updates: SoftwareModel[]): Promise<{ software: SoftwareModel; date: Date; time: string }[]> {
+  private async getSortedUpdates(updates: SoftwareModel[]): Promise<{ software: SoftwareModel; jiraKey: string; date: Date; time: string }[]> {
     const updatesWithVersions = await Promise.all(
       updates.map(async software => {
         const latestVersion = await software.getLastVersion()
+        const issue = await software.getLastIssue()
         if (latestVersion) {
           const time = dayjs(latestVersion.updatedAt).format(TIME_FORMAT)
-          return { software, date: latestVersion.updatedAt, time }
+          return { software, date: latestVersion.updatedAt, time, jiraKey: issue.jira_key }
         }
         return null
       }),
     )
 
     // Filter out null values and sort by date and time
-    const validUpdates = updatesWithVersions.filter(item => item !== null) as { software: SoftwareModel; date: Date; time: string }[]
+    const validUpdates = updatesWithVersions.filter(item => item !== null) as { software: SoftwareModel; jiraKey: string; date: Date; time: string }[]
 
     return validUpdates.sort((a, b) => {
       // Sort first by date, then by time if the dates are equal
@@ -195,8 +149,8 @@ class SoftwareUpdateNotifier {
   }
 
   private generateAsciiTable(rows: SoftwareRow[]): string {
-    const headers = ['Nr.', 'Datum', 'Produkt', 'Version', 'Baramundi V.', 'Verantwortlich']
-    const allRows = rows.map((row, i) => [`${rows.length - i}`, row.date, row.name, row.version, row.baraVersion, row.responsible])
+    const headers = ['Nr.', 'Datum', 'Produkt', 'Version', 'Baramundi V.', 'Verantwortlich', 'Jira Ticket']
+    const allRows = rows.map((row, i) => [`${rows.length - i}`, row.date, row.name, row.version, row.baraVersion, row.responsible, row.jiraKey])
     const table = [headers, ...allRows]
 
     const colWidths = headers.map((_, colIdx) => Math.max(...table.map(row => row[colIdx].length)))
