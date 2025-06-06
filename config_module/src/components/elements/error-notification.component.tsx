@@ -1,9 +1,10 @@
-import { iniState } from '../../slices/message.slice';
+import { MessageState } from '../../store/slices/message.slice'
+import { Alert } from '@mui/material'
 
 type Props = {
-  websiteId: string;
-  messages: iniState[];
-};
+  websiteId: string
+  messages: MessageState[]
+}
 export const APIErrorNotification = ({ messages, websiteId }: Props) => {
   return (
     <>
@@ -11,17 +12,17 @@ export const APIErrorNotification = ({ messages, websiteId }: Props) => {
         <div className="form-group mt-3">
           {messages.map(({ message, id }, index) => {
             return id === websiteId ? (
-              <div key={index} className="alert alert-danger" role="alert">
-                <div>{message}</div>
-              </div>
+              <Alert key={index} severity="error">
+                {message}
+              </Alert>
             ) : (
               ''
-            );
+            )
           })}
         </div>
       ) : (
         ''
       )}
     </>
-  );
-};
+  )
+}

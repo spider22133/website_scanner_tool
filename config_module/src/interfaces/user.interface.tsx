@@ -1,8 +1,12 @@
+import { Role } from '../../../scanner_module/dist/scanner_module/src/interfaces/role.interface'
+import { SoftwareUser } from './common'
 export default interface IUser {
-  firstName?: string;
-  lastName?: string;
-  email: string;
-  password: string;
-  roles?: string[];
-  token?: string;
+  id?: number
+  firstName?: string
+  lastName?: string
+  email: string
+  password: string
+  roles?: Role[]
+  userSettings?: SoftwareUser
+  token?: string
 }

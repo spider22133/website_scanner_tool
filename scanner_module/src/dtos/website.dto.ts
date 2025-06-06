@@ -1,12 +1,15 @@
-import { IsString, IsBoolean } from 'class-validator';
+import { IsString, IsBoolean } from 'class-validator'
 
 export default class CreateWebsiteDto {
   @IsString()
-  public name: string;
+  public name: string
 
   @IsString()
-  public url: string;
+  public url: string
 
   @IsBoolean()
-  public is_active: boolean;
+  public is_hidden: boolean
+
+  @IsBoolean()
+  public is_active: boolean
 }

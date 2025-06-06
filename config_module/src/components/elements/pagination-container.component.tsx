@@ -1,36 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect } from 'react'
 
 type Props = {
-  totalItems: number;
-  itemsPerPage: number;
-  currentPage: number;
-  pageChange: (page: number) => void;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-};
+  totalItems: number
+  itemsPerPage: number
+  currentPage: number
+  pageChange: (page: number) => void
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+}
 
 export default function PaginationContainer(props: Props) {
-  const { totalItems, pageChange, itemsPerPage, currentPage, setCurrentPage } = props;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const { totalItems, pageChange, itemsPerPage, currentPage, setCurrentPage } = props
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
 
   useEffect(() => {
-    pageChange(currentPage);
-  }, [currentPage]);
+    pageChange(currentPage)
+  }, [currentPage])
 
   const onFirstPage = (): void => {
-    setCurrentPage(1);
-  };
+    setCurrentPage(1)
+  }
 
   const onLastPage = (): void => {
-    setCurrentPage(totalPages);
-  };
+    setCurrentPage(totalPages)
+  }
 
   const onNextPage = (): void => {
-    setCurrentPage(currentPage + 1);
-  };
+    setCurrentPage(currentPage + 1)
+  }
 
   const onPreviousPage = (): void => {
-    setCurrentPage(currentPage - 1);
-  };
+    setCurrentPage(currentPage - 1)
+  }
 
   return (
     <nav>
@@ -62,5 +62,5 @@ export default function PaginationContainer(props: Props) {
         </li>
       </ul>
     </nav>
-  );
+  )
 }

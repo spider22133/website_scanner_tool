@@ -1,3 +1,3 @@
-import { schema } from 'normalizr';
+import { schema } from 'normalizr'
 
-export const stateEntity = new schema.Entity('states');
+export const stateEntity = new schema.Entity('states')

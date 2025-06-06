@@ -1,23 +1,13 @@
-import React from 'react';
-import { Route, Redirect, RouteProps } from 'react-router-dom';
-import { userIsLogged } from '../helpers/session.helper';
+import { Navigate, useLocation } from 'react-router-dom'
+import { userIsLogged } from './session.helper'
 
-interface AnyRouteProps extends RouteProps {
-  component?: any;
-  children?: any;
+import type { JSX } from 'react'
+
+export const RequireAuth = ({ children }: { children: JSX.Element }) => {
+  const location = useLocation()
+  return userIsLogged() ? children : <Navigate to="/login" state={{ from: location }} replace />
 }
 
-export function PublicRoute(props: AnyRouteProps) {
-  const { component: Component, ...rest } = props;
-  return <Route {...rest} render={props => (!userIsLogged() ? <Component {...props} /> : <Redirect to={{ pathname: '/websites' }} />)} />;
-}
-
-export function PrivateRoute(props: AnyRouteProps) {
-  const { component: Component, ...rest } = props;
-  return (
-    <Route
-      {...rest}
-      render={props => (userIsLogged() ? <Component {...props} /> : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />)}
-    />
-  );
+export const RedirectIfLogged = ({ children }: { children: JSX.Element }) => {
+  return userIsLogged() ? <Navigate to="/dashboard" replace /> : children
 }

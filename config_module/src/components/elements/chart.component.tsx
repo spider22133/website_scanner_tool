@@ -1,24 +1,26 @@
-import { ApexOptions } from 'apexcharts';
-import { useEffect, useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
-import { addZero } from '../../helpers/chart.helper';
-import IState from '../../interfaces/website-state.interface';
+import { ApexOptions } from 'apexcharts'
+import { useEffect, useState } from 'react'
+import ReactApexChart from 'react-apexcharts'
+import { addZero } from '../../helpers/chart.helper'
+import { useTheme } from '@mui/material'
 type Props = {
-  states: IState[];
-  aggrStates: { avg: number; min: number; max: number } | undefined;
-};
+  states: any
+  aggrStates: { avg: number; min: number; max: number } | undefined
+}
 export default function Chart({ states, aggrStates }: Props) {
+  const theme = useTheme()
   const [series, setSeries] = useState<ApexAxisChartSeries>([
     {
       name: 'Answer Time:',
       data: [0],
     },
-  ]);
+  ])
 
   const [options, setOptions] = useState<ApexOptions>({
     chart: {
       type: 'area',
       height: 350,
+      group: '',
       toolbar: {
         tools: {
           pan: false,
@@ -36,7 +38,7 @@ export default function Chart({ states, aggrStates }: Props) {
       curve: 'smooth',
     },
     title: {
-      text: 'Answer Time Overview',
+      text: 'Home Page Response Time Overview',
       align: 'left',
       style: {
         fontSize: '18px',
@@ -44,6 +46,12 @@ export default function Chart({ states, aggrStates }: Props) {
     },
     xaxis: {
       categories: [0],
+      tickPlacement: 'between',
+      tickAmount: 15,
+      labels: {
+        offsetY: 10,
+        hideOverlappingLabels: true,
+      },
     },
     yaxis: {
       labels: {
@@ -58,22 +66,25 @@ export default function Chart({ states, aggrStates }: Props) {
     legend: {
       horizontalAlign: 'left',
     },
-  });
+    colors: [theme.palette.info.main],
+  })
 
   useEffect(() => {
-    const answerTimes: number[] = [];
-    const createdTimes: string[] = [];
+    const answerTimes: number[] = []
+    const createdTimes: string[] = []
 
-    states.forEach(e => {
-      const date = new Date(e.createdAt);
-      const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`;
-      answerTimes.push(e.answer_time);
-      createdTimes.push(time);
-    });
+    states.forEach((e: any) => {
+      if (e.response_time) {
+        const date = new Date(e.createdAt)
+        const time = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} - ${addZero(date.getHours())}:${addZero(date.getMinutes())}`
+        answerTimes.push(e.response_time)
+        createdTimes.push(time)
+      }
+    })
 
-    setSeries([{ data: answerTimes }]);
-    setOptions({ xaxis: { categories: createdTimes } });
-  }, [states.length]);
+    setSeries([{ data: answerTimes }])
+    setOptions({ xaxis: { categories: createdTimes } })
+  }, [states.length])
 
   return (
     <>
@@ -96,5 +107,5 @@ export default function Chart({ states, aggrStates }: Props) {
         </div>
       </div>
     </>
-  );
+  )
 }

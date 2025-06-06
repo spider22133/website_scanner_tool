@@ -1,81 +1,93 @@
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useHistory } from 'react-router-dom';
-import * as Yup from 'yup';
-import IUser from '../../interfaces/user.interface';
-import { RootState, useAppDispatch } from '../../store';
-import { login } from '../../slices/auth.slice';
-import { useSelector } from 'react-redux';
-import { APIErrorNotification } from '../elements/error-notification.component';
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useNavigate } from 'react-router-dom'
+import * as Yup from 'yup'
+import IUser from '../../interfaces/user.interface'
+import { RootState, useAppDispatch } from '../../store/store'
+import { login } from '../../store/slices/auth.slice'
+import { useSelector } from 'react-redux'
+import { APIErrorNotification } from '../elements/error-notification.component'
+import { Button, TextField, Box, Container, Paper, Typography } from '@mui/material'
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required('Email is required').email('Email is invalid'),
+  email: Yup.string().required('E-Mail oder Benutzername ist erforderlich'),
   password: Yup.string()
-    .required('Password is required')
-    .min(6, 'Password must be at least 6 characters')
-    .max(40, 'Password must not exceed 40 characters'),
-});
+    .required('Passwort ist erforderlich')
+    .min(6, 'Passwort muss mindestens 6 Zeichen lang sein')
+    .max(40, 'Passwort darf 40 Zeichen nicht überschreiten'),
+})
 
 export default function LogIn() {
-  const { loading } = useSelector((state: RootState) => state.auth);
-  const messages = useSelector((state: RootState) => state.messages);
-  const history = useHistory();
-  const dispatch = useAppDispatch();
+  const { loading } = useSelector((state: RootState) => state.auth)
+  const messages = useSelector((state: RootState) => state.messages)
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<IUser>({
     resolver: yupResolver(validationSchema),
-  });
+  })
 
   const onSubmit: SubmitHandler<IUser> = data => {
-    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && history.push('/websites'));
-  };
+    dispatch(login({ data, id: 'login' })).then(response => login.fulfilled.match(response) && navigate('/dashboard'))
+  }
 
   return (
-    <section className="vh-100-c" style={{ backgroundColor: '#508bfc' }}>
-      <div className="container py-5 h-100">
-        <div className="row d-flex justify-content-center align-items-center h-100">
-          <div className="col-12 col-md-8 col-lg-6 col-xl-4">
-            <div className="bg-light p-5 border shadow" style={{ borderRadius: '1rem' }}>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="form-group mb-4">
-                  <input
-                    type="text"
-                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                    placeholder="Enter Email"
-                    {...register('email')}
-                  />
-                  <div className="invalid-feedback">{errors.email?.message}</div>
-                </div>
-                <div className="form-group mb-4">
-                  <input
-                    type="password"
-                    placeholder="Enter Password"
-                    {...register('password')}
-                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  />
-                  <div className="invalid-feedback">{errors.password?.message}</div>
-                </div>
-                {/*<div className="mb-4 form-check w-100">
-                   <a href="#" className="float-end">
-                    Reset Password
-                  </a>
-                </div> */}
-                <button type="submit" className="btn btn-primary w-100 my-3 shadow" disabled={loading}>
-                  {loading ? 'Loading...' : 'Login'}
-                </button>
-                <p className="text-center m-0">
-                  No account yet, <a href="/signup">Please Signup</a>
-                </p>
-              </form>
-              <APIErrorNotification messages={messages} websiteId="login" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#508bfc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper
+          elevation={3}
+          sx={{
+            padding: 4,
+            borderRadius: '1rem',
+            backgroundColor: '#fff',
+          }}
+        >
+          <Typography variant="h4" align="center" gutterBottom>
+            Anmeldung
+          </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box sx={{ mb: 3, pt: 1 }}>
+              <TextField
+                fullWidth
+                label="E-Mail oder Benutzername eingeben"
+                variant="filled"
+                autoComplete="email"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                {...register('email')}
+              />
+            </Box>
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                label="Passwort eingeben"
+                type="password"
+                variant="filled"
+                autoComplete="current-password"
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                {...register('password')}
+              />
+            </Box>
+            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading} sx={{ my: 2, boxShadow: 2 }}>
+              {loading ? 'Wird geladen...' : 'Anmelden'}
+            </Button>
+          </form>
+          <APIErrorNotification messages={messages} websiteId="login" />
+        </Paper>
+      </Container>
+    </Box>
+  )
 }

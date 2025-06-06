@@ -1,45 +1,90 @@
-import { NextFunction, Request, Response } from 'express';
-import WebsiteChecker from 'websiteChecker';
+import { NextFunction, Request, Response } from 'express'
+import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
+import dayjs from 'dayjs'
+import { logger } from '@/utils/logger'
+import weekday from 'dayjs/plugin/weekday'
+dayjs.extend(weekday)
 
 class TimerController {
-  private _interval = 3600000;
-  public timer: NodeJS.Timer;
-  public worker: WebsiteChecker;
+  private static _instance: TimerController
+  private timer?: NodeJS.Timeout
+  private triggerHour = 8
+  private triggerMinute = 0
+  private constructor(public worker: SoftwareVersionChecker) {}
 
-  constructor(worker: WebsiteChecker) {
-    this.worker = worker;
-  }
-
-  get interval(): number {
-    return this._interval;
-  }
-
-  set interval(value: number) {
-    this._interval = value;
-  }
-
-  public updateInterval = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const newInterval = Number(req.params.interval);
-
-      clearInterval(this.timer);
-      this._interval = newInterval;
-
-      this.timer = setInterval(() => {
-        return this.worker.checkWebsites();
-      }, this._interval);
-
-      res.status(200).json({ data: newInterval, message: 'updated' });
-    } catch (error) {
-      next(error);
+  public static getInstance(worker: SoftwareVersionChecker): TimerController {
+    if (!this._instance) {
+      this._instance = new TimerController(worker)
     }
-  };
+    return this._instance
+  }
 
-  public run() {
-    this.timer = setInterval(() => {
-      return this.worker.checkWebsites();
-    }, this._interval);
+  public updateTriggerTime = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { hour, minute } = req.body
+
+      if (this.isValidTime(hour, minute)) {
+        this.triggerHour = hour
+        this.triggerMinute = minute
+
+        logger.info(`✅ Trigger time updated to: ${this.formatTime(hour, minute)}`)
+        res.status(200).json({ data: { hour, minute }, message: 'Trigger time updated' })
+        this.restartTimer()
+      } else {
+        res.status(400).json({ message: 'Invalid hour or minute provided' })
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  private isValidTime(hour: number, minute: number): boolean {
+    return Number.isInteger(hour) && Number.isInteger(minute) && hour >= 0 && hour < 24 && minute >= 0 && minute < 60
+  }
+
+  private formatTime(hour: number, minute: number): string {
+    return dayjs().hour(hour).minute(minute).format('HH:mm')
+  }
+
+  private calculateNextTrigger(): number {
+    const now = dayjs()
+    let nextTrigger = dayjs().hour(this.triggerHour).minute(this.triggerMinute).second(0).millisecond(0)
+
+    if (nextTrigger.isBefore(now) || nextTrigger.isSame(now)) {
+      nextTrigger = nextTrigger.add(1, 'day')
+    }
+
+    // Skip weekends (Sunday=0, Saturday=6)
+    while (nextTrigger.weekday() === 0 || nextTrigger.weekday() === 6) {
+      nextTrigger = nextTrigger.add(1, 'day')
+    }
+
+    return nextTrigger.diff(now)
+  }
+
+  private restartTimer(): void {
+    if (this.timer) {
+      clearTimeout(this.timer)
+    }
+
+    const delay = this.calculateNextTrigger()
+    const nextRun = dayjs().add(delay, 'millisecond')
+
+    // Map weekday number to name for better readability
+    const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const weekdayName = weekdayNames[nextRun.weekday()]
+
+    logger.info(`🕰️ Next software check scheduled at ${nextRun.format('YYYY-MM-DD HH:mm')} (${weekdayName})`)
+
+    this.timer = setTimeout(() => {
+      this.worker.checkAllSoftware()
+      this.restartTimer()
+    }, delay)
+  }
+
+  public run(): void {
+    this.restartTimer()
   }
 }
 
-export default TimerController;
+export default TimerController

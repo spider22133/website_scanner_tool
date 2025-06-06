@@ -1,0 +1,54 @@
+import { Sequelize, DataTypes, Model, Optional, BelongsToSetAssociationMixin } from 'sequelize'
+import { SoftwareVersion } from '@interfaces/software_version.interface'
+import { SoftwareModel } from '@models/software.model'
+
+export type SoftwareVersionCreationAttributes = Optional<SoftwareVersion, 'id'>
+
+export class SoftwareVersionModel extends Model<SoftwareVersion, SoftwareVersionCreationAttributes> implements SoftwareVersion {
+  public id: number
+  public software_id: number
+  public version: string
+  public hasJiraIssue: boolean
+
+  public setSoftware!: BelongsToSetAssociationMixin<SoftwareModel, number>
+
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
+}
+
+export default function (sequelize: Sequelize): typeof SoftwareVersionModel {
+  SoftwareVersionModel.init(
+    {
+      id: {
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+      software_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      version: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      hasJiraIssue: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+    },
+    {
+      tableName: 'software_versions',
+      sequelize,
+      indexes: [
+        {
+          unique: true,
+          fields: ['version', 'software_id'],
+        },
+      ],
+    },
+  )
+
+  return SoftwareVersionModel
+}

@@ -1,147 +1,114 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import IWebsite from '../interfaces/website.interface';
-import IState from '../interfaces/website-state.interface';
-import PaginationContainer from './elements/pagination-container.component';
-import WebsitesListItem from './websites/webseites-list-item.component';
-import StatesDataService from '../services/states.service';
-import StatesTable from './websites/states-table.component';
-import ErrorTable from './websites/error-table.component';
-import ErrorsDataService from '../services/errors.service';
-import IWebsiteError from '../interfaces/error.interface';
-import fetchData from '../helpers/fetch-data.helper';
-import Chart from './elements/chart.component';
-import AddWebsite from './websites/add-website.component';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react'
+import { fetchAllSoftware } from '../store/thunks/software.thunk'
+import { RootState, useAppDispatch } from '../store/store'
+import { useSelector } from 'react-redux'
+import { Box, Container, Paper, Grid } from '@mui/material'
+import SoftwareList from './software/list/software-list-container'
+import AppSearchBar from './elements/app-search-bar.component'
+import socketIOClient from 'socket.io-client'
+import TabsComponent from './software/tabs/tabs.component'
+import { SoftwareEntry } from '../../../types/common'
+import { CustomTabProps } from '../interfaces/common'
+import SoftwareWidgetsLayout from './software/tabs/software-widgets-layout.'
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
+import FlipOutlinedIcon from '@mui/icons-material/FlipOutlined'
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
+import { retrieveUsers } from '../store/slices/user.slice'
+import SoftwareUpdateStepper from './software/tabs/software-update-steps-layout'
 
-import { queryWebsites, retrieveWebsites } from '../slices/websites.slice';
-import { RootState, useAppDispatch } from '../store';
-import { useSelector } from 'react-redux';
-import { getStatesByWebsiteId, selectAllStates } from '../slices/states.slice';
-import { Stack, IconButton, InputAdornment, TextField, Typography, Box, Container, useTheme, Paper, Grid, Button } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import Visibility from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOff from '@mui/icons-material/VisibilityOffOutlined';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import WebsitesList from './websites/websites-list';
-import SearchFilterBar from './elements/search-filter-bar.component';
-
-const variants = {
-  open: { height: '100%', opacity: 1 },
-  closed: { height: '0px', opacity: 0 },
-};
+export interface PackageDetailsProps {
+  software?: SoftwareEntry
+}
 
 const DashboardComponent: React.FC = () => {
-  const itemsPerPage = 15;
-  const dispatch = useAppDispatch();
-  const { user } = useSelector((state: RootState) => state.auth);
-  const states = useSelector(selectAllStates);
+  const ENDPOINT = 'http://localhost:3001/'
+  const itemsPerPage = 20
+  const dispatch = useAppDispatch()
 
-  const [displayedStates, setDisplayedStates] = useState<IState[]>([]);
-  const [aggrStates, setAggrStates] = useState<{ avg: number; min: number; max: number }>();
-  const [errors, setWebsiteErrors] = useState<IWebsiteError[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const { software, softwareFilteredList } = useSelector((state: RootState) => state.software)
+
+  const [displayedSoftware, setDisplayedSoftware] = useState<SoftwareEntry[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
-    dispatch(retrieveWebsites());
-    dispatch(getStatesByWebsiteId('1'));
-    getAggrStates('1');
-  }, [dispatch]);
+    dispatch(fetchAllSoftware())
+    dispatch(retrieveUsers())
+
+    const socket = socketIOClient(ENDPOINT, {
+      reconnectionAttempts: 5,
+      reconnectionDelay: 5000,
+      autoConnect: true,
+    })
+    socket.on('updateSoftware', (data: any) => {
+      if (data === 'changed') dispatch(fetchAllSoftware())
+    })
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
-    onPageChange();
-  }, [states]);
+    const firstWebsiteId = software[0]?.winget_id
+  }, [dispatch, software])
 
-  const setActiveWebsite = (website: IWebsite, index: number) => {
-    setCurrentIndex(index);
-    setCurrentPage(1);
-    getErrorsByWebsiteId(website.id);
-    getAggrStates(website.id);
+  useEffect(() => {
+    onPageChange()
+  }, [software])
 
-    dispatch(getStatesByWebsiteId(website.id));
-  };
-
-  const getAggrStates = (id: string) => {
-    fetchData(StatesDataService.getAggregatedDataByWebsiteId(id), setAggrStates);
-  };
-
-  const getErrorsByWebsiteId = (id: string) => {
-    fetchData(ErrorsDataService.getErrorsByWebsiteId(id), setWebsiteErrors);
-  };
+  const setActiveWebsite = (website: SoftwareEntry, index: number) => {
+    setCurrentIndex(index)
+  }
 
   const onPageChange = (page = 1) => {
-    const startItem = (page - 1) * itemsPerPage;
-    const endItem = page * itemsPerPage;
-    setDisplayedStates(states.slice(startItem, endItem));
-  };
+    const startItem = (page - 1) * itemsPerPage
+    const endItem = page * itemsPerPage
+    setDisplayedSoftware(software.slice(startItem, endItem))
+  }
+
+  const tabs: CustomTabProps[] = [
+    {
+      tabType: 'MAIN',
+      tabIcon: <ArticleOutlinedIcon />,
+      tabLabel: 'Softwareprofil',
+      tabContent: () =>
+        softwareFilteredList[currentIndex] ? (
+          <SoftwareWidgetsLayout software={softwareFilteredList[currentIndex]} />
+        ) : (
+          <div>No software selected</div>
+        ),
+    },
+    {
+      tabType: 'CREATE_BDS',
+      tabIcon: <FlipOutlinedIcon />,
+      tabLabel: 'Software paketieren',
+      tabContent: () => <SoftwareUpdateStepper software={softwareFilteredList[currentIndex]} />,
+    },
+    {
+      tabType: 'STATUS_REPORTS',
+      tabIcon: <AssessmentOutlinedIcon />,
+      tabLabel: 'Status Berichte',
+      tabContent: () => <React.Fragment />,
+    },
+  ]
 
   return (
-    <Box sx={{ bgcolor: 'grey.A100' }} className="vh-100-c">
-      <Container maxWidth="xl" sx={{ mt: 2 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} lg={5}>
-            <Paper sx={{ p: 3, mb: 2 }}>
-              <SearchFilterBar />
-            </Paper>
-            <Paper sx={{ p: 3, mb: 2 }}>
-              <WebsitesList currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
-            </Paper>
-            <motion.div
-              animate={showAddForm ? 'open' : 'closed'}
-              variants={variants}
-              initial="closed"
-              transition={{ ease: 'easeOut', duration: '0.5' }}
-            >
-              <AddWebsite showAddForm={showAddForm} setShowAddForm={setShowAddForm} />
-            </motion.div>
-
-            {user.roles &&
-              (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_MODERATOR')) &&
-              (!showAddForm ? (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => setShowAddForm(showAddForm => !showAddForm)}
-                  startIcon={<AddCircleOutlineOutlinedIcon />}
-                >
-                  Add new
-                </Button>
-              ) : null)}
-          </Grid>
-          <Grid item xs={12} lg={7} className="scrollable">
-            {errors.length > 0 ? (
-              <div className="border border-danger border-2 rounded-2 p-4 mb-3">
-                <h2 className="">Error list</h2>
-                <ErrorTable errors={errors} />
-              </div>
-            ) : (
-              ''
-            )}
-            <Paper sx={{ p: 4, mb: 2 }}>{<Chart states={states} aggrStates={aggrStates} />}</Paper>
-            <Paper sx={{ p: 4, mb: 2 }}>
-              <h2>Check list</h2>
-              <StatesTable states={displayedStates} />
-              <div className="pagination">
-                {states.length > 0 ? (
-                  <PaginationContainer
-                    totalItems={states.length}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    pageChange={onPageChange}
-                    setCurrentPage={setCurrentPage}
-                  />
-                ) : (
-                  ''
-                )}
-              </div>
-            </Paper>
-          </Grid>
+    <Container maxWidth={false} className="dashboard-container" sx={{ pt: 2 }}>
+      <Grid container spacing={2}>
+        <Grid className="left-column" size={{ xs: 12, lg: 7, xl: 5 }}>
+          <Paper className="search-bar-container">
+            <AppSearchBar />
+          </Paper>
+          <Paper className="websites-list-container">
+            <SoftwareList software={displayedSoftware} currentIndex={currentIndex} setActiveWebsite={setActiveWebsite} />
+          </Paper>
         </Grid>
-      </Container>
-    </Box>
-  );
-};
+        <Grid size={{ xs: 12, lg: 5, xl: 7 }}>
+          <TabsComponent tabs={tabs} />
+        </Grid>
+      </Grid>
+    </Container>
+  )
+}
 
-export default DashboardComponent;
+export default DashboardComponent

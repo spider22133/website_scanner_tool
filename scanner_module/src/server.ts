@@ -1,33 +1,29 @@
-process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
+import 'dotenv/config'
+import App from '@/app'
+import AuthRoute from '@routes/auth.route'
+import IndexRoute from '@routes/index.route'
+import TimerRoute from '@routes/timer.route'
+import UsersRoute from '@routes/users.route'
+import WebsiteStepsRoute from '@routes/control_steps.route'
+import SoftwareRoute from '@routes/software.route'
+import validateEnv from '@utils/validateEnv'
+import { logger } from './utils/logger'
+import JiraRoute from './routes/jira.route'
 
-import 'dotenv/config';
-import App from '@/app';
-import WebsiteChecker from 'websiteChecker';
-import AuthRoute from '@routes/auth.route';
-import IndexRoute from '@routes/index.route';
-import TimerRoute from '@routes/timer.route';
-import UsersRoute from '@routes/users.route';
-import StatesRoute from '@routes/states.route';
-import WebsiteErrorsRoute from '@routes/error.route';
-import WebsitesRoute from '@routes/websites.route';
-import validateEnv from '@utils/validateEnv';
-import TimerController from '@controllers/timer.controller';
+// 1️⃣ Environment Setup
+process.env['NODE_CONFIG_DIR'] = `${__dirname}/config`
+validateEnv()
 
-validateEnv();
+// 2️⃣ Initial App setup with independent routes
+const app = new App([new JiraRoute(), new IndexRoute(), new UsersRoute(), new AuthRoute(), new WebsiteStepsRoute()])
 
-const websiteChecker = new WebsiteChecker();
-const timer = new TimerController(websiteChecker);
-timer.interval = 3600000;
-timer.run();
+// 3️⃣ Now that `app` is defined, inject dependent routes
+app.addRoutes([new SoftwareRoute(app.softwareVersionChecker), new TimerRoute(app.timerController)])
 
-const app = new App([
-  new IndexRoute(),
-  new UsersRoute(),
-  new AuthRoute(),
-  new WebsitesRoute(),
-  new TimerRoute(timer),
-  new StatesRoute(),
-  new WebsiteErrorsRoute(),
-]);
+// 4️⃣ Start App
+app.listen()
 
-app.listen();
+// 5️⃣ Initialize bot
+app.webexBot?.initialize().then(() => {
+  logger.info('📢 Bot is ready to send messages.')
+})

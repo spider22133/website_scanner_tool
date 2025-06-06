@@ -1,16 +1,18 @@
-import config from 'config';
-import { Sequelize } from 'sequelize';
-import { dbConfig } from '@interfaces/db.interface';
-import UserModel from '@/models/user.model';
-import RoleModel from '@models/role.model';
-import WebsiteModel from '@/models/website.model';
-import WebsiteStateModel from '@/models/website_state.model';
-import WebsiteErrorModel from '@/models/website_error.model';
-import { logger } from '@utils/logger';
+import config from 'config'
+import { Sequelize } from 'sequelize'
+import { dbConfig } from '@interfaces/db.interface'
 
-const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');
+import { UserModel, default as initUserModel } from '@models/user.model'
+import { RoleModel, default as initRoleModel } from '@models/role.model'
+import { SoftwareModel, default as initSoftwareModel } from '@models/software.model'
+import { SoftwareVersionModel, default as initSoftwareVersionModel } from '@models/software_version.model'
+import { SoftwareUser, default as initSoftwareUserModel } from '@/models/software_user.model'
+import { IssueModel, default as initIssueModel } from '@models/issue.model'
+
+const { host, user, password, database, pool, port }: dbConfig = config.get('dbConfig')
 const sequelize = new Sequelize(database, user, password, {
   host: host,
+  port: port,
   dialect: 'mysql',
   timezone: '+01:00',
   define: {
@@ -28,18 +30,82 @@ const sequelize = new Sequelize(database, user, password, {
     // logger.info(time + 'ms' + ' ' + query);
   },
   benchmark: true,
-});
+})
 
-sequelize.authenticate();
+sequelize.authenticate()
 
-const DB = {
-  WebsiteStates: WebsiteStateModel(sequelize),
-  WebsiteErrors: WebsiteErrorModel(sequelize),
-  Websites: WebsiteModel(sequelize),
-  Roles: RoleModel(sequelize),
-  Users: UserModel(sequelize),
+const DB: any = {
+  Roles: initRoleModel(sequelize),
+  SoftwareVersions: initSoftwareVersionModel(sequelize),
+  SoftwareUser: initSoftwareUserModel(sequelize),
+  Users: initUserModel(sequelize),
+  Software: initSoftwareModel(sequelize),
+  Issue: initIssueModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
-};
+}
 
-export default DB;
+function initAssociations() {
+  // Issue belongs to exactly one user
+  IssueModel.belongsTo(UserModel, {
+    foreignKey: 'user_id',
+    as: 'user',
+  })
+
+  // Issue belongs to exactly one software
+  IssueModel.belongsTo(SoftwareModel, {
+    foreignKey: 'software_id',
+    as: 'software',
+  })
+
+  SoftwareModel.hasMany(IssueModel, {
+    foreignKey: 'software_id',
+    as: 'issues',
+  })
+
+  // Software Version
+  SoftwareModel.hasMany(SoftwareVersionModel, {
+    sourceKey: 'id',
+    foreignKey: 'software_id',
+    as: 'versions',
+    onDelete: 'CASCADE',
+  })
+
+  SoftwareVersionModel.belongsTo(SoftwareModel, {
+    foreignKey: 'software_id',
+    as: 'software',
+  })
+
+  // Sofrware users settings
+  SoftwareModel.belongsToMany(UserModel, {
+    through: SoftwareUser,
+    foreignKey: 'softwareId',
+    otherKey: 'userId',
+    as: 'users',
+  })
+
+  UserModel.belongsToMany(SoftwareModel, {
+    through: SoftwareUser,
+    foreignKey: 'userId',
+    otherKey: 'softwareId',
+  })
+
+  // User roles
+  UserModel.belongsToMany(RoleModel, {
+    as: 'roles',
+    through: 'user_roles',
+    foreignKey: 'user_id',
+    otherKey: 'role_id',
+  })
+
+  RoleModel.belongsToMany(UserModel, {
+    as: 'users',
+    through: 'user_roles',
+    foreignKey: 'role_id',
+    otherKey: 'user_id',
+  })
+}
+
+initAssociations()
+
+export default DB

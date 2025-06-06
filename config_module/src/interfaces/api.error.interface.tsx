@@ -1,3 +1,3 @@
 export default interface httpErrors {
-  message: string;
+  message: string
 }
