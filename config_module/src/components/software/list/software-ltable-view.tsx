@@ -15,7 +15,7 @@ import {
 import { useSelector } from 'react-redux'
 import { SoftwareEntry } from '../../../../../types/common'
 import { RootState, useAppDispatch } from '../../../store/store'
-import { checkSoftware, deleteSoftware, updateSoftware } from '../../../store/thunks/software.thunk'
+import { checkSoftware, createSoftware, deleteSoftware, updateSoftware } from '../../../store/thunks/software.thunk'
 import TimeAgo from 'javascript-time-ago'
 import { isAdminUser } from '../../utilities/isAdminUser'
 import { getJiraIssues } from '../../../store/thunks/issues.thunk'
@@ -81,18 +81,54 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
     }
   }
 
+  const handleCellDoubleClick: GridEventListener<'cellDoubleClick'> = (params, event) => {
+    if (params.row.winget_id && ['name', 'publisher', 'version'].includes(params.field)) {
+      event.stopPropagation()
+    }
+  }
+
+  const handleCellKeyDown: GridEventListener<'cellKeyDown'> = (params, event) => {
+    if (params.row.winget_id && ['name', 'publisher', 'version'].includes(params.field)) {
+      event.stopPropagation()
+    }
+  }
+
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } })
   }
 
-  const handleSaveClick = (id: GridRowId) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } })
+  const handleSaveClick = (id: GridRowId) => async () => {
+    setRowModesModel(prevModel => ({
+      ...prevModel,
+      [id]: { mode: GridRowModes.View },
+    }))
+
+    // get the updated row values from the DataGrid APIRef
+    const updatedRow = gridRef.current?.getRowWithUpdatedValues?.(id, '') as SoftwareRow | undefined
+
+    if (!updatedRow) {
+      console.warn('No updated row data found.')
+      return
+    }
+
+    const { isNew, ...rest } = updatedRow
+    const softwareData: SoftwareEntry = {
+      ...rest,
+      details: JSON.stringify(updatedRow.details),
+    }
+
+    if (updatedRow.isNew) {
+      await dispatch(createSoftware(softwareData as SoftwareEntry))
+    } else {
+      const { versions, users, updatedAt, createdAt, ...rest } = softwareData
+      await dispatch(updateSoftware(rest as SoftwareEntry))
+    }
   }
 
   const handleDeleteClick = (id: GridRowId) => () => {
     if (window.confirm('Sind Sie sicher, dass Sie dieses Element löschen möchten?')) {
       dispatch(deleteSoftware({ id: id as string }))
-      setRows(rows.filter(row => row.id !== id))
+      setRows(rows.filter(row => row.id != id))
     }
   }
 
@@ -146,9 +182,11 @@ const SoftwareTableView: React.FC<SoftwareTableProps> = ({ timeAgo, softwareFilt
           const index = softwareFilteredList.findIndex(s => s.id === params.row.id)
           setActiveWebsite(params.row, index)
         }}
+        processRowUpdate={processRowUpdate}
+        onCellDoubleClick={handleCellDoubleClick}
+        onCellKeyDown={handleCellKeyDown}
         onRowModesModelChange={handleRowModesModelChange}
         onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
         sx={{ border: 'none' }}
         slots={{ toolbar: SoftwareEditToolbar }}
         slotProps={{

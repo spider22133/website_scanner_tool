@@ -46,7 +46,7 @@ class SoftwareRoute implements Route {
     this.router.post(
       `${this.path}/create`,
       [validationMiddleware(CreateSoftwareDto, 'body', true), authMiddleware],
-      this.softwareController.createWinGetSoftware,
+      this.softwareController.createSoftware,
     )
     this.router.put(`${this.path}/:id`, validationMiddleware(UpdateSoftwareDto, 'body', true), this.softwareController.updateSoftware)
     this.router.delete(`${this.path}/:id`, authMiddleware, this.softwareController.deleteSoftware)

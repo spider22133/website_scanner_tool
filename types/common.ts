@@ -52,7 +52,7 @@ export interface SoftwareEntry {
   bara_version?: string;
   icon?: string;
   source?: string;
-  details?: WingetPackageDetails;
+  details?: WingetPackageDetails | string;
   is_central_managed?: boolean;
   is_hidden?: boolean;
   is_current?: boolean;

@@ -115,7 +115,7 @@ const softwareSlice = createSlice({
       // Delete website
 
       .addCase(deleteSoftware.fulfilled, (state, { payload }) => {
-        state.software = state.software.filter(item => item.winget_id !== payload.id)
+        state.software = state.software.filter(item => item.id !== payload.id)
       })
 
       // Fetch representatives

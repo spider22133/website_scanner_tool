@@ -79,8 +79,10 @@ class SoftwareService {
   public async createSoftware(softwareData: CreateSoftwareDto): Promise<SoftwareModel> {
     if (isEmpty(softwareData)) throw new HttpException(400, 'Software data is empty')
 
-    const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: softwareData.winget_id } })
-    if (findSoftware) throw new HttpException(409, `Winget ID ${softwareData.winget_id} already exists`)
+    if (softwareData.winget_id) {
+      const findSoftware: SoftwareModel = await this.software.findOne({ where: { winget_id: softwareData.winget_id } })
+      if (findSoftware) throw new HttpException(409, `Winget ID ${softwareData.winget_id} already exists`)
+    }
 
     const software = await this.software.create(softwareData)
     await software.createVersion({

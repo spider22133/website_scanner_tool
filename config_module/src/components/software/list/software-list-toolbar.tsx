@@ -23,7 +23,6 @@ const SoftwareEditToolbar = (props: GridSlotProps['toolbar']) => {
     const maxId = Math.max(...rows.map(item => Number(item.id)), 0)
     const newId = (maxId + 1).toString()
     setRows(oldRows => [
-      ...oldRows,
       {
         id: newId,
         winget_id: undefined,
@@ -33,6 +32,7 @@ const SoftwareEditToolbar = (props: GridSlotProps['toolbar']) => {
         source: 'custom',
         isNew: true,
       } as SoftwareEntry,
+      ...oldRows,
     ])
 
     setRowModesModel(oldModel => ({

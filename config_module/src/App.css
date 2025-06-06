@@ -190,3 +190,7 @@ p {
   font-size: 0.8rem !important;
   line-height: 1em !important;
 }
+
+.MuiDataGrid-cell .MuiInputBase-input {
+  padding: 0 10px;
+}

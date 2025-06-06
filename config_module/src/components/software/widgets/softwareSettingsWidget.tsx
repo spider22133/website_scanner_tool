@@ -223,7 +223,7 @@ const SoftwareSettingsWidget: React.FC<SoftwareSettingsWidgetProps> = ({ softwar
                   />
                 </Button>
                 {software.icon && !iconFiles?.[0] && (
-                  <Avatar src={`http://localhost:3001${software.icon}?v=${Date.now()}`} alt="Software Icon" sx={{ width: 32, height: 32 }} />
+                  <Avatar src={`http://localhost:3001${software.icon}?v=${software.updatedAt}`} alt="Software Icon" sx={{ width: 32, height: 32 }} />
                 )}
                 {iconFiles?.[0] && (
                   <Box>

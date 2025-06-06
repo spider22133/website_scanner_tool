@@ -12,6 +12,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined'
 import DeviceHubOutlinedIcon from '@mui/icons-material/DeviceHubOutlined'
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import CancelIcon from '@mui/icons-material/Close'
@@ -86,12 +87,17 @@ const SoftwareColumns = ({
     renderCell: (params: GridRenderCellParams<SoftwareEntry>) => <Box>{params.value}</Box>,
   },
   {
-    field: 'publisher',
+    field: 'publisher_flat',
     headerName: 'Publisher',
     flex: 1,
     sortable: false,
     editable: true,
-    renderCell: (params: GridRenderCellParams<SoftwareEntry>) => params.row.details?.publisher || '',
+    valueGetter: (value, row) => row.details?.publisher || '',
+    valueSetter: (value, row) => {
+      const newRow = { ...row }
+      newRow.details = { ...newRow.details, publisher: value }
+      return newRow
+    },
   },
   {
     field: 'version',
@@ -101,7 +107,7 @@ const SoftwareColumns = ({
     editable: true,
     renderCell: (params: GridRenderCellParams<SoftwareEntry>) => (
       <Stack direction="row" alignItems="center" spacing={1}>
-        <CloudDownloadOutlinedIcon fontSize="small" />
+        {params.row.source === 'custom' ? <DashboardCustomizeIcon fontSize="small" /> : <CloudDownloadOutlinedIcon fontSize="small" />}
         <span>{params.row.version || ''}</span>
       </Stack>
     ),

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import SoftwareService from '@services/software.service'
 import SoftwareVersionChecker from '@/classes/SoftwareVersionChecker'
 import SoftwareVersionService from '@services/software_versions.service'
-import { SoftwareEntry } from '../../../types/common'
+import { SoftwareEntry, WingetPackageDetails } from '../../../types/common'
 import { CreateSoftwareDto, UpdateSoftwareDto } from '@dtos/software.dto'
 import { Software } from '@interfaces/software.interface'
 import { WingetGitHubApi } from '@/classes/api/WingetApi'
@@ -71,22 +71,36 @@ class SoftwareController {
     }
   }
 
-  public createSoftware = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const websiteData = req.body
-
-      const createSoftwareData = await this.softwareService.createSoftware({ ...websiteData, is_current: true })
-      res.status(201).json({ data: createSoftwareData, message: 'created' })
-    } catch (error) {
-      next(error)
-    }
-  }
-
   public deleteSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const deleteSoftwareData: Software = await this.softwareService.deleteSoftware(req.params.id)
+      // Find software first to get icon path
+      const softwareToDelete = await this.softwareService.findSoftwareById(req.params.id)
 
-      res.status(200).json({ data: deleteSoftwareData, message: 'deleted' })
+      if (!softwareToDelete) {
+        res.status(404).json({ message: 'Software not found' })
+      }
+
+      // If an icon path exists, delete the icon file
+      if (softwareToDelete.icon) {
+        const iconFilePath = path.join(process.cwd(), 'public', softwareToDelete.icon)
+        // process.cwd() ensures absolute path, adjust if your base dir differs
+
+        if (fs.existsSync(iconFilePath)) {
+          fs.unlink(iconFilePath, err => {
+            if (err) {
+              console.error(`Failed to delete icon file at ${iconFilePath}:`, err)
+              // You can decide if you want to throw here or just log
+            } else {
+              console.log(`Deleted icon file at ${iconFilePath}`)
+            }
+          })
+        }
+      }
+
+      // Now delete the software record from DB
+      const deletedSoftware = await this.softwareService.deleteSoftware(req.params.id)
+
+      res.status(200).json({ data: deletedSoftware, message: 'Deleted software and icon' })
     } catch (error) {
       next(error)
     }
@@ -155,14 +169,18 @@ class SoftwareController {
   // WinGet
   //
 
-  public createWinGetSoftware = async (req: Request, res: Response, next: NextFunction) => {
+  public createSoftware = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const softwareData: CreateSoftwareDto = req.body
-      const packageDetails = await this.softwareVersionChecker.wingetApi.showSoftware(softwareData.winget_id)
+      let packageDetails = {}
+
+      if (softwareData.winget_id) {
+        packageDetails = await this.softwareVersionChecker.wingetApi.showSoftware(softwareData.winget_id)
+      }
 
       let createSoftwareData = await this.softwareService.createSoftware({
         ...softwareData,
-        details: JSON.stringify(packageDetails),
+        details: packageDetails ? JSON.stringify(packageDetails) : softwareData.details,
       })
 
       const { currentBaramundiAppId } = await this.softwareVersionChecker.findCurrentBaramundiApp(createSoftwareData)
